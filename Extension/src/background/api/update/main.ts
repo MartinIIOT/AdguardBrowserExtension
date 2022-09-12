@@ -71,7 +71,7 @@ export class UpdateApi {
             // On every update clear persisted caches
             UpdateApi.clearCache();
         } catch (e) {
-            log.error('Error while app updating', e);
+            log.error(`Error while app updating: ${e.message}`);
             await SettingsApi.reset();
         }
     }
