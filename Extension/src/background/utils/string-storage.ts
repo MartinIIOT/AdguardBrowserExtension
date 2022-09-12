@@ -3,16 +3,16 @@ import { StorageInterface } from '../../common/storage';
 /**
  * Class for managing data that is persisted as string
  */
-export class StringStorage<K, V> {
+export class StringStorage<K, V, Mode extends 'sync' | 'async'> {
     protected key: K;
 
-    protected storage: StorageInterface<K, string>;
+    protected storage: StorageInterface<K, unknown, Mode>;
 
     protected data: V;
 
     constructor(
         key: K,
-        storage: StorageInterface<K, string>,
+        storage: StorageInterface<K, unknown, Mode>,
     ) {
         this.key = key;
         this.storage = storage;

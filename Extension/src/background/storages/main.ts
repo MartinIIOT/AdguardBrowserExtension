@@ -1,11 +1,10 @@
 import browser from 'webextension-polyfill';
-
 import { StorageInterface } from '../../common/storage';
 
 /**
  * browser.storage.local wrapper with dev-friendly interface
  */
-export class Storage implements StorageInterface {
+export class Storage implements StorageInterface<string, unknown, 'async'> {
     private storage = browser.storage.local;
 
     public async set(key: string, value: unknown): Promise<void> {

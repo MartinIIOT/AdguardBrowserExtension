@@ -11,7 +11,7 @@ import {
 
 import { MessageType } from '../../common/messages';
 import { messageHandler } from '../message-handler';
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 import { AntiBannerFiltersId } from '../../common/constants';
 import { UserAgent } from '../../common/user-agent';
 import { Engine } from '../engine';

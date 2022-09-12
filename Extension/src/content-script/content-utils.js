@@ -19,7 +19,7 @@
 import { contentPage } from './content-script';
 import { MessageType } from '../common/constants';
 import { messenger } from '../pages/services/messenger';
-import { SettingOption } from '../common/settings';
+import { SettingOption } from '../background/schema';
 
 export const contentUtils = (function () {
     const MAX_Z_INDEX = '2147483647';

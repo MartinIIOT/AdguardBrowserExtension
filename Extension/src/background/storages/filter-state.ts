@@ -1,8 +1,8 @@
 import { AntiBannerFiltersId } from '../../common/constants';
-import { SettingOption } from '../../common/settings';
 import { StringStorage } from '../utils/string-storage';
 import { Metadata } from './metadata';
 import { settingsStorage } from './settings';
+import { SettingOption } from '../schema';
 
 export type FilterState = {
     enabled: boolean;
@@ -12,7 +12,11 @@ export type FilterState = {
 
 export type FilterStateStorageData = Record<number, FilterState>;
 
-export class FilterStateStorage extends StringStorage<SettingOption.FILTERS_STATE_PROP, FilterStateStorageData> {
+export class FilterStateStorage extends StringStorage<
+    SettingOption.FILTERS_STATE,
+    FilterStateStorageData,
+    'sync'
+> {
     /**
      * This filters have own complex state management
      */
@@ -99,4 +103,4 @@ export class FilterStateStorage extends StringStorage<SettingOption.FILTERS_STAT
     }
 }
 
-export const filterStateStorage = new FilterStateStorage(SettingOption.FILTERS_STATE_PROP, settingsStorage);
+export const filterStateStorage = new FilterStateStorage(SettingOption.FILTERS_STATE, settingsStorage);

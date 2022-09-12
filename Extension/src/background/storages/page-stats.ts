@@ -6,10 +6,10 @@ import {
     differenceInDays,
     differenceInMonths,
 } from 'date-fns';
+import { PAGE_STATISTIC_KEY } from '../../common/constants';
 
-import { SettingOption } from '../../common/settings';
 import { StringStorage } from '../utils/string-storage';
-import { settingsStorage } from './settings';
+import { storage } from './main';
 
 export type PageStatsDataItem = Record<string, number>;
 
@@ -25,10 +25,7 @@ export type PageStats = {
     data?: PageStatsData,
 };
 
-export class PageStatsStorage extends StringStorage<
-    SettingOption.PAGE_STATISTIC,
-    PageStats
-> {
+export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, PageStats, 'async'> {
     public static TOTAL_GROUP_ID = 'total';
 
     public static MAX_HOURS_HISTORY = 24;
@@ -48,7 +45,7 @@ export class PageStatsStorage extends StringStorage<
 
     public setStatisticsData(data: PageStatsData) {
         this.data.data = data;
-        this.save();
+        return this.save();
     }
 
     /**
@@ -198,6 +195,6 @@ export class PageStatsStorage extends StringStorage<
 }
 
 export const pageStatsStorage = new PageStatsStorage(
-    SettingOption.PAGE_STATISTIC,
-    settingsStorage,
+    PAGE_STATISTIC_KEY,
+    storage,
 );

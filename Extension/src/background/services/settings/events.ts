@@ -1,4 +1,4 @@
-import { SettingOption, Settings } from '../../../common/settings';
+import { SettingOption, Settings } from '../../schema';
 
 export type SettingsListener<T extends keyof Settings> = (value: Settings[T]) => void | Promise<void>;
 

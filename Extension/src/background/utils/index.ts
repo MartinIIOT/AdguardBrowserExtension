@@ -4,7 +4,7 @@ export * from './filters';
 export * from './i18n';
 export * from './lazy';
 export * from './lru-cache';
-export * from './storage';
 export * from './string-storage';
 export * from './url';
 export * from './version';
+export * from './run-info';

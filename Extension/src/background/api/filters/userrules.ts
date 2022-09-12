@@ -2,7 +2,7 @@ import { RuleConverter } from '@adguard/tsurlfilter';
 
 import { log } from '../../../common/log';
 import { AntiBannerFiltersId } from '../../../common/constants';
-import { SettingOption } from '../../../common/settings';
+import { SettingOption } from '../../schema';
 import { listeners } from '../../notifier';
 import {
     FiltersStorage,

@@ -1,9 +1,7 @@
 import { log } from '../../common/log';
 import {
-    SettingOption,
     AppearanceTheme,
     defaultSettings,
-    Settings,
 } from '../../common/settings';
 
 import {
@@ -22,12 +20,16 @@ import {
     StealthOptions,
     UserFilterConfig,
     UserFilterOptions,
-} from '../configuration';
+    SettingOption,
+    Settings,
+    settingsValidator,
+} from '../schema';
 
 import {
     filterStateStorage,
     groupStateStorage,
     settingsStorage,
+    storage,
 } from '../storages';
 
 import { UserRulesApi } from './filters/userrules';
@@ -38,9 +40,20 @@ import {
     CustomFilterDTO,
     FiltersApi,
 } from './filters';
-import { AntiBannerFiltersId } from '../../common/constants';
+import { ADGUARD_SETTINGS_KEY, AntiBannerFiltersId } from '../../common/constants';
 
 export class SettingsApi {
+    public static async init() {
+        try {
+            const data = await storage.get(ADGUARD_SETTINGS_KEY);
+            const settings = settingsValidator.parse(data);
+            settingsStorage.setCache(settings);
+        } catch (e) {
+            log.error('Error while settings initialization', e);
+            await SettingsApi.reset();
+        }
+    }
+
     public static set<T extends SettingOption>(key: T, value: Settings[T]): void {
         settingsStorage.set(key, value);
     }
@@ -49,7 +62,7 @@ export class SettingsApi {
         return {
             names: SettingOption,
             defaultValues: defaultSettings,
-            values: settingsStorage.getSettings(),
+            values: settingsStorage.getData(),
         };
     }
 
@@ -79,17 +92,11 @@ export class SettingsApi {
     }
 
     public static async reset() {
-        const version = settingsStorage.get(SettingOption.APP_VERSION);
-
-        const clientId = settingsStorage.get(SettingOption.CLIENT_ID);
-
         await UserRulesApi.setUserRules([]);
 
         // Set settings store to defaults
-        settingsStorage.setSettings({
+        settingsStorage.setData({
             ...defaultSettings,
-            [SettingOption.APP_VERSION]: version,
-            [SettingOption.CLIENT_ID]: clientId,
         });
 
         // Re-init filters

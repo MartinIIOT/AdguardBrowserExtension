@@ -3,7 +3,7 @@ import browser from 'webextension-polyfill';
 import { BrowserUtils } from '../../utils/browser-utils';
 import { log } from '../../../common/log';
 import { UserAgent } from '../../../common/user-agent';
-import { SettingOption } from '../../../common/settings';
+import { SettingOption } from '../../schema';
 import { AntiBannerFiltersId, ANTIBANNER_GROUPS_ID } from '../../../common/constants';
 import {
     CommonFilterMetadata,

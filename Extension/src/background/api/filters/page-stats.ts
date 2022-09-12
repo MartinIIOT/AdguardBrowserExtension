@@ -25,10 +25,11 @@ export class PageStatsApi {
     /**
      * Init page stats storage
      */
-    public static init() {
+    public static async init() {
         try {
-            const storageData = pageStatsStorage.read();
-            if (storageData) {
+            const storageData = await pageStatsStorage.read();
+            if (typeof storageData === 'string') {
+                // TODO: schema validation
                 pageStatsStorage.setCache(JSON.parse(storageData));
             } else {
                 pageStatsStorage.setData({});

@@ -14,19 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-import browser from 'webextension-polyfill';
-
-import { SettingOption } from '../../common/settings';
-import { settingsStorage } from '../storages';
+import { Prefs } from '../prefs';
+import { appStorage } from '../storages';
 
 import { Version } from './version';
 
 export class BrowserUtils {
     static getExtensionParams(): string[] {
-        const clientId = encodeURIComponent(settingsStorage.get(SettingOption.CLIENT_ID));
-        const locale = encodeURIComponent(browser.i18n.getUILanguage());
-        const version = encodeURIComponent(browser.runtime.getManifest().version);
-        const id = encodeURIComponent(browser.runtime.id);
+        const persistedClientId = appStorage.getClientId();
+
+        if (typeof persistedClientId !== 'string') {
+            throw new Error('client id is not found');
+        }
+
+        const clientId = encodeURIComponent(persistedClientId);
+        const locale = encodeURIComponent(Prefs.language);
+        const version = encodeURIComponent(Prefs.version);
+        const id = encodeURIComponent(Prefs.id);
+
         const params: string[] = [];
         params.push(`v=${version}`);
         params.push(`cid=${clientId}`);

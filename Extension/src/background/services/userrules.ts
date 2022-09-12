@@ -6,7 +6,7 @@ import {
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
 import { SettingsService } from './settings';
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 import { UserRulesApi } from '../api';
 
 export class UserRulesService {

@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 import { StringStorage } from '../utils/string-storage';
 import { i18n } from '../utils/i18n';
 import { settingsStorage } from './settings';
@@ -47,7 +47,7 @@ export type Metadata = {
     tags: TagMetadata[]
 };
 
-export class MetadataStorage extends StringStorage<SettingOption.METADATA, Metadata> {
+export class MetadataStorage extends StringStorage<SettingOption.METADATA, Metadata, 'sync'> {
     public getFilters() {
         return this.data.filters;
     }

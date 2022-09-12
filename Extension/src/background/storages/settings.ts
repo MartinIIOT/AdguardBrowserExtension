@@ -1,11 +1,8 @@
 import { debounce } from 'lodash';
-import {
-    Settings,
-    SettingOption,
-    ADGUARD_SETTINGS_KEY,
-} from '../../common/settings';
+import { ADGUARD_SETTINGS_KEY } from '../../common/constants';
 import { StorageInterface } from '../../common/storage';
 import { storage } from './main';
+import { Settings, SettingOption } from '../schema';
 
 /**
  * Storage for app settings
@@ -16,11 +13,11 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
     /**
     * save settings in browser.storage.local
     */
-   private save = debounce(() => {
-       storage.set(ADGUARD_SETTINGS_KEY, this.settings);
-   }, SettingsStorage.saveTimeoutMs);
+    private save = debounce(() => {
+        storage.set(ADGUARD_SETTINGS_KEY, this.settings);
+    }, SettingsStorage.saveTimeoutMs);
 
-    settings: Settings;
+    private settings: Settings;
 
     /**
      * Set setting to storage
@@ -48,18 +45,25 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
     }
 
     /**
-     * Set settings to storage
+     * Get all current settings
      */
-    public setSettings(settings: Settings) {
-        this.settings = settings;
-        this.save();
+    public getData(): Settings {
+        return this.settings;
     }
 
     /**
-     * Get all settings from storage
+     * Set settings to memory cache
      */
-    public getSettings(): Partial<Settings> {
-        return this.settings;
+    public setCache(settings: Settings) {
+        this.settings = settings;
+    }
+
+    /**
+     * Set settings to storage
+     */
+    public setData(settings: Settings) {
+        this.setCache(settings);
+        this.save();
     }
 }
 

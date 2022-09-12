@@ -3,14 +3,17 @@ import SHA256 from 'crypto-js/sha256';
 
 import { log } from '../../common/log';
 import { strings } from '../../common/strings';
+import { SB_SUSPENDED_CACHE_KEY } from '../../common/constants';
+
 import {
+    storage,
     settingsStorage,
     sbCache,
     sbRequestCache,
 } from '../storages';
 import { ExtensionXMLHttpRequest, network } from './network';
 import { UrlUtils } from '../utils/url';
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 
 export class SafebrowsingApi {
     /**
@@ -101,7 +104,7 @@ export class SafebrowsingApi {
 
         // check safebrowsing is active
         const now = Date.now();
-        const suspendedFrom = settingsStorage.get(SettingOption.SB_SUSPENDED_CACHE) - 0;
+        const suspendedFrom = Number(await storage.get(SB_SUSPENDED_CACHE_KEY));
         if (suspendedFrom && (now - suspendedFrom) < SafebrowsingApi.SUSPEND_TTL_MS) {
             return;
         }
@@ -129,14 +132,14 @@ export class SafebrowsingApi {
             response = await network.lookupSafebrowsing(shortHashes);
         } catch (e) {
             log.error('Error response from safebrowsing lookup server for {0}', host);
-            SafebrowsingApi.suspendSafebrowsing();
+            await SafebrowsingApi.suspendSafebrowsing();
             return;
         }
 
         if (response && response.status >= 500) {
             // Error on server side, suspend request
             log.error('Error response status {0} received from safebrowsing lookup server.', response.status);
-            SafebrowsingApi.suspendSafebrowsing();
+            await SafebrowsingApi.suspendSafebrowsing();
             return;
         }
 
@@ -145,7 +148,7 @@ export class SafebrowsingApi {
             return;
         }
 
-        SafebrowsingApi.resumeSafebrowsing();
+        await SafebrowsingApi.resumeSafebrowsing();
 
         shortHashes.forEach((x) => {
             sbRequestCache.set(x, true);
@@ -239,15 +242,15 @@ export class SafebrowsingApi {
     /**
      * Resumes previously suspended work of SafebrowsingFilter
      */
-    private static resumeSafebrowsing() {
-        settingsStorage.remove(SettingOption.SB_SUSPENDED_CACHE);
+    private static async resumeSafebrowsing() {
+        await storage.remove(SB_SUSPENDED_CACHE_KEY);
     }
 
     /**
      * Suspend work of SafebrowsingFilter (in case of backend error)
      */
-    private static suspendSafebrowsing() {
-        settingsStorage.set(SettingOption.SB_SUSPENDED_CACHE, Date.now());
+    private static async suspendSafebrowsing() {
+        await storage.set(SB_SUSPENDED_CACHE_KEY, Date.now());
     }
 
     /**

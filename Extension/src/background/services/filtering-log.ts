@@ -9,8 +9,7 @@ import {
     PageReloadEvent,
     RemoveParamEvent,
     RemoveHeaderEvent,
-    // TODO: rename
-    ApplyCosmenticRuleEvent,
+    ApplyCosmeticRuleEvent,
     ApplyBasicRuleEvent,
     ApplyCspRuleEvent,
     CookieEvent,
@@ -108,7 +107,7 @@ export class FilteringLogService {
         });
     }
 
-    static onApplyCosmeticRule({ data }: ApplyCosmenticRuleEvent) {
+    static onApplyCosmeticRule({ data }: ApplyCosmeticRuleEvent) {
         const {
             tabId,
             rule,

@@ -1,6 +1,6 @@
-import { SettingOption } from '../../common/settings';
 import { StringStorage } from '../utils/string-storage';
 import { settingsStorage } from './settings';
+import { SettingOption } from '../schema';
 
 export type CustomFilterMetadata = {
     filterId: number,
@@ -20,7 +20,11 @@ export type CustomFilterMetadata = {
 /**
  * Storage for custom filters metadata
  */
-export class CustomFilterMetadataStorage extends StringStorage<SettingOption.CUSTOM_FILTERS, CustomFilterMetadata[]> {
+export class CustomFilterMetadataStorage extends StringStorage<
+    SettingOption.CUSTOM_FILTERS,
+    CustomFilterMetadata[],
+    'sync'
+> {
     /**
      * Get custom filter metadata by filter id
      */

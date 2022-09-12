@@ -9,7 +9,7 @@ import {
 import { Engine } from '../../engine';
 import { UrlUtils } from '../../utils/url';
 import { settingsStorage } from '../../storages';
-import { SettingOption } from '../../../common/settings';
+import { SettingOption } from '../../schema';
 import { BrowserUtils } from '../../utils/browser-utils';
 import { AntiBannerFiltersId } from '../../../common/constants';
 

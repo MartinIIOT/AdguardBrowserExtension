@@ -1,10 +1,10 @@
 /**
- * Common storage interface
+ * Common storage interfaces
  */
-export interface StorageInterface<K = string, V = unknown> {
-    set(key: K, value: V): Awaited<void>
+export interface StorageInterface<K = string, V = unknown, Mode extends 'sync' | 'async' = 'sync'> {
+    set(key: K, value: V): Mode extends 'async' ? Promise<void> : void
 
-    get(key: K): Awaited<V | undefined>
+    get(key: K): Mode extends 'async' ? Promise<V> : V
 
-    remove(key: K): Awaited<void>
+    remove(key: K): Mode extends 'async' ? Promise<void> : void
 }

@@ -4,3 +4,5 @@ export * from './filtering-log';
 export * from './settings';
 export * from './ui';
 export * from './extension';
+export * from './install';
+export * from './update';

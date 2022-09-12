@@ -46,7 +46,7 @@ export class CustomFilterApi {
     public static init() {
         try {
             const storageData = customFilterMetadataStorage.read();
-            if (storageData) {
+            if (typeof storageData === 'string') {
                 customFilterMetadataStorage.setCache(JSON.parse(storageData));
             } else {
                 customFilterMetadataStorage.setData([]);

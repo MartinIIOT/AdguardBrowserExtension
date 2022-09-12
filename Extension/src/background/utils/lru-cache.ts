@@ -22,14 +22,14 @@ import { StorageInterface } from '../../common/storage';
  * LRU map stored in local storage,
  * which automatically clears less recently used entries
  */
-export class LruCache<StorageKey, Key, Value> extends LRUMap<Key, Value> {
+export class LruCache<StorageKey, Key, Value, Mode extends 'sync' | 'async'> extends LRUMap<Key, Value> {
     protected key: StorageKey;
 
-    protected storage: StorageInterface<StorageKey, string>;
+    protected storage: StorageInterface<StorageKey, unknown, Mode>;
 
     constructor(
         key: StorageKey,
-        storage: StorageInterface<StorageKey, string>,
+        storage: StorageInterface<StorageKey, unknown, Mode>,
         limit = 1000,
     ) {
         super(limit);
@@ -41,7 +41,7 @@ export class LruCache<StorageKey, Key, Value> extends LRUMap<Key, Value> {
     public init() {
         const storageData = this.storage.get(this.key);
 
-        if (!storageData) {
+        if (typeof storageData !== 'string') {
             return;
         }
 
@@ -61,7 +61,7 @@ export class LruCache<StorageKey, Key, Value> extends LRUMap<Key, Value> {
         return super.get(key);
     }
 
-    public set(key: Key, value: Value): LruCache<StorageKey, Key, Value> {
+    public set(key: Key, value: Value): LruCache<StorageKey, Key, Value, Mode> {
         super.set(key, value);
 
         if (this.size % 20 === 0) {

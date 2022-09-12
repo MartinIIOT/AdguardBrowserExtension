@@ -1,4 +1,4 @@
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 import { StringStorage } from '../utils/string-storage';
 import { settingsStorage } from './settings';
 
@@ -33,7 +33,7 @@ export type I18nMetadata = {
     tags: TagsI18n,
 };
 
-export const i18nMetadataStorage = new StringStorage<SettingOption.I18N_METADATA, I18nMetadata>(
+export const i18nMetadataStorage = new StringStorage<SettingOption.I18N_METADATA, I18nMetadata, 'sync'>(
     SettingOption.I18N_METADATA,
     settingsStorage,
 );

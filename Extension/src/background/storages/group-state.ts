@@ -1,4 +1,4 @@
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 import { StringStorage } from '../utils/string-storage';
 import { Metadata } from './metadata';
 import { settingsStorage } from './settings';
@@ -11,8 +11,9 @@ export type GroupState = {
 export type GroupStateStorageData = Record<number, GroupState>;
 
 export class GroupStateStorage extends StringStorage<
-    SettingOption.GROUPS_STATE_PROP,
-    GroupStateStorageData
+    SettingOption.GROUPS_STATE,
+    GroupStateStorageData,
+    'sync'
 > {
     private static defaultState = {
         enabled: false,
@@ -84,4 +85,4 @@ export class GroupStateStorage extends StringStorage<
     }
 }
 
-export const groupStateStorage = new GroupStateStorage(SettingOption.GROUPS_STATE_PROP, settingsStorage);
+export const groupStateStorage = new GroupStateStorage(SettingOption.GROUPS_STATE, settingsStorage);

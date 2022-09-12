@@ -1,4 +1,4 @@
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 import { StringStorage } from '../utils/string-storage';
 import { Metadata } from './metadata';
 import { settingsStorage } from './settings';
@@ -13,8 +13,9 @@ export type FilterVersionData = {
 export type FilterVersionStorageData = Record<number, FilterVersionData>;
 
 export class FilterVersionStorage extends StringStorage<
-    SettingOption.FILTERS_VERSION_PROP,
-    FilterVersionStorageData
+    SettingOption.FILTERS_VERSION,
+    FilterVersionStorageData,
+    'sync'
 > {
     public get(filterId: number): FilterVersionData {
         return this.data[filterId];
@@ -60,4 +61,4 @@ export class FilterVersionStorage extends StringStorage<
     }
 }
 
-export const filterVersionStorage = new FilterVersionStorage(SettingOption.FILTERS_VERSION_PROP, settingsStorage);
+export const filterVersionStorage = new FilterVersionStorage(SettingOption.FILTERS_VERSION, settingsStorage);

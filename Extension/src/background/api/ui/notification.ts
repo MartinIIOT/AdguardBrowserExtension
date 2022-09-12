@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { SettingOption } from '../../../common/settings';
+import { SettingOption } from '../../schema';
 import { UserAgent } from '../../../common/user-agent';
 import { UiService } from '../../services';
 

@@ -1,3 +1,4 @@
+export * from './app';
 export * from './allowlist';
 export * from './custom-filter-metadata';
 export * from './editor';

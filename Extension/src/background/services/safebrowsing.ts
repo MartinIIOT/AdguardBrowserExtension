@@ -3,7 +3,7 @@ import { RequestType } from '@adguard/tsurlfilter';
 import { RequestData, RequestEvents } from '@adguard/tswebextension';
 import { SafebrowsingApi } from '../api/safebrowsing';
 import { SettingsService } from './settings';
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 
 export class SafebrowsingService {
     static init() {

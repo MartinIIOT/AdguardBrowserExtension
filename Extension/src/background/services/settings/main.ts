@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import browser from 'webextension-polyfill';
 import { MessageType } from '../../../common/messages';
-import { SettingOption } from '../../../common/settings';
+import { SettingOption } from '../../schema';
 import { messageHandler } from '../../message-handler';
 import { UserAgent } from '../../../common/user-agent';
 import { AntiBannerFiltersId } from '../../../common/constants';

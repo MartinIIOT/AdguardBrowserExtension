@@ -11,7 +11,7 @@ import {
 import { UserAgent } from '../../common/user-agent';
 import { Engine } from '../engine';
 import { settingsStorage } from '../storages';
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../common/constants';
 import { listeners } from '../notifier';
 

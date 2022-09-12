@@ -3,18 +3,18 @@ import browser from 'webextension-polyfill';
 
 import { MessageType } from '../common/messages';
 import { log } from '../common/log';
-import {
-    ADGUARD_SETTINGS_KEY, defaultSettings, genClientId, SettingOption, Settings,
-} from '../common/settings';
 
 import { messageHandler } from './message-handler';
 import { Engine } from './engine';
-import { settingsStorage, storage } from './storages';
+import { appStorage, settingsStorage, storage } from './storages';
 import {
     toasts,
     CommonFilterApi,
     PagesApi,
     FiltersApi,
+    SettingsApi,
+    UpdateApi,
+    InstallApi,
 } from './api';
 import {
     UiService,
@@ -36,7 +36,9 @@ import {
     ForwardFrom,
 } from '../common/forward';
 
-import { Prefs } from './prefs';
+import { SettingOption } from './schema';
+import { getRunInfo } from './utils';
+import { CLIENT_ID_KEY } from '../common/constants';
 
 /**
  * App entry point
@@ -52,46 +54,27 @@ export class App {
      * and handle webextension API events for first install and update scenario
      */
     static async init() {
-        /**
-         * Initializes message handler as soon as possible to prevent connection errors from extension pages
-         */
+        // Initializes message handler as soon as possible to prevent connection errors from extension pages
         messageHandler.init();
 
-        /**
-         * Get persisted settings from browser.storage.local
-         */
-        const settings = await storage.get(ADGUARD_SETTINGS_KEY) as Partial<Settings | undefined>;
+        // get application run info
+        const runInfo = await getRunInfo();
 
-        /**
-         * Checks if app initialized first time or updated
-         */
-        const prevVersion = settings?.[SettingOption.APP_VERSION];
-        const currentVersion = Prefs.version;
+        const {
+            previousVersion,
+            currentVersion,
+            isInstall,
+            isUpdate,
+        } = runInfo;
 
-        const isVersionChanged = prevVersion !== currentVersion;
-
-        const isFirstRun = isVersionChanged && !prevVersion;
-        const isUpdate = isVersionChanged && prevVersion;
-
-        // TODO: settings chain migration
-        // if(isUpdate){
-        //    settings = Migration.updateSettings(prevVersion, currentVersion, settings)
-        // }
-
-        /**
-         * Set settings
-         *
-         * Use Object.assign to prevent setting fields mismatch,
-         * when partial data stored
-         *
-         * Force rewrite app data
-         */
-        settingsStorage.setSettings({
-            ...defaultSettings,
-            ...settings,
-            [SettingOption.APP_VERSION]: currentVersion,
-            [SettingOption.CLIENT_ID]: settings?.[SettingOption.CLIENT_ID] || genClientId(),
-        });
+        if (isInstall) {
+            await InstallApi.install(runInfo);
+        } else if (isUpdate) {
+            await UpdateApi.update(runInfo);
+        } else {
+            await App.initAppData();
+            await SettingsApi.init();
+        }
 
         /**
          * Initializes Filters data:
@@ -102,6 +85,11 @@ export class App {
          */
         await FiltersApi.init();
 
+        // Remove obsolete filters on update
+        if (isUpdate) {
+            await UpdateApi.removeObsoleteFilters();
+        }
+
         /**
          * Initializes app notifications:
          * - Initializes notifications storage
@@ -109,34 +97,22 @@ export class App {
          */
         NotificationService.init();
 
-        /**
-         * Adds listeners for settings events
-         */
+        // Adds listeners for settings events
         SettingsService.init();
 
-        /**
-         * Adds listeners for filter and group state events (enabling, updates)
-         */
+        // Adds listeners for filter and group state events (enabling, updates)
         await FiltersService.init();
 
-        /**
-         * Adds listeners specified for custom filters
-         */
+        // Adds listeners specified for custom filters
         await CustomFilterService.init();
 
-        /**
-         * Adds listeners for allowlist events
-         */
+        // Adds listeners for allowlist events
         await AllowlistService.init();
 
-        /**
-         * Adds listeners for userrules list events
-         */
+        // Adds listeners for userrules list events
         await UserRulesService.init();
 
-        /**
-         * Adds listeners for filtering log
-         */
+        // Adds listeners for filtering log
         FilteringLogService.init();
 
         /**
@@ -145,14 +121,10 @@ export class App {
          */
         await UiService.init();
 
-        /**
-         * Adds listeners for popup events
-         */
+        // Adds listeners for popup events
         PopupService.init();
 
-        /**
-         * Initializes language detector for auto-enabling relevant filters
-         */
+        // Initializes language detector for auto-enabling relevant filters
         localeDetect.init();
 
         /**
@@ -170,43 +142,29 @@ export class App {
          */
         SafebrowsingService.init();
 
-        /**
-         * Sets app uninstall url
-         */
+        // Sets app uninstall url
         await App.setUninstallUrl();
 
-        /**
-         * First install additional scenario
-         */
-        if (isFirstRun) {
-            /**
-             * Adds engine status listener for filters-download page
-             */
+        // First install additional scenario
+        if (isInstall) {
+            // Adds engine status listener for filters-download page
             messageHandler.addListener(MessageType.CHECK_REQUEST_FILTER_READY, App.onCheckRequestFilterReady);
 
-            /**
-             * Opens filters-download page
-             */
+            // Opens filters-download page
             await PagesApi.openFiltersDownloadPage();
 
-            /**
-             * Loads default filters
-             */
+            // Loads default filters
             await CommonFilterApi.initDefaultFilters();
         }
 
-        /**
-         * Update additional scenario
-         */
+        // Update additional scenario
         if (isUpdate) {
             if (!settingsStorage.get(SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION)) {
-                toasts.showApplicationUpdatedPopup(currentVersion, prevVersion);
+                toasts.showApplicationUpdatedPopup(currentVersion, previousVersion);
             }
         }
 
-        /**
-         * Runs tswebextension
-         */
+        // Runs tswebextension
         await Engine.start();
     }
 
@@ -237,6 +195,16 @@ export class App {
         } catch (e) {
             log.error(`Can't set app uninstall url: ${e.message}`);
         }
+    }
+
+    private static async initAppData() {
+        const clientId = await storage.get(CLIENT_ID_KEY);
+
+        if (typeof clientId !== 'string') {
+            throw new Error('client id is not found');
+        }
+
+        appStorage.setClientId(clientId);
     }
 }
 

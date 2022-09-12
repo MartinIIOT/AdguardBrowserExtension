@@ -3,7 +3,7 @@ import {
     DisableAntiBannerFilterMessage,
     MessageType,
 } from '../../common/constants';
-import { SettingOption } from '../../common/settings';
+import { SettingOption } from '../schema';
 
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';

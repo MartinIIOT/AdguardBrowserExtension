@@ -1,4 +1,4 @@
-import { SettingOption } from '../../../common/settings';
+import { SettingOption } from '../../schema';
 import { listeners } from '../../notifier';
 import {
     settingsStorage,
@@ -153,7 +153,7 @@ export class AllowlistApi {
     private static initStorage(storage: DomainsStorage, defaultData: string[] = []) {
         try {
             const storageData = storage.read();
-            if (storageData) {
+            if (typeof storageData === 'string') {
                 storage.setCache(JSON.parse(storageData));
             } else {
                 storage.setData(defaultData);

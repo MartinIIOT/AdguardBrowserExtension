@@ -41,7 +41,7 @@ export class FiltersApi {
         await FiltersApi.initI18nMetadata();
         await FiltersApi.initMetadata();
 
-        PageStatsApi.init();
+        await PageStatsApi.init();
         CustomFilterApi.init();
         AllowlistApi.init();
         await UserRulesApi.init();
@@ -310,7 +310,7 @@ export class FiltersApi {
     private static async initI18nMetadata() {
         const storageData = i18nMetadataStorage.read();
 
-        if (!storageData) {
+        if (typeof storageData !== 'string') {
             await FiltersApi.loadI18nMetadataFromBackend(false);
             return;
         }
@@ -329,7 +329,7 @@ export class FiltersApi {
     private static async initMetadata() {
         const storageData = metadataStorage.read();
 
-        if (!storageData) {
+        if (typeof storageData !== 'string') {
             await FiltersApi.loadMetadataFromFromBackend(false);
             return;
         }
@@ -359,7 +359,7 @@ export class FiltersApi {
     private static initFilterStateStorage(metadata: Metadata) {
         const storageData = filterStateStorage.read();
 
-        if (!storageData) {
+        if (typeof storageData !== 'string') {
             filterStateStorage.setData(FilterStateStorage.applyMetadata({}, metadata));
             return;
         }
@@ -383,7 +383,7 @@ export class FiltersApi {
     private static initGroupStateStorage(metadata: Metadata) {
         const storageData = groupStateStorage.read();
 
-        if (!storageData) {
+        if (typeof storageData !== 'string') {
             groupStateStorage.setData(GroupStateStorage.applyMetadata({}, metadata));
             return;
         }
@@ -407,7 +407,7 @@ export class FiltersApi {
     private static initFilterVersionStorage(metadata: Metadata) {
         const storageData = filterVersionStorage.read();
 
-        if (!storageData) {
+        if (typeof storageData !== 'string') {
             filterVersionStorage.setData(FilterVersionStorage.applyMetadata({}, metadata));
             return;
         }
