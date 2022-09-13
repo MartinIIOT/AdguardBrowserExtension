@@ -72,7 +72,7 @@ export class LruCache<StorageKey, Key, Value, Mode extends 'sync' | 'async'> ext
     }
 
     public clear(): void {
-        this.clear();
+        super.clear();
         this.save();
     }
 }

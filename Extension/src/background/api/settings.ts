@@ -44,14 +44,9 @@ import { ADGUARD_SETTINGS_KEY, AntiBannerFiltersId } from '../../common/constant
 
 export class SettingsApi {
     public static async init() {
-        try {
-            const data = await storage.get(ADGUARD_SETTINGS_KEY);
-            const settings = settingsValidator.parse(data);
-            settingsStorage.setCache(settings);
-        } catch (e) {
-            log.error('Error while settings initialization', e);
-            await SettingsApi.reset();
-        }
+        const data = await storage.get(ADGUARD_SETTINGS_KEY);
+        const settings = settingsValidator.parse(data);
+        settingsStorage.setCache(settings);
     }
 
     public static set<T extends SettingOption>(key: T, value: Settings[T]): void {

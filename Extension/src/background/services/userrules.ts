@@ -44,7 +44,7 @@ export class UserRulesService {
 
         return {
             userRules: content,
-            // settings: settings.getAllSettings(),
+            // TODO settings: settings.getAllSettings(),
         };
     }
 

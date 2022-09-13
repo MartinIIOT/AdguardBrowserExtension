@@ -69,20 +69,29 @@ export class App {
 
         if (isInstall) {
             await InstallApi.install(runInfo);
-        } else if (isUpdate) {
+        }
+
+        if (isUpdate) {
             await UpdateApi.update(runInfo);
-        } else {
-            await App.initAppData();
-            await SettingsApi.init();
         }
 
         /**
-         * Initializes Filters data:
-         * - Loads app i18n metadata and caches it in i18n-metadata storage
-         * - Loads app metadata, apply localization from i18n-metadata storage and caches it in metadata storage
-         * - Initializes storages for userrules, allowlist, custom filters metadata and page-stats
-         * - Initializes storages for filters state, groups state and filters versions, based on app metadata
+         * Initializes App storage data
          */
+        await App.initAppData();
+
+        /**
+         * Initializes Settings storage data
+         */
+        await SettingsApi.init();
+
+        /**
+          * Initializes Filters data:
+          * - Loads app i18n metadata and caches it in i18n-metadata storage
+          * - Loads app metadata, apply localization from i18n-metadata storage and caches it in metadata storage
+          * - Initializes storages for userrules, allowlist, custom filters metadata and page-stats
+          * - Initializes storages for filters state, groups state and filters versions, based on app metadata
+          */
         await FiltersApi.init();
 
         // Remove obsolete filters on update

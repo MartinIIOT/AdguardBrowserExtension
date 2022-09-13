@@ -1,10 +1,8 @@
 import { log } from '../../../common/log';
 import {
-    settingsStorage,
     storage,
     filterStateStorage,
     FiltersStorage,
-    appStorage,
 } from '../../storages';
 import {
     ADGUARD_SETTINGS_KEY,
@@ -23,7 +21,6 @@ import { BrowserUtils, RunInfo } from '../../utils';
 import { defaultSettings } from '../../../common/settings';
 import { FiltersApi } from '../filters';
 import { InstallApi } from '../install';
-import { SettingsApi } from '../settings';
 
 export class UpdateApi {
     /**
@@ -54,25 +51,48 @@ export class UpdateApi {
         await Promise.all(removePromises);
     }
 
-    public static async update(runInfo: RunInfo) {
+    /**
+     * Update app data based on run info
+     */
+    public static async update({
+        clientId,
+        currentVersion,
+        previousVersion,
+    }: RunInfo) {
+        // check clientId existence
+        if (clientId) {
+            await storage.set(CLIENT_ID_KEY, clientId);
+        } else {
+            await storage.set(CLIENT_ID_KEY, InstallApi.genClientId());
+        }
+
+        // set actual schema and app version
+        await storage.set(SCHEMA_VERSION_KEY, APP_SCHEMA_VERSION);
+        await storage.set(APP_VERSION_KEY, currentVersion);
+
+        // clear persisted caches
+        UpdateApi.clearCache();
+
         try {
-            if (!runInfo.previousVersion) {
-                throw new Error('Can`t update app, because previous version is not found');
-            }
-
-            if (BrowserUtils.isGreaterVersion('4.0.180', runInfo.previousVersion)) {
-                UpdateApi.clearPromoDetails();
-            }
-
-            if (BrowserUtils.isGreaterVersion('4.2.0', runInfo.previousVersion)) {
-                await UpdateApi.updateSettings(runInfo);
-            }
-
-            // On every update clear persisted caches
-            UpdateApi.clearCache();
+            await UpdateApi.migrate(previousVersion);
         } catch (e) {
-            log.error(`Error while app updating: ${e.message}`);
-            await SettingsApi.reset();
+            log.error(`Error while migration from ${previousVersion} to ${currentVersion}: ${e.message}`);
+            log.info('Reset settings...');
+            await storage.set(ADGUARD_SETTINGS_KEY, defaultSettings);
+        }
+    }
+
+    private static async migrate(fromVersion: string) {
+        if (!fromVersion) {
+            throw new Error('Can`t update app, because previous version is not found');
+        }
+
+        if (BrowserUtils.isGreaterVersion('4.0.180', fromVersion)) {
+            UpdateApi.clearPromoDetails();
+        }
+
+        if (BrowserUtils.isGreaterVersion('4.2.0', fromVersion)) {
+            await UpdateApi.updateStorage();
         }
     }
 
@@ -88,12 +108,7 @@ export class UpdateApi {
     /**
      * In the v4.2.0 we refactoring storage data structure
      */
-    private static async updateSettings({
-        currentVersion,
-    }: RunInfo) {
-        // sets schema version
-        await storage.set(SCHEMA_VERSION_KEY, APP_SCHEMA_VERSION);
-
+    private static async updateStorage() {
         // get current settings
         const currentSettings = await storage.get(ADGUARD_SETTINGS_KEY);
 
@@ -103,22 +118,21 @@ export class UpdateApi {
             throw new Error('Settings in not a object');
         }
 
-        // delete app version from settings and add updated to root storage
+        // delete app version from settings
         if (currentSettings?.[APP_VERSION_KEY]) {
             delete currentSettings[APP_VERSION_KEY];
-            await storage.set(APP_VERSION_KEY, currentVersion);
+        }
+
+        // delete metadata from settings (new one will be loaded while filter initialization)
+        if (currentSettings?.[SettingOption.I18N_METADATA]) {
+            delete currentSettings[SettingOption.I18N_METADATA];
+        }
+
+        if (currentSettings?.[SettingOption.METADATA]) {
+            delete currentSettings[SettingOption.METADATA];
         }
 
         // move client id from settings to root storage
-        let clientId = currentSettings?.[CLIENT_ID_KEY];
-
-        if (!clientId) {
-            clientId = InstallApi.genClientId();
-        }
-
-        await storage.set(CLIENT_ID_KEY, clientId);
-        appStorage.setClientId(clientId);
-
         await UpdateApi.moveStorageData(CLIENT_ID_KEY, currentSettings);
 
         // move page stats to root storage
@@ -128,10 +142,11 @@ export class UpdateApi {
         await UpdateApi.moveStorageData(SB_SUSPENDED_CACHE_KEY, currentSettings);
         await UpdateApi.moveStorageData(SB_LRU_CACHE_KEY, currentSettings);
 
-        // merge with default settings and validate
+        // merge current with default settings and validate
         const settings = settingsValidator.parse({ ...defaultSettings, ...currentSettings });
 
-        settingsStorage.setData(settings);
+        // set new settings to storage
+        await storage.set(ADGUARD_SETTINGS_KEY, settings);
     }
 
     /**

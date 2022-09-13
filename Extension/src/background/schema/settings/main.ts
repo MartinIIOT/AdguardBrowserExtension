@@ -1,4 +1,5 @@
 import zod from 'zod';
+import { SchemaPreprocessor } from '../preprocessor';
 
 export enum SettingOption {
     // filters states
@@ -57,33 +58,34 @@ export enum SettingOption {
     VIEWED_NOTIFICATIONS = 'viewed-notifications',
 }
 
+// Setting options may be stringified, use preprocessors for correct type casting
 export const settingsValidator = zod.object({
-    [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: zod.boolean(),
-    [SettingOption.DISABLE_SAFEBROWSING]: zod.boolean(),
-    [SettingOption.DISABLE_COLLECT_HITS]: zod.boolean(),
-    [SettingOption.DEFAULT_ALLOWLIST_MODE]: zod.boolean(),
-    [SettingOption.ALLOWLIST_ENABLED]: zod.boolean(),
-    [SettingOption.USE_OPTIMIZED_FILTERS]: zod.boolean(),
-    [SettingOption.DISABLE_DETECT_FILTERS]: zod.boolean(),
-    [SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION]: zod.boolean(),
-    [SettingOption.FILTERS_UPDATE_PERIOD]: zod.number(),
-    [SettingOption.DISABLE_STEALTH_MODE]: zod.boolean(),
-    [SettingOption.HIDE_REFERRER]: zod.boolean(),
-    [SettingOption.HIDE_SEARCH_QUERIES]: zod.boolean(),
-    [SettingOption.SEND_DO_NOT_TRACK]: zod.boolean(),
-    [SettingOption.BLOCK_CHROME_CLIENT_DATA]: zod.boolean(),
-    [SettingOption.BLOCK_WEBRTC]: zod.boolean(),
-    [SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES]: zod.boolean(),
-    [SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME]: zod.number(),
-    [SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES]: zod.boolean(),
-    [SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME]: zod.number(),
+    [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DISABLE_SAFEBROWSING]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DISABLE_COLLECT_HITS]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DEFAULT_ALLOWLIST_MODE]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.ALLOWLIST_ENABLED]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.USE_OPTIMIZED_FILTERS]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DISABLE_DETECT_FILTERS]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.FILTERS_UPDATE_PERIOD]: SchemaPreprocessor.numberValidator,
+    [SettingOption.DISABLE_STEALTH_MODE]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.HIDE_REFERRER]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.HIDE_SEARCH_QUERIES]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.SEND_DO_NOT_TRACK]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.BLOCK_CHROME_CLIENT_DATA]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.BLOCK_WEBRTC]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME]: SchemaPreprocessor.numberValidator,
+    [SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME]: SchemaPreprocessor.numberValidator,
     [SettingOption.APPEARANCE_THEME]: zod.enum(['system', 'dark', 'light']),
-    [SettingOption.USER_FILTER_ENABLED]: zod.boolean(),
-    [SettingOption.HIDE_RATE_BLOCK]: zod.boolean(),
-    [SettingOption.USER_RULES_EDITOR_WRAP]: zod.boolean(),
-    [SettingOption.DISABLE_FILTERING]: zod.boolean(),
-    [SettingOption.DISABLE_SHOW_PAGE_STATS]: zod.boolean(),
-    [SettingOption.DISABLE_SHOW_CONTEXT_MENU]: zod.boolean(),
+    [SettingOption.USER_FILTER_ENABLED]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.HIDE_RATE_BLOCK]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.USER_RULES_EDITOR_WRAP]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DISABLE_FILTERING]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DISABLE_SHOW_PAGE_STATS]: SchemaPreprocessor.booleanValidator,
+    [SettingOption.DISABLE_SHOW_CONTEXT_MENU]: SchemaPreprocessor.booleanValidator,
     [SettingOption.ALLOWLIST_DOMAINS]: zod.string(),
     [SettingOption.INVERTED_ALLOWLIST_DOMAINS]: zod.string(),
 
@@ -96,7 +98,7 @@ export const settingsValidator = zod.object({
 
     [SettingOption.CUSTOM_FILTERS]: zod.string().optional(),
 
-    [SettingOption.LAST_NOTIFICATION_TIME]: zod.number().optional(),
+    [SettingOption.LAST_NOTIFICATION_TIME]: SchemaPreprocessor.numberValidator.optional(),
     [SettingOption.VIEWED_NOTIFICATIONS]: zod.array(zod.string()).optional(),
 });
 
