@@ -3,18 +3,15 @@ export * from './messages';
 export const APP_SCHEMA_VERSION = 1;
 
 export const CLIENT_ID_KEY = 'client-id';
-
 export const APP_VERSION_KEY = 'app-version';
-
 export const SCHEMA_VERSION_KEY = 'schema-version';
-
 export const ADGUARD_SETTINGS_KEY = 'adguard-settings';
-
 export const PAGE_STATISTIC_KEY = 'page-statistic';
-
 export const SB_LRU_CACHE_KEY = 'sb-lru-cache';
-
 export const SB_SUSPENDED_CACHE_KEY = 'safebrowsing-suspended-from';
+export const VIEWED_NOTIFICATIONS_KEY = 'viewed-notifications';
+export const LAST_NOTIFICATION_TIME_KEY = 'viewed-notification-time';
+
 /**
  * Filter ids used in the code on the background page and filtering log page
  */

@@ -13,9 +13,9 @@ export class NotificationService {
         messageHandler.addListener(MessageType.SET_NOTIFICATION_VIEWED, NotificationService.setNotificationViewed);
     }
 
-    private static setNotificationViewed({ data }) {
+    private static async setNotificationViewed({ data }) {
         const { withDelay } = data;
 
-        notificationApi.setNotificationViewed(withDelay);
+        await notificationApi.setNotificationViewed(withDelay);
     }
 }

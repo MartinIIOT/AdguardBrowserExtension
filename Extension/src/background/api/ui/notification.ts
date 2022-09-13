@@ -1,5 +1,4 @@
 import browser from 'webextension-polyfill';
-import { SettingOption } from '../../schema';
 import { UserAgent } from '../../../common/user-agent';
 import { UiService } from '../../services';
 
@@ -7,9 +6,10 @@ import {
     notificationStorage,
     Notification,
     NotificationText,
-    settingsStorage,
+    storage,
 } from '../../storages';
 import { TabsApi } from '../extension';
+import { LAST_NOTIFICATION_TIME_KEY, VIEWED_NOTIFICATIONS_KEY } from '../../../common/constants';
 
 export class NotificationApi {
     private static checkTimeoutMs = 10 * 60 * 1000; // 10 minutes
@@ -60,12 +60,13 @@ export class NotificationApi {
         }
 
         if (this.currentNotification) {
-            const viewedNotifications = settingsStorage.get(SettingOption.VIEWED_NOTIFICATIONS) || [];
             const { id } = this.currentNotification;
 
-            if (!viewedNotifications.includes(id)) {
+            const viewedNotifications = await storage.get(VIEWED_NOTIFICATIONS_KEY) || [];
+
+            if (Array.isArray(viewedNotifications) && !viewedNotifications.includes(id)) {
                 viewedNotifications.push(id);
-                settingsStorage.set(SettingOption.VIEWED_NOTIFICATIONS, viewedNotifications);
+                await storage.set(VIEWED_NOTIFICATIONS_KEY, viewedNotifications);
                 const tab = await TabsApi.getActive();
                 if (tab?.id) {
                     await UiService.updateTabIcon(tab.id);
@@ -78,7 +79,7 @@ export class NotificationApi {
     /**
      * Finds out notification for current time and checks if notification wasn't shown yet
      */
-    public getCurrentNotification(): Notification | null {
+    public async getCurrentNotification(): Promise<Notification | null> {
         // Do not display notification on Firefox
         if (UserAgent.isFirefox) {
             return null;
@@ -90,7 +91,7 @@ export class NotificationApi {
         }
 
         const currentTime = Date.now();
-        const timeSinceLastNotification = currentTime - NotificationApi.getLastNotificationTime();
+        const timeSinceLastNotification = currentTime - await NotificationApi.getLastNotificationTime();
 
         if (timeSinceLastNotification < NotificationApi.minPeriodMs) {
         // Just a check to not show the notification too often
@@ -106,9 +107,9 @@ export class NotificationApi {
         // Update the last notification check time
         this.notificationCheckTime = currentTime;
 
-        const viewedNotifications = settingsStorage.get(SettingOption.VIEWED_NOTIFICATIONS) || [];
-
         const notificationsValues = Array.from(notificationStorage.values());
+
+        const viewedNotifications = await storage.get(VIEWED_NOTIFICATIONS_KEY) || [];
 
         for (let i = 0; i < notificationsValues.length; i += 1) {
             const notification = notificationsValues[i];
@@ -116,8 +117,9 @@ export class NotificationApi {
             const from = new Date(notification.from).getTime();
             const to = new Date(notification.to).getTime();
             if (from < currentTime
-            && to > currentTime
-            && !viewedNotifications.includes(notification.id)
+                && to > currentTime
+                && Array.isArray(viewedNotifications)
+                && !viewedNotifications.includes(notification.id)
             ) {
                 this.currentNotification = notification;
                 return this.currentNotification;
@@ -161,12 +163,12 @@ export class NotificationApi {
      * Gets the last time a notification was shown.
      * If it was not shown yet, initialized with the current time.
      */
-    private static getLastNotificationTime() {
-        let lastTime = settingsStorage.get(SettingOption.LAST_NOTIFICATION_TIME) || 0;
+    private static async getLastNotificationTime() {
+        let lastTime = Number(await storage.get(LAST_NOTIFICATION_TIME_KEY) || 0);
 
         if (lastTime === 0) {
             lastTime = Date.now();
-            settingsStorage.set(SettingOption.LAST_NOTIFICATION_TIME, lastTime);
+            await storage.set(LAST_NOTIFICATION_TIME_KEY, lastTime);
         }
 
         return lastTime;

@@ -44,7 +44,7 @@ export class PopupService {
                 showInfoAboutFullVersion: !settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 isMacOs: UserAgent.isMacOs,
                 isEdgeBrowser: UserAgent.isEdge || UserAgent.isEdgeChromium,
-                notification: notificationApi.getCurrentNotification(),
+                notification: await notificationApi.getCurrentNotification(),
                 isDisableShowAdguardPromoInfo: settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
                 hasCustomRulesToReset: false, // TODO,
             },

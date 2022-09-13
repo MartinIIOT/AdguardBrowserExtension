@@ -68,7 +68,7 @@ export class Toasts {
         previousVersion: string,
         triesCount = 1,
     ) {
-        const promoNotification = notificationApi.getCurrentNotification();
+        const promoNotification = await notificationApi.getCurrentNotification();
         if (!promoNotification
             && BrowserUtils.getMajorVersionNumber(
                 currentVersion,

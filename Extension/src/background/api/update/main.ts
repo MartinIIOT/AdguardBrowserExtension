@@ -9,10 +9,12 @@ import {
     APP_SCHEMA_VERSION,
     APP_VERSION_KEY,
     CLIENT_ID_KEY,
+    LAST_NOTIFICATION_TIME_KEY,
     PAGE_STATISTIC_KEY,
     SB_LRU_CACHE_KEY,
     SB_SUSPENDED_CACHE_KEY,
     SCHEMA_VERSION_KEY,
+    VIEWED_NOTIFICATIONS_KEY,
 } from '../../../common/constants';
 
 import { SettingOption, settingsValidator } from '../../schema';
@@ -101,8 +103,8 @@ export class UpdateApi {
      * are clearing them
      */
     private static clearPromoDetails() {
-        window.localStorage.removeItem(SettingOption.VIEWED_NOTIFICATIONS);
-        window.localStorage.removeItem(SettingOption.LAST_NOTIFICATION_TIME);
+        window.localStorage.removeItem(VIEWED_NOTIFICATIONS_KEY);
+        window.localStorage.removeItem(LAST_NOTIFICATION_TIME_KEY);
     }
 
     /**
@@ -131,6 +133,10 @@ export class UpdateApi {
         if (currentSettings?.[SettingOption.METADATA]) {
             delete currentSettings[SettingOption.METADATA];
         }
+
+        // mode notification data from settings to root storage
+        await UpdateApi.moveStorageData(VIEWED_NOTIFICATIONS_KEY, currentSettings);
+        await UpdateApi.moveStorageData(LAST_NOTIFICATION_TIME_KEY, currentSettings);
 
         // move client id from settings to root storage
         await UpdateApi.moveStorageData(CLIENT_ID_KEY, currentSettings);

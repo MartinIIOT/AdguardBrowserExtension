@@ -52,10 +52,6 @@ export enum SettingOption {
     // UI misc
     HIDE_RATE_BLOCK = 'hide-rate-block',
     USER_RULES_EDITOR_WRAP = 'user-rules-editor-wrap',
-
-    // notifications
-    LAST_NOTIFICATION_TIME = 'viewed-notification-time',
-    VIEWED_NOTIFICATIONS = 'viewed-notifications',
 }
 
 // Setting options may be stringified, use preprocessors for correct type casting
@@ -97,9 +93,6 @@ export const settingsValidator = zod.object({
     [SettingOption.I18N_METADATA]: zod.string().optional(),
 
     [SettingOption.CUSTOM_FILTERS]: zod.string().optional(),
-
-    [SettingOption.LAST_NOTIFICATION_TIME]: SchemaPreprocessor.numberValidator.optional(),
-    [SettingOption.VIEWED_NOTIFICATIONS]: zod.array(zod.string()).optional(),
 });
 
 export type Settings = zod.infer<typeof settingsValidator>;

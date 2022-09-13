@@ -167,7 +167,7 @@ export class UiService {
             }
 
             // If there's an active notification, indicate it on the badge
-            const notification = notificationApi.getCurrentNotification();
+            const notification = await notificationApi.getCurrentNotification();
             if (notification) {
                 badge = notification.badgeText || badge;
                 badgeColor = notification.badgeBgColor || badgeColor;
