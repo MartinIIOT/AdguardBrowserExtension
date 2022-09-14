@@ -1,5 +1,3 @@
-import browser from 'webextension-polyfill';
-
 import {
     defaultFilteringLog,
     FilteringEventType,
@@ -9,16 +7,16 @@ import {
     getDomain,
 } from '@adguard/tswebextension';
 
-import { MessageType } from '../../common/messages';
-import { messageHandler } from '../message-handler';
-import { SettingOption } from '../schema';
-import { AntiBannerFiltersId } from '../../common/constants';
-import { UserAgent } from '../../common/user-agent';
-import { Engine } from '../engine';
-import { settingsStorage } from '../storages';
-import { PageStatsApi, SettingsApi, notificationApi } from '../api';
+import { MessageType } from '../../../common/messages';
+import { messageHandler } from '../../message-handler';
+import { SettingOption } from '../../schema';
+import { AntiBannerFiltersId } from '../../../common/constants';
+import { UserAgent } from '../../../common/user-agent';
+import { settingsStorage } from '../../storages';
+import { PageStatsApi, SettingsApi, notificationApi } from '../../api';
 
-import { UiService } from './ui';
+import { UiService } from './main';
+import { SettingsService } from '../settings';
 
 export class PopupService {
     static init() {
@@ -64,13 +62,7 @@ export class PopupService {
     private static async onChangeFilteringDisable({ data }) {
         const { state: disabled } = data;
 
-        settingsStorage.set(SettingOption.DISABLE_FILTERING, disabled);
-
-        await Engine.update();
-
-        const currentTab = (await browser.tabs.query({ active: true, currentWindow: true }))[0];
-
-        await browser.tabs.reload(currentTab.id);
+        await SettingsService.setSettingAndPublishEvent(SettingOption.DISABLE_FILTERING, disabled);
     }
 
     /**

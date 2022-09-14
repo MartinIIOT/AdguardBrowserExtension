@@ -2,18 +2,18 @@ import { debounce } from 'lodash';
 import browser from 'webextension-polyfill';
 import { isHttpRequest, tabsApi } from '@adguard/tswebextension';
 
-import { messageHandler } from '../message-handler';
+import { messageHandler } from '../../message-handler';
 import {
     MessageType,
     OpenAbuseTabMessage,
     OpenSiteReportTabMessage,
-} from '../../common/messages';
-import { UserAgent } from '../../common/user-agent';
-import { Engine } from '../engine';
-import { settingsStorage } from '../storages';
-import { SettingOption } from '../schema';
-import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../common/constants';
-import { listeners } from '../notifier';
+} from '../../../common/messages';
+import { UserAgent } from '../../../common/user-agent';
+import { Engine } from '../../engine';
+import { settingsStorage } from '../../storages';
+import { SettingOption } from '../../schema';
+import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../../common/constants';
+import { listeners } from '../../notifier';
 
 import {
     toasts,
@@ -23,9 +23,8 @@ import {
     SettingsApi,
     notificationApi,
     PagesApi,
-} from '../api';
+} from '../../api';
 
-// TODO: decompose
 export class UiService {
     static async init() {
         await toasts.init();
@@ -64,14 +63,17 @@ export class UiService {
     }
 
     static async openSiteReportPage({ data }: OpenSiteReportTabMessage): Promise<void> {
-        const { url } = data;
+        const { url, from } = data;
 
-        await PagesApi.openSiteReportPage(url);
+        await PagesApi.openSiteReportPage(url, from);
     }
 
     static async openAssistant(): Promise<void> {
-        const activeTab = await TabsApi.findOne({ active: true });
-        Engine.api.openAssistant(activeTab.id);
+        const activeTab = await TabsApi.getActive();
+
+        if (activeTab) {
+            Engine.api.openAssistant(activeTab.id);
+        }
     }
 
     static initializeFrameScriptRequest() {

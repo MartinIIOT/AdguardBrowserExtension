@@ -49,8 +49,18 @@ export class SettingsApi {
         settingsStorage.setCache(settings);
     }
 
-    public static set<T extends SettingOption>(key: T, value: Settings[T]): void {
+    /**
+     * Set setting to setting storage
+     */
+    public static setSetting<T extends SettingOption>(key: T, value: Settings[T]): void {
         settingsStorage.set(key, value);
+    }
+
+    /**
+     * Get setting from setting storage
+     */
+    public static getSetting<T extends SettingOption>(key: T): Settings[T] {
+        return settingsStorage.get(key);
     }
 
     public static getData() {

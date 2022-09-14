@@ -19,7 +19,7 @@ export class FiltersService {
         messageHandler.addListener(MessageType.DISABLE_ANTIBANNER_FILTER, FiltersService.onFilterDisable);
         messageHandler.addListener(MessageType.ENABLE_FILTERS_GROUP, FiltersService.onGroupEnable);
         messageHandler.addListener(MessageType.DISABLE_FILTERS_GROUP, FiltersService.onGroupDisable);
-        messageHandler.addListener(MessageType.CHECK_ANTIBANNER_FILTERS_UPDATE, FiltersService.onFiltersUpdate);
+        messageHandler.addListener(MessageType.CHECK_ANTIBANNER_FILTERS_UPDATE, FiltersService.checkFiltersUpdate);
 
         SettingsService.onSettingChange.addListener(
             SettingOption.USE_OPTIMIZED_FILTERS,
@@ -57,7 +57,7 @@ export class FiltersService {
         await Engine.update();
     }
 
-    static async onFiltersUpdate() {
+    static async checkFiltersUpdate() {
         try {
             const enabledFilters = FiltersApi.getEnabledFilters();
 

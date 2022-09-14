@@ -55,7 +55,11 @@ export class PagesApi {
     }
 
     static async openFilteringLogPage(): Promise<void> {
-        const activeTab = (await browser.tabs.query({ currentWindow: true, active: true }))[0];
+        const activeTab = await TabsApi.getActive();
+
+        if (!activeTab) {
+            return;
+        }
 
         const url = PagesApi.filteringLogUrl + (activeTab.id ? `#${activeTab.id}` : '');
 
@@ -75,7 +79,7 @@ export class PagesApi {
             browserName = 'Other';
         }
 
-        const filterIds = Engine.api.configuration.filters;
+        const filterIds = Engine.api.configuration?.filters || [];
 
         const params: ForwardParams = {
             action: ForwardAction.REPORT,
@@ -107,7 +111,7 @@ export class PagesApi {
         });
     }
 
-    static async openSiteReportPage(siteUrl: string): Promise<void> {
+    static async openSiteReportPage(siteUrl: string, from: ForwardFrom): Promise<void> {
         const domain = UrlUtils.getDomainName(siteUrl);
 
         if (!domain) {
@@ -118,8 +122,8 @@ export class PagesApi {
 
         await TabsApi.openTab({
             url: Forward.get({
+                from,
                 action: ForwardAction.SITE_REPORT,
-                from: ForwardFrom.CONTEXT_MENU,
                 domain: encodeURIComponent(punycodeDomain),
             }),
         });

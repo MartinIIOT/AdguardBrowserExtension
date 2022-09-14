@@ -1,6 +1,6 @@
-import { MessageType } from '../../common/messages';
-import { notificationApi } from '../api';
-import { messageHandler } from '../message-handler';
+import { MessageType } from '../../../common/messages';
+import { notificationApi } from '../../api';
+import { messageHandler } from '../../message-handler';
 
 /**
  * Service that manages adguard events notifications.

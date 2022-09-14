@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 import browser from 'webextension-polyfill';
 import { MessageType } from '../../../common/messages';
-import { SettingOption } from '../../schema';
+import { SettingOption, Settings } from '../../schema';
 import { messageHandler } from '../../message-handler';
 import { UserAgent } from '../../../common/user-agent';
 import { AntiBannerFiltersId } from '../../../common/constants';
 
 import { Engine } from '../../engine';
-import { Categories, SettingsApi } from '../../api';
+import { Categories, SettingsApi, TabsApi } from '../../api';
 import { listeners } from '../../notifier';
 import { SettingsEvents } from './events';
 import { fullscreenUserRulesEditor } from '../fullscreen-user-rules-editor';
@@ -47,6 +47,21 @@ export class SettingsService {
             SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME,
             Engine.update,
         );
+        SettingsService.onSettingChange.addListener(
+            SettingOption.DISABLE_FILTERING,
+            SettingsService.onFilteringStateChange,
+        );
+    }
+
+    static async setSettingAndPublishEvent<T extends SettingOption>(key: T, value: Settings[T]) {
+        SettingsApi.setSetting(key, value);
+
+        await SettingsService.onSettingChange.publishEvent(key, value);
+
+        listeners.notifyListeners(listeners.SETTING_UPDATED, {
+            propertyName: key,
+            propertyValue: value,
+        });
     }
 
     static getOptionsData() {
@@ -69,14 +84,7 @@ export class SettingsService {
 
     static async changeUserSettings(message) {
         const { key, value } = message.data;
-        SettingsApi.set(key, value);
-
-        await SettingsService.onSettingChange.publishEvent(key, value);
-
-        listeners.notifyListeners(listeners.SETTING_UPDATED, {
-            propertyName: key,
-            propertyValue: value,
-        });
+        await SettingsService.setSettingAndPublishEvent(key, value);
     }
 
     static async reset() {
@@ -105,5 +113,15 @@ export class SettingsService {
             content: await SettingsApi.export(),
             appVersion: browser.runtime.getManifest().version,
         };
+    }
+
+    static async onFilteringStateChange() {
+        await Engine.update();
+
+        const activeTab = await TabsApi.getActive();
+
+        if (activeTab) {
+            await browser.tabs.reload(activeTab.id);
+        }
     }
 }

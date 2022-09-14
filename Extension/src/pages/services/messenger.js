@@ -222,8 +222,8 @@ class Messenger {
         return this.sendMessage(MessageType.OPEN_ABUSE_TAB, { url, from });
     }
 
-    async checkSiteSecurity(url) {
-        return this.sendMessage(MessageType.OPEN_SITE_REPORT_TAB, { url });
+    async checkSiteSecurity(url, from) {
+        return this.sendMessage(MessageType.OPEN_SITE_REPORT_TAB, { url, from });
     }
 
     async resetCustomRulesForPage(url) {

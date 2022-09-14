@@ -1,5 +1,5 @@
 import { ForwardFrom } from './forward';
-import { SettingOption, Settings } from './settings';
+import { SettingOption, Settings } from '../background/schema';
 
 /**
  * Message types used for message passing between background page and
@@ -121,6 +121,7 @@ export type OpenSiteReportTabMessage = {
   type: MessageType.OPEN_SITE_REPORT_TAB;
   data: {
     url: string;
+    from: ForwardFrom;
   };
 };
 

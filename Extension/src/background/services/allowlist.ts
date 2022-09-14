@@ -50,12 +50,10 @@ export class AllowlistService {
     }
 
     /**
-     * If default allowlist mode, adds domain to the list
+     * If default allowlist mode, adds tab url to the list
      * If inverted allowlist mode, removes domain from the list
      */
-    static async onAddAllowlistDomain(message: AddAllowlistDomainPopupMessage) {
-        const { tabId } = message.data;
-
+    static async addTabUrlToAllowlist(tabId: number) {
         const mainFrame = tabsApi.getTabMainFrame(tabId);
 
         if (!mainFrame?.url) {
@@ -75,13 +73,17 @@ export class AllowlistService {
         await browser.tabs.reload(tabId);
     }
 
+    static async onAddAllowlistDomain(message: AddAllowlistDomainPopupMessage) {
+        const { tabId } = message.data;
+
+        await AllowlistService.addTabUrlToAllowlist(tabId);
+    }
+
     /**
      * If default allowlist mode, removes domain from the list
      * If inverted allowlist mode, adds domain to the list
      */
-    static async onRemoveAllowlistDomain(message: RemoveAllowlistDomainMessage) {
-        const { tabId } = message.data;
-
+    static async removeTabUrlFromAllowlist(tabId: number) {
         const mainFrame = tabsApi.getTabMainFrame(tabId);
 
         if (!mainFrame?.url) {
@@ -99,6 +101,12 @@ export class AllowlistService {
         await Engine.update();
 
         await browser.tabs.reload(tabId);
+    }
+
+    static async onRemoveAllowlistDomain(message: RemoveAllowlistDomainMessage) {
+        const { tabId } = message.data;
+
+        await AllowlistService.removeTabUrlFromAllowlist(tabId);
     }
 
     /**
