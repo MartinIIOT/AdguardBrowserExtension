@@ -1,3 +1,4 @@
+import { log } from '../../../common/log';
 import {
     ANTIBANNER_GROUPS_ID,
     CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER,
@@ -17,6 +18,7 @@ import {
     Metadata,
     GroupStateStorage,
     FilterVersionStorage,
+    FiltersStorage,
 } from '../../storages';
 
 import { network } from '../network';
@@ -47,6 +49,8 @@ export class FiltersApi {
         await UserRulesApi.init();
 
         FiltersApi.loadFilteringStates();
+
+        await FiltersApi.removeObsoleteFilters();
     }
 
     /**
@@ -61,6 +65,8 @@ export class FiltersApi {
         await FiltersApi.loadMetadataFromFromBackend(remote);
 
         FiltersApi.loadFilteringStates();
+
+        await FiltersApi.removeObsoleteFilters();
     }
 
     /**
@@ -422,5 +428,25 @@ export class FiltersApi {
         } catch (e) {
             filterVersionStorage.setData(FilterVersionStorage.applyMetadata({}, metadata));
         }
+    }
+
+    /**
+     * Remove if necessary obsolete filters
+     */
+    private static async removeObsoleteFilters() {
+        const installedFiltersIds = filterStateStorage.getInstalledFilters();
+        const metadataFiltersIds = FiltersApi.getFiltersMetadata().map(({ filterId }) => filterId);
+
+        const tasks = installedFiltersIds
+            .filter(id => !metadataFiltersIds.includes(id))
+            .map(async id => {
+                filterVersionStorage.delete(id);
+                filterStateStorage.delete(id);
+                await FiltersStorage.remove(id);
+
+                log.info(`Filter with id: ${id} removed from the storage`);
+            });
+
+        await Promise.allSettled(tasks);
     }
 }

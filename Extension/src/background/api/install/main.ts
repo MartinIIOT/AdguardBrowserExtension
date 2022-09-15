@@ -1,5 +1,4 @@
 import {
-    APP_SCHEMA_VERSION,
     ADGUARD_SETTINGS_KEY,
     APP_VERSION_KEY,
     CLIENT_ID_KEY,
@@ -27,12 +26,12 @@ export class InstallApi {
     /**
      * Create client id and initialize default data
      */
-    public static async install({ currentVersion }: RunInfo) {
+    public static async install({ currentAppVersion, currentSchemaVersion }: RunInfo) {
         const clientId = InstallApi.genClientId();
         await storage.set(CLIENT_ID_KEY, clientId);
 
-        await storage.set(SCHEMA_VERSION_KEY, APP_SCHEMA_VERSION);
-        await storage.set(APP_VERSION_KEY, currentVersion);
+        await storage.set(SCHEMA_VERSION_KEY, currentSchemaVersion);
+        await storage.set(APP_VERSION_KEY, currentAppVersion);
         await storage.set(ADGUARD_SETTINGS_KEY, defaultSettings);
     }
 }

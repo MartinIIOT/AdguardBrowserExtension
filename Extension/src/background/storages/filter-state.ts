@@ -60,6 +60,13 @@ export class FilterStateStorage extends StringStorage<
             .map(([id]) => Number(id));
     }
 
+    public getInstalledFilters(): number[] {
+        return Object
+            .entries(this.data)
+            .filter(([,state]) => state.installed)
+            .map(([id]) => Number(id));
+    }
+
     public enableFilters(filtersIds: number[]) {
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];

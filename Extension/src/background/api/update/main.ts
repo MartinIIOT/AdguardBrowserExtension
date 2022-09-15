@@ -1,12 +1,7 @@
 import { log } from '../../../common/log';
-import {
-    storage,
-    filterStateStorage,
-    FiltersStorage,
-} from '../../storages';
+import { storage } from '../../storages';
 import {
     ADGUARD_SETTINGS_KEY,
-    APP_SCHEMA_VERSION,
     APP_VERSION_KEY,
     CLIENT_ID_KEY,
     LAST_NOTIFICATION_TIME_KEY,
@@ -19,47 +14,23 @@ import {
 
 import { SettingOption, settingsValidator } from '../../schema';
 import { SafebrowsingApi } from '../safebrowsing';
-import { BrowserUtils, RunInfo } from '../../utils';
+import { RunInfo } from '../../utils';
 import { defaultSettings } from '../../../common/settings';
-import { FiltersApi } from '../filters';
 import { InstallApi } from '../install';
 
 export class UpdateApi {
-    /**
-     * On every update remove if necessary obsolete filters
-     * Called after Filter Api initialization
-     */
-    public static async removeObsoleteFilters() {
-        const filtersStateInfo = filterStateStorage.getData();
-        const allFiltersMetadata = FiltersApi.getFiltersMetadata();
-
-        const installedFiltersIds = Object.keys(filtersStateInfo)
-            .map(filterId => Number(filterId));
-
-        const existingFiltersIds = installedFiltersIds.filter((filterId) => {
-            return allFiltersMetadata.find(f => f.filterId === filterId);
-        });
-
-        const filtersIdsToRemove = installedFiltersIds.filter((id) => {
-            return !existingFiltersIds.includes(id);
-        });
-
-        const removePromises = filtersIdsToRemove.map(async (filterId) => {
-            filterStateStorage.delete(filterId);
-            await FiltersStorage.remove(filterId);
-            log.info(`Filter with id: ${filterId} removed from the storage`);
-        });
-
-        await Promise.all(removePromises);
-    }
+    private static schemaMigrationMap: Record<string, () => Promise<void>> = {
+        [UpdateApi.createSchemaMigrationKey(0, 1)]: UpdateApi.migrateFromV0toV1,
+    };
 
     /**
      * Update app data based on run info
      */
     public static async update({
         clientId,
-        currentVersion,
-        previousVersion,
+        currentAppVersion,
+        currentSchemaVersion,
+        previousSchemaVersion,
     }: RunInfo) {
         // check clientId existence
         if (clientId) {
@@ -69,48 +40,61 @@ export class UpdateApi {
         }
 
         // set actual schema and app version
-        await storage.set(SCHEMA_VERSION_KEY, APP_SCHEMA_VERSION);
-        await storage.set(APP_VERSION_KEY, currentVersion);
+        await storage.set(SCHEMA_VERSION_KEY, currentSchemaVersion);
+        await storage.set(APP_VERSION_KEY, currentAppVersion);
 
         // clear persisted caches
         UpdateApi.clearCache();
 
+        // if schema version changes, process migration
+        if (previousSchemaVersion !== currentSchemaVersion) {
+            await UpdateApi.runSchemaMigration(previousSchemaVersion, currentSchemaVersion);
+        }
+    }
+
+    private static createSchemaMigrationKey(
+        previousSchemaVersion: number,
+        currentSchemaVersion: number,
+    ) {
+        return `${previousSchemaVersion}-${currentSchemaVersion}`;
+    }
+
+    private static async runSchemaMigration(
+        previousSchemaVersion: number,
+        currentSchemaVersion: number,
+    ) {
+        const schemaMigrationKey = UpdateApi.createSchemaMigrationKey(previousSchemaVersion, currentSchemaVersion);
+        const schemaMigrationAction = UpdateApi.schemaMigrationMap[schemaMigrationKey];
+
         try {
-            await UpdateApi.migrate(previousVersion);
+            if (!schemaMigrationAction) {
+                throw new Error('can`t find schema migration action');
+            }
+
+            await schemaMigrationAction();
         } catch (e) {
-            log.error(`Error while migration from ${previousVersion} to ${currentVersion}: ${e.message}`);
+            log.error(`Error while schema migrating from ${
+                previousSchemaVersion
+            } to ${
+                currentSchemaVersion
+            }: ${
+                e.message
+            }`);
+
             log.info('Reset settings...');
             await storage.set(ADGUARD_SETTINGS_KEY, defaultSettings);
         }
     }
 
-    private static async migrate(fromVersion: string) {
-        if (!fromVersion) {
-            throw new Error('Can`t update app, because previous version is not found');
-        }
+    private static async migrateFromV0toV1() {
+        // In the v4.0.171 we have littered window.localStorage with proms used in the promo notifications module,
+        // now we are clearing them
 
-        if (BrowserUtils.isGreaterVersion('4.0.180', fromVersion)) {
-            UpdateApi.clearPromoDetails();
-        }
-
-        if (BrowserUtils.isGreaterVersion('4.2.0', fromVersion)) {
-            await UpdateApi.updateStorage();
-        }
-    }
-
-    /**
-     * In the v4.0.171 we have littered window.localStorage with proms used in the promo notifications module, now we
-     * are clearing them
-     */
-    private static clearPromoDetails() {
         window.localStorage.removeItem(VIEWED_NOTIFICATIONS_KEY);
         window.localStorage.removeItem(LAST_NOTIFICATION_TIME_KEY);
-    }
 
-    /**
-     * In the v4.2.0 we refactoring storage data structure
-     */
-    private static async updateStorage() {
+        // In the v4.2.0 we refactoring storage data structure
+
         // get current settings
         const currentSettings = await storage.get(ADGUARD_SETTINGS_KEY);
 

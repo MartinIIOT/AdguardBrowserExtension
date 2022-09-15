@@ -61,11 +61,14 @@ export class App {
         const runInfo = await getRunInfo();
 
         const {
-            previousVersion,
-            currentVersion,
-            isInstall,
-            isUpdate,
+            previousAppVersion,
+            currentAppVersion,
         } = runInfo;
+
+        const isAppVersionChanged = previousAppVersion !== currentAppVersion;
+
+        const isInstall = isAppVersionChanged && !previousAppVersion;
+        const isUpdate = isAppVersionChanged && !!previousAppVersion;
 
         if (isInstall) {
             await InstallApi.install(runInfo);
@@ -93,11 +96,6 @@ export class App {
           * - Initializes storages for filters state, groups state and filters versions, based on app metadata
           */
         await FiltersApi.init();
-
-        // Remove obsolete filters on update
-        if (isUpdate) {
-            await UpdateApi.removeObsoleteFilters();
-        }
 
         /**
          * Initializes app notifications:
@@ -169,7 +167,7 @@ export class App {
         // Update additional scenario
         if (isUpdate) {
             if (!settingsStorage.get(SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION)) {
-                toasts.showApplicationUpdatedPopup(currentVersion, previousVersion);
+                toasts.showApplicationUpdatedPopup(currentAppVersion, previousAppVersion);
             }
         }
 
