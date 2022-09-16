@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import { MessageType } from '../../common/messages';
-import { SettingOption, Settings } from '../schema';
+import { SettingOption } from '../schema';
 import { messageHandler } from '../message-handler';
 import { UserAgent } from '../../common/user-agent';
 import { AntiBannerFiltersId } from '../../common/constants';
@@ -50,17 +50,6 @@ export class SettingsService {
         );
     }
 
-    static async setSettingAndPublishEvent<T extends SettingOption>(key: T, value: Settings[T]) {
-        SettingsApi.setSetting(key, value);
-
-        await settingsEvents.publishEvent(key, value);
-
-        listeners.notifyListeners(listeners.SETTING_UPDATED, {
-            propertyName: key,
-            propertyValue: value,
-        });
-    }
-
     static getOptionsData() {
         return {
             settings: SettingsApi.getData(),
@@ -81,7 +70,7 @@ export class SettingsService {
 
     static async changeUserSettings(message) {
         const { key, value } = message.data;
-        await SettingsService.setSettingAndPublishEvent(key, value);
+        await SettingsApi.setSetting(key, value);
     }
 
     static async reset() {

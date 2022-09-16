@@ -13,7 +13,6 @@ import { settingsStorage } from '../../storages';
 import { PageStatsApi, SettingsApi, notificationApi } from '../../api';
 
 import { UiService } from './main';
-import { SettingsService } from '../settings';
 import { FramesApi, FrameData } from '../../api/ui/frames';
 
 export class PopupService {
@@ -60,7 +59,7 @@ export class PopupService {
     private static async onChangeFilteringDisable({ data }) {
         const { state: disabled } = data;
 
-        await SettingsService.setSettingAndPublishEvent(SettingOption.DISABLE_FILTERING, disabled);
+        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, disabled);
     }
 
     /**

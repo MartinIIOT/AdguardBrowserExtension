@@ -32,15 +32,18 @@ import {
     storage,
 } from '../storages';
 
-import { UserRulesApi } from './filters/userrules';
-import { AllowlistApi } from './filters/allowlist';
 import {
     CommonFilterApi,
     CustomFilterApi,
     CustomFilterDTO,
     FiltersApi,
+    UserRulesApi,
+    AllowlistApi,
 } from './filters';
+
 import { ADGUARD_SETTINGS_KEY, AntiBannerFiltersId } from '../../common/constants';
+import { settingsEvents } from '../events';
+import { listeners } from '../notifier';
 
 export class SettingsApi {
     public static async init() {
@@ -50,10 +53,18 @@ export class SettingsApi {
     }
 
     /**
-     * Set setting to setting storage
+     * Set setting to storage and publish setting event
      */
-    public static setSetting<T extends SettingOption>(key: T, value: Settings[T]): void {
+    public static async setSetting<T extends SettingOption>(key: T, value: Settings[T]): Promise<void> {
         settingsStorage.set(key, value);
+
+        await settingsEvents.publishEvent(key, value);
+
+        // legacy event mediator for frontend
+        listeners.notifyListeners(listeners.SETTING_UPDATED, {
+            propertyName: key,
+            propertyValue: value,
+        });
     }
 
     /**

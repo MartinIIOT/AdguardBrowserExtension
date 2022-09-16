@@ -5,12 +5,12 @@ import { ForwardFrom } from '../../../common/forward';
 import { SettingOption } from '../../schema';
 import { TabsApi } from '../../api/extension';
 import { PagesApi } from '../../api/ui/pages';
-import { SettingsService } from '../settings';
 import { FiltersService } from '../filters';
 import { UiService } from './main';
 import { AllowlistService } from '../allowlist';
 import { translator } from '../../../common/translators/translator';
 import { FrameData, FramesApi } from '../../api/ui/frames';
+import { SettingsApi } from '../../api';
 
 export type AddMenuItemOptions = Menus.CreateCreatePropertiesType & {
     messageArgs?: { [key: string]: unknown },
@@ -54,11 +54,11 @@ export class ContextMenuService {
     }
 
     private static async enableFiltering() {
-        await SettingsService.setSettingAndPublishEvent(SettingOption.DISABLE_FILTERING, false);
+        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, false);
     }
 
     private static async disableFiltering() {
-        await SettingsService.setSettingAndPublishEvent(SettingOption.DISABLE_FILTERING, true);
+        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, true);
     }
 
     private static async enableSiteFiltering() {
