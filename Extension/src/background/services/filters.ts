@@ -10,7 +10,7 @@ import { Engine } from '../engine';
 import { listeners } from '../notifier';
 import { FiltersApi, toasts } from '../api';
 import { CommonFilterMetadata, filterStateStorage, groupStateStorage } from '../storages';
-import { SettingsService } from './settings';
+import { settingsEvents } from '../events';
 
 export class FiltersService {
     static async init() {
@@ -21,7 +21,7 @@ export class FiltersService {
         messageHandler.addListener(MessageType.DISABLE_FILTERS_GROUP, FiltersService.onGroupDisable);
         messageHandler.addListener(MessageType.CHECK_ANTIBANNER_FILTERS_UPDATE, FiltersService.checkFiltersUpdate);
 
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.USE_OPTIMIZED_FILTERS,
             FiltersService.onOptimizedFiltersSwitch,
         );

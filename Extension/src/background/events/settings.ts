@@ -1,4 +1,4 @@
-import { SettingOption, Settings } from '../../schema';
+import { SettingOption, Settings } from '../schema';
 
 export type SettingsListener<T extends keyof Settings> = (value: Settings[T]) => void | Promise<void>;
 
@@ -22,3 +22,5 @@ export class SettingsEvents {
         }
     }
 }
+
+export const settingsEvents = new SettingsEvents();

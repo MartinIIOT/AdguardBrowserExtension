@@ -5,9 +5,9 @@ import {
 } from '../../common/constants';
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
-import { SettingsService } from './settings';
 import { SettingOption } from '../schema';
 import { UserRulesApi } from '../api';
+import { settingsEvents } from '../events';
 
 export class UserRulesService {
     static async init() {
@@ -23,7 +23,7 @@ export class UserRulesService {
 
         Engine.api.onAssistantCreateRule.subscribe(UserRulesService.addUserRule);
 
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.USER_FILTER_ENABLED,
             UserRulesService.handleEnableStateChange,
         );

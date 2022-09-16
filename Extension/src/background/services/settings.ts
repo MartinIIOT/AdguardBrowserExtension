@@ -1,20 +1,17 @@
-/* eslint-disable no-console */
 import browser from 'webextension-polyfill';
-import { MessageType } from '../../../common/messages';
-import { SettingOption, Settings } from '../../schema';
-import { messageHandler } from '../../message-handler';
-import { UserAgent } from '../../../common/user-agent';
-import { AntiBannerFiltersId } from '../../../common/constants';
+import { MessageType } from '../../common/messages';
+import { SettingOption, Settings } from '../schema';
+import { messageHandler } from '../message-handler';
+import { UserAgent } from '../../common/user-agent';
+import { AntiBannerFiltersId } from '../../common/constants';
 
-import { Engine } from '../../engine';
-import { Categories, SettingsApi, TabsApi } from '../../api';
-import { listeners } from '../../notifier';
-import { SettingsEvents } from './events';
-import { fullscreenUserRulesEditor } from '../fullscreen-user-rules-editor';
+import { Engine } from '../engine';
+import { Categories, SettingsApi, TabsApi } from '../api';
+import { listeners } from '../notifier';
+import { settingsEvents } from '../events';
+import { fullscreenUserRulesEditor } from './fullscreen-user-rules-editor';
 
 export class SettingsService {
-    static onSettingChange = new SettingsEvents();
-
     static init() {
         messageHandler.addListener(MessageType.GET_OPTIONS_DATA, SettingsService.getOptionsData);
         messageHandler.addListener(MessageType.RESET_SETTINGS, SettingsService.reset);
@@ -22,32 +19,32 @@ export class SettingsService {
         messageHandler.addListener(MessageType.APPLY_SETTINGS_JSON, SettingsService.import);
         messageHandler.addListener(MessageType.LOAD_SETTINGS_JSON, SettingsService.export);
 
-        SettingsService.onSettingChange.addListener(SettingOption.DISABLE_STEALTH_MODE, Engine.update);
-        SettingsService.onSettingChange.addListener(SettingOption.HIDE_REFERRER, Engine.update);
-        SettingsService.onSettingChange.addListener(SettingOption.HIDE_SEARCH_QUERIES, Engine.update);
-        SettingsService.onSettingChange.addListener(SettingOption.SEND_DO_NOT_TRACK, Engine.update);
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(SettingOption.DISABLE_STEALTH_MODE, Engine.update);
+        settingsEvents.addListener(SettingOption.HIDE_REFERRER, Engine.update);
+        settingsEvents.addListener(SettingOption.HIDE_SEARCH_QUERIES, Engine.update);
+        settingsEvents.addListener(SettingOption.SEND_DO_NOT_TRACK, Engine.update);
+        settingsEvents.addListener(
             SettingOption.BLOCK_CHROME_CLIENT_DATA,
             Engine.update,
         );
-        SettingsService.onSettingChange.addListener(SettingOption.BLOCK_WEBRTC, Engine.update);
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(SettingOption.BLOCK_WEBRTC, Engine.update);
+        settingsEvents.addListener(
             SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES,
             Engine.update,
         );
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME,
             Engine.update,
         );
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES,
             Engine.update,
         );
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME,
             Engine.update,
         );
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.DISABLE_FILTERING,
             SettingsService.onFilteringStateChange,
         );
@@ -56,7 +53,7 @@ export class SettingsService {
     static async setSettingAndPublishEvent<T extends SettingOption>(key: T, value: Settings[T]) {
         SettingsApi.setSetting(key, value);
 
-        await SettingsService.onSettingChange.publishEvent(key, value);
+        await settingsEvents.publishEvent(key, value);
 
         listeners.notifyListeners(listeners.SETTING_UPDATED, {
             propertyName: key,

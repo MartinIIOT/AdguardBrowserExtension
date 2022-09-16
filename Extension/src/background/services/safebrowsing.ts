@@ -2,14 +2,14 @@ import browser, { WebRequest } from 'webextension-polyfill';
 import { RequestType } from '@adguard/tsurlfilter';
 import { RequestData, RequestEvents } from '@adguard/tswebextension';
 import { SafebrowsingApi } from '../api/safebrowsing';
-import { SettingsService } from './settings';
 import { SettingOption } from '../schema';
+import { settingsEvents } from '../events';
 
 export class SafebrowsingService {
     static init() {
         SafebrowsingApi.initCache();
 
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.DISABLE_SAFEBROWSING,
             SafebrowsingApi.clearCache,
         );

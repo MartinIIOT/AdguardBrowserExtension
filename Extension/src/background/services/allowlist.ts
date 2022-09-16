@@ -8,9 +8,9 @@ import {
 } from '../../common/constants';
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
-import { SettingsService } from './settings';
 import { SettingOption } from '../schema';
 import { AllowlistApi } from '../api';
+import { settingsEvents } from '../events';
 
 /**
  * Service for processing events with a allowlist
@@ -25,12 +25,12 @@ export class AllowlistService {
         messageHandler.addListener(MessageType.ADD_ALLOWLIST_DOMAIN_POPUP, AllowlistService.onAddAllowlistDomain);
         messageHandler.addListener(MessageType.REMOVE_ALLOWLIST_DOMAIN, AllowlistService.onRemoveAllowlistDomain);
 
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.ALLOWLIST_ENABLED,
             AllowlistService.onEnableStateChange,
         );
 
-        SettingsService.onSettingChange.addListener(
+        settingsEvents.addListener(
             SettingOption.DEFAULT_ALLOWLIST_MODE,
             AllowlistService.onAllowlistModeChange,
         );
