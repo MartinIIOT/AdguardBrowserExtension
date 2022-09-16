@@ -1,3 +1,4 @@
+import { TabContext, tabsApi } from '@adguard/tswebextension';
 import browser, { Menus } from 'webextension-polyfill';
 
 import { ForwardFrom } from '../../../common/forward';
@@ -9,12 +10,16 @@ import { FiltersService } from '../filters';
 import { UiService } from './main';
 import { AllowlistService } from '../allowlist';
 import { translator } from '../../../common/translators/translator';
+import { FrameData, FramesApi } from '../../api/ui/frames';
 
 export type AddMenuItemOptions = Menus.CreateCreatePropertiesType & {
-    messageArgs: { [key: string]: unknown },
+    messageArgs?: { [key: string]: unknown },
 };
 
-export const enum ContextMenuActions {
+export const enum ContextMenuItems {
+    SITE_PROTECTION_DISABLED = 'context_site_protection_disabled',
+    SITE_FILTERING_DISABLED = 'context_site_filtering_disabled',
+    SITE_EXCEPTION = 'context_site_exception',
     BLOCK_SITE_ADS = 'context_block_site_ads',
     BLOCK_SITE_ELEMENT = 'context_block_site_element',
     SECURITY_REPORT = 'context_security_report',
@@ -28,21 +33,25 @@ export const enum ContextMenuActions {
     UPDATE_ANTIBANNER_FILTERS = 'context_update_antibanner_filters',
 }
 
-// TODO
 export class ContextMenuService {
     public static actionMap = {
-        [ContextMenuActions.BLOCK_SITE_ADS]: UiService.openAssistant,
-        [ContextMenuActions.BLOCK_SITE_ELEMENT]: UiService.openAssistant, // TODO
-        [ContextMenuActions.SECURITY_REPORT]: ContextMenuService.openSiteReportPage,
-        [ContextMenuActions.COMPLAINT_WEBSITE]: ContextMenuService.openAbusePage,
-        [ContextMenuActions.SITE_FILTERING_ON]: ContextMenuService.enableSiteFiltering,
-        [ContextMenuActions.SITE_FILTERING_OFF]: ContextMenuService.disableSiteFiltering,
-        [ContextMenuActions.ENABLE_PROTECTION]: ContextMenuService.enableFiltering,
-        [ContextMenuActions.DISABLE_PROTECTION]: ContextMenuService.disableFiltering,
-        [ContextMenuActions.OPEN_SETTINGS]: PagesApi.openSettingsPage,
-        [ContextMenuActions.OPEN_LOG]: PagesApi.openFilteringLogPage,
-        [ContextMenuActions.UPDATE_ANTIBANNER_FILTERS]: FiltersService.checkFiltersUpdate,
+        [ContextMenuItems.BLOCK_SITE_ADS]: UiService.openAssistant,
+        [ContextMenuItems.BLOCK_SITE_ELEMENT]: UiService.openAssistant, // TODO
+        [ContextMenuItems.SECURITY_REPORT]: ContextMenuService.openSiteReportPage,
+        [ContextMenuItems.COMPLAINT_WEBSITE]: ContextMenuService.openAbusePage,
+        [ContextMenuItems.SITE_FILTERING_ON]: ContextMenuService.enableSiteFiltering,
+        [ContextMenuItems.SITE_FILTERING_OFF]: ContextMenuService.disableSiteFiltering,
+        [ContextMenuItems.ENABLE_PROTECTION]: ContextMenuService.enableFiltering,
+        [ContextMenuItems.DISABLE_PROTECTION]: ContextMenuService.disableFiltering,
+        [ContextMenuItems.OPEN_SETTINGS]: PagesApi.openSettingsPage,
+        [ContextMenuItems.OPEN_LOG]: PagesApi.openFilteringLogPage,
+        [ContextMenuItems.UPDATE_ANTIBANNER_FILTERS]: FiltersService.checkFiltersUpdate,
     };
+
+    public static init() {
+        tabsApi.onUpdate.subscribe(ContextMenuService.updateMenu);
+        tabsApi.onActivated.subscribe(ContextMenuService.updateMenu);
+    }
 
     private static async enableFiltering() {
         await SettingsService.setSettingAndPublishEvent(SettingOption.DISABLE_FILTERING, false);
@@ -84,19 +93,39 @@ export class ContextMenuService {
         }
     }
 
-    private static addMenuItem(action: ContextMenuActions, options: AddMenuItemOptions) {
+    private static addFilteringDisabledMenuItems() {
+        ContextMenuService.addMenuItem(ContextMenuItems.SITE_FILTERING_DISABLED);
+        ContextMenuService.addSeparator();
+        ContextMenuService.addMenuItem(ContextMenuItems.OPEN_LOG);
+        ContextMenuService.addMenuItem(ContextMenuItems.OPEN_SETTINGS);
+        ContextMenuService.addMenuItem(ContextMenuItems.ENABLE_PROTECTION);
+    }
+
+    private static addUrlFilteringDisabledContextMenuItems() {
+        ContextMenuService.addMenuItem(ContextMenuItems.SITE_FILTERING_DISABLED);
+        ContextMenuService.addSeparator();
+        ContextMenuService.addMenuItem(ContextMenuItems.OPEN_LOG);
+        ContextMenuService.addMenuItem(ContextMenuItems.OPEN_SETTINGS);
+        ContextMenuService.addMenuItem(ContextMenuItems.UPDATE_ANTIBANNER_FILTERS);
+    }
+
+    private static addMenuItem(item: ContextMenuItems, options: AddMenuItemOptions = {}) {
         const { messageArgs, ...rest } = options;
+
+        let onClick: (() => void) | undefined;
+
+        const action = ContextMenuService.actionMap?.[item];
+
+        if (action) {
+            onClick = () => {
+                action();
+            };
+        }
 
         browser.contextMenus.create({
             contexts: ['all'],
-            title: translator.getMessage(action, messageArgs),
-            onclick: () => {
-                const callback = ContextMenuService.actionMap[action];
-
-                if (callback) {
-                    callback();
-                }
-            },
+            title: translator.getMessage(item, messageArgs),
+            onclick: onClick,
             ...rest,
         });
     }
@@ -106,5 +135,54 @@ export class ContextMenuService {
             type: 'separator',
             contexts: ['all'],
         });
+    }
+
+    private static addMenu({
+        applicationFilteringDisabled,
+        urlFilteringDisabled,
+        documentAllowlisted,
+        userAllowlisted,
+        canAddRemoveRule,
+    }: FrameData) {
+        if (applicationFilteringDisabled) {
+            ContextMenuService.addFilteringDisabledMenuItems();
+        } else if (urlFilteringDisabled) {
+            ContextMenuService.addUrlFilteringDisabledContextMenuItems();
+        } else {
+            if (documentAllowlisted && !userAllowlisted) {
+                ContextMenuService.addMenuItem(ContextMenuItems.SITE_EXCEPTION);
+            } else if (canAddRemoveRule) {
+                if (documentAllowlisted) {
+                    ContextMenuService.addMenuItem(ContextMenuItems.SITE_FILTERING_ON);
+                } else {
+                    ContextMenuService.addMenuItem(ContextMenuItems.SITE_FILTERING_OFF);
+                }
+            }
+            ContextMenuService.addSeparator();
+
+            if (!documentAllowlisted) {
+                ContextMenuService.addMenuItem(ContextMenuItems.BLOCK_SITE_ADS);
+                ContextMenuService.addMenuItem(ContextMenuItems.BLOCK_SITE_ELEMENT, {
+                    contexts: ['image', 'video', 'audio'],
+                });
+            }
+
+            ContextMenuService.addMenuItem(ContextMenuItems.SECURITY_REPORT);
+            ContextMenuService.addMenuItem(ContextMenuItems.COMPLAINT_WEBSITE);
+            ContextMenuService.addSeparator();
+            ContextMenuService.addMenuItem(ContextMenuItems.UPDATE_ANTIBANNER_FILTERS);
+            ContextMenuService.addSeparator();
+            ContextMenuService.addMenuItem(ContextMenuItems.OPEN_SETTINGS);
+            ContextMenuService.addMenuItem(ContextMenuItems.OPEN_LOG);
+            ContextMenuService.addMenuItem(ContextMenuItems.DISABLE_PROTECTION);
+        }
+    }
+
+    private static async updateMenu(tabContext: TabContext) {
+        const frameData = FramesApi.getMainFrameDataByTabContext(tabContext);
+
+        await browser.contextMenus.removeAll();
+
+        ContextMenuService.addMenu(frameData);
     }
 }

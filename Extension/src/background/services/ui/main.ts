@@ -1,6 +1,6 @@
 import { debounce } from 'lodash';
 import browser from 'webextension-polyfill';
-import { isHttpRequest, tabsApi } from '@adguard/tswebextension';
+import { tabsApi } from '@adguard/tswebextension';
 
 import { messageHandler } from '../../message-handler';
 import {
@@ -24,6 +24,7 @@ import {
     notificationApi,
     PagesApi,
 } from '../../api';
+import { FramesApi } from '../../api/ui/frames';
 
 export class UiService {
     static async init() {
@@ -123,27 +124,27 @@ export class UiService {
         }
 
         try {
-            let blocked: number;
-            let disabled: boolean;
-
             const tabContext = tabsApi.getTabContext(tabId);
 
             if (!tabContext) {
                 return;
             }
 
-            const { frames, metadata } = tabContext;
+            const {
+                urlFilteringDisabled,
+                documentAllowlisted,
+                applicationFilteringDisabled,
+                totalBlockedTab,
+            } = FramesApi.getMainFrameDataByTabContext(tabContext);
 
-            const { blockedRequestCount, mainFrameRule } = metadata;
+            const disabled = urlFilteringDisabled
+                || documentAllowlisted
+                || applicationFilteringDisabled;
 
-            const mainFrame = frames.get(0);
-
-            disabled = !isHttpRequest(mainFrame?.url);
-            disabled = disabled || (!!mainFrameRule && mainFrameRule.isAllowlist());
-            disabled = disabled || settingsStorage.get(SettingOption.DISABLE_FILTERING);
+            let blocked: number;
 
             if (!disabled && !settingsStorage.get(SettingOption.DISABLE_SHOW_PAGE_STATS)) {
-                blocked = blockedRequestCount || 0;
+                blocked = totalBlockedTab;
             } else {
                 blocked = 0;
             }

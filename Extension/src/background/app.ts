@@ -29,6 +29,7 @@ import {
     SafebrowsingService,
     localeDetect,
     NotificationService,
+    ContextMenuService,
 } from './services';
 import {
     Forward,
@@ -148,6 +149,8 @@ export class App {
          * - Adds listener for safebrowsing settings option switcher
          */
         SafebrowsingService.init();
+
+        ContextMenuService.init();
 
         // Sets app uninstall url
         await App.setUninstallUrl();
