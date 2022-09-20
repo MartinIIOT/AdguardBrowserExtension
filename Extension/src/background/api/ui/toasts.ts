@@ -4,8 +4,8 @@ import { BrowserUtils } from '../../utils/browser-utils';
 
 import { translator } from '../../../common/translators/translator';
 import { TabsApi } from '../extension';
-import { CommonFilterMetadata } from '../../storages';
 import { notificationApi } from './notification';
+import { FilterMetadata } from '../filters';
 
 export class Toasts {
     private static maxTries = 500; // 2500 sec
@@ -47,13 +47,13 @@ export class Toasts {
         }
     }
 
-    public showFiltersEnabledAlertMessage(filters: CommonFilterMetadata[]) {
+    public showFiltersEnabledAlertMessage(filters: FilterMetadata[]) {
         const { title, text } = Toasts.getFiltersEnabledResultMessage(filters);
 
         this.showAlertMessage(title, text);
     }
 
-    public showFiltersUpdatedAlertMessage(success: boolean, filters?: CommonFilterMetadata[]) {
+    public showFiltersUpdatedAlertMessage(success: boolean, filters?: FilterMetadata[]) {
         const { title, text } = Toasts.getFiltersUpdateResultMessage(success, filters);
 
         this.showAlertMessage(title, text);
@@ -131,7 +131,7 @@ export class Toasts {
         }
     }
 
-    private static getFiltersEnabledResultMessage(enabledFilters: CommonFilterMetadata[]) {
+    private static getFiltersEnabledResultMessage(enabledFilters: FilterMetadata[]) {
         const title = translator.getMessage('alert_popup_filter_enabled_title');
 
         const text = enabledFilters
@@ -146,7 +146,7 @@ export class Toasts {
 
     private static getFiltersUpdateResultMessage(
         success: boolean,
-        updatedFilters?: CommonFilterMetadata[],
+        updatedFilters?: FilterMetadata[],
     ) {
         if (!success || !updatedFilters) {
             return {

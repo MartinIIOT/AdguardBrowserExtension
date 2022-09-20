@@ -4,6 +4,7 @@ import { SettingOption } from '../schema';
 
 export type CustomFilterMetadata = {
     filterId: number,
+    displayNumber: number,
     groupId: number,
     name: string,
     description: string,

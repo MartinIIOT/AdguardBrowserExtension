@@ -1,4 +1,3 @@
-import { tabsApi, getHost } from '@adguard/tswebextension';
 import browser from 'webextension-polyfill';
 import {
     MessageType,
@@ -49,64 +48,16 @@ export class AllowlistService {
         return { content, appVersion: browser.runtime.getManifest().version };
     }
 
-    /**
-     * If default allowlist mode, adds tab url to the list
-     * If inverted allowlist mode, removes domain from the list
-     */
-    static async addTabUrlToAllowlist(tabId: number) {
-        const mainFrame = tabsApi.getTabMainFrame(tabId);
-
-        if (!mainFrame?.url) {
-            return;
-        }
-
-        const domain = getHost(mainFrame.url);
-
-        if (AllowlistApi.isInverted()) {
-            AllowlistApi.removeInvertedAllowlistDomain(domain);
-        } else {
-            AllowlistApi.addAllowlistDomain(domain);
-        }
-
-        await Engine.update();
-
-        await browser.tabs.reload(tabId);
-    }
-
     static async onAddAllowlistDomain(message: AddAllowlistDomainPopupMessage) {
         const { tabId } = message.data;
 
-        await AllowlistService.addTabUrlToAllowlist(tabId);
-    }
-
-    /**
-     * If default allowlist mode, removes domain from the list
-     * If inverted allowlist mode, adds domain to the list
-     */
-    static async removeTabUrlFromAllowlist(tabId: number) {
-        const mainFrame = tabsApi.getTabMainFrame(tabId);
-
-        if (!mainFrame?.url) {
-            return;
-        }
-
-        const domain = getHost(mainFrame.url);
-
-        if (AllowlistApi.isInverted()) {
-            AllowlistApi.addInvertedAllowlistDomain(domain);
-        } else {
-            AllowlistApi.removeAllowlistDomain(domain);
-        }
-
-        await Engine.update();
-
-        await browser.tabs.reload(tabId);
+        await AllowlistApi.addTabUrlToAllowlist(tabId);
     }
 
     static async onRemoveAllowlistDomain(message: RemoveAllowlistDomainMessage) {
         const { tabId } = message.data;
 
-        await AllowlistService.removeTabUrlFromAllowlist(tabId);
+        await AllowlistApi.removeTabUrlFromAllowlist(tabId);
     }
 
     /**

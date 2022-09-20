@@ -15,7 +15,9 @@ import {
     SettingsApi,
     UpdateApi,
     InstallApi,
+    FilterUpdateApi,
 } from './api';
+
 import {
     UiService,
     PopupService,
@@ -29,7 +31,6 @@ import {
     SafebrowsingService,
     localeDetect,
     NotificationService,
-    ContextMenuService,
 } from './services';
 import {
     Forward,
@@ -99,6 +100,11 @@ export class App {
         await FiltersApi.init();
 
         /**
+         * Check installed filters updates
+         */
+        await FilterUpdateApi.autoUpdateFilters();
+
+        /**
          * Initializes app notifications:
          * - Initializes notifications storage
          * - Adds listeners for notification events
@@ -149,8 +155,6 @@ export class App {
          * - Adds listener for safebrowsing settings option switcher
          */
         SafebrowsingService.init();
-
-        ContextMenuService.init();
 
         // Sets app uninstall url
         await App.setUninstallUrl();

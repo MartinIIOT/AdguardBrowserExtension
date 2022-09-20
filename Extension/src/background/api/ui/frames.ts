@@ -32,7 +32,7 @@ export type FrameData = {
  * Helper class for retrieving frame data from both tswebextension and app state
  */
 export class FramesApi {
-    public static getMainFrameDataByTabContext({
+    public static getMainFrameData({
         info,
         frames,
         metadata,

@@ -1,3 +1,5 @@
+import { getHost, tabsApi } from '@adguard/tswebextension';
+import browser from 'webextension-polyfill';
 import { SettingOption } from '../../schema';
 import { listeners } from '../../notifier';
 import {
@@ -5,6 +7,8 @@ import {
     allowlistDomainsStorage,
     invertedAllowlistDomainsStorage,
 } from '../../storages';
+
+import { Engine } from '../../engine';
 
 export type DomainsStorage =
     | typeof allowlistDomainsStorage
@@ -96,6 +100,66 @@ export class AllowlistApi {
      */
     public static removeInvertedAllowlistDomain(domain: string) {
         AllowlistApi.removeDomain(domain, invertedAllowlistDomainsStorage);
+    }
+
+    /**
+     * If default allowlist mode, removes tab domain from the list
+     * If inverted allowlist mode, adds tab domain to the list
+     *
+     * Updates tswebextension configuration and reload tab after changes apply
+     */
+    public static async removeTabUrlFromAllowlist(tabId: number) {
+        const mainFrame = tabsApi.getTabMainFrame(tabId);
+
+        if (!mainFrame?.url) {
+            return;
+        }
+
+        const domain = getHost(mainFrame.url);
+
+        if (!domain) {
+            return;
+        }
+
+        if (AllowlistApi.isInverted()) {
+            AllowlistApi.addInvertedAllowlistDomain(domain);
+        } else {
+            AllowlistApi.removeAllowlistDomain(domain);
+        }
+
+        await Engine.update();
+
+        await browser.tabs.reload(tabId);
+    }
+
+    /**
+     * If default allowlist mode, adds tab url to the list
+     * If inverted allowlist mode, removes domain from the list
+     *
+     * Updates tswebextension configuration and reload tab after changes apply
+     */
+    public static async addTabUrlToAllowlist(tabId: number) {
+        const mainFrame = tabsApi.getTabMainFrame(tabId);
+
+        if (!mainFrame?.url) {
+            return;
+        }
+
+        const domain = getHost(mainFrame.url);
+
+        if (!domain) {
+            return;
+        }
+
+        if (AllowlistApi.isInverted()) {
+            AllowlistApi.removeInvertedAllowlistDomain(domain);
+        } else {
+            AllowlistApi.addAllowlistDomain(domain);
+        }
+
+        await Engine.update();
+
+        await browser.tabs.reload(tabId);
     }
 
     /**

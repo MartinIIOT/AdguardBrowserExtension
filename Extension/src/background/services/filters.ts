@@ -7,10 +7,10 @@ import { SettingOption } from '../schema';
 
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
-import { listeners } from '../notifier';
-import { FiltersApi, toasts } from '../api';
-import { CommonFilterMetadata, filterStateStorage, groupStateStorage } from '../storages';
+import { FiltersApi, FilterUpdateApi, toasts } from '../api';
+import { filterStateStorage, groupStateStorage } from '../storages';
 import { settingsEvents } from '../events';
+import { listeners } from '../notifier';
 
 export class FiltersService {
     static async init() {
@@ -21,10 +21,7 @@ export class FiltersService {
         messageHandler.addListener(MessageType.DISABLE_FILTERS_GROUP, FiltersService.onGroupDisable);
         messageHandler.addListener(MessageType.CHECK_ANTIBANNER_FILTERS_UPDATE, FiltersService.checkFiltersUpdate);
 
-        settingsEvents.addListener(
-            SettingOption.USE_OPTIMIZED_FILTERS,
-            FiltersService.onOptimizedFiltersSwitch,
-        );
+        settingsEvents.addListener(SettingOption.USE_OPTIMIZED_FILTERS, FiltersService.onOptimizedFiltersSwitch);
     }
 
     static async onFilterEnable(message: AddAndEnableFilterMessage) {
@@ -59,16 +56,11 @@ export class FiltersService {
 
     static async checkFiltersUpdate() {
         try {
-            const enabledFilters = FiltersApi.getEnabledFilters();
-
-            const updatedFilters = await FiltersApi.updateFilters(enabledFilters);
-
-            filterStateStorage.enableFilters(enabledFilters);
+            const updatedFilters = await FilterUpdateApi.updateEnabledFilters();
 
             await Engine.update();
 
-            // TODO: type-save alerts for custom filter updates
-            toasts.showFiltersUpdatedAlertMessage(true, updatedFilters as CommonFilterMetadata[]);
+            toasts.showFiltersUpdatedAlertMessage(true, updatedFilters);
             listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY, updatedFilters);
 
             return updatedFilters;

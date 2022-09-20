@@ -33,6 +33,18 @@ export class FilterVersionStorage extends StringStorage<
         this.save();
     }
 
+    public refreshLastCheckTime(filtersIds: number[]) {
+        for (let i = 0; i < filtersIds.length; i += 1) {
+            const filterId = filtersIds[i];
+
+            if (this.data[filterId]) {
+                this.data[filterId].lastCheckTime = Date.now();
+            }
+        }
+
+        this.save();
+    }
+
     public static applyMetadata(
         data: FilterVersionStorageData,
         metadata: Metadata,

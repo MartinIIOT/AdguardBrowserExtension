@@ -76,10 +76,10 @@ export class FiltersApi {
      *
      * @param filterId - filter id
      */
-    public static isFilterRulesIsLoaded(filterId: number) {
+    public static isFilterRulesIsLoaded(filterId: number): boolean {
         const filterState = filterStateStorage.get(filterId);
 
-        return filterState?.loaded;
+        return !!filterState?.loaded;
     }
 
     /**
@@ -87,10 +87,10 @@ export class FiltersApi {
      *
      * @param filterId - filter id
      */
-    public static isFilterEnabled(filterId: number) {
+    public static isFilterEnabled(filterId: number): boolean {
         const filterState = filterStateStorage.get(filterId);
 
-        return filterState?.enabled;
+        return !!filterState?.enabled;
     }
 
     /**
@@ -171,39 +171,6 @@ export class FiltersApi {
         await Promise.allSettled(commonFilters.map(id => CommonFilterApi.loadFilterRulesFromBackend(id, true)));
 
         filterStateStorage.enableFilters(filtersIds);
-    }
-
-    /**
-     * Update filters
-     *
-     * @param filtersIds - filter ids
-     */
-    public static async updateFilters(filtersIds: number[]) {
-        /**
-         * Reload common filters metadata from backend for correct
-         * version matching on update check.
-         */
-        await FiltersApi.loadMetadata(true);
-
-        const updatedFiltersMetadata: FilterMetadata[] = [];
-
-        const updateTasks = filtersIds.map(async (filterId) => {
-            let filterMetadata: CustomFilterMetadata | CommonFilterMetadata | null;
-
-            if (CustomFilterApi.isCustomFilter(filterId)) {
-                filterMetadata = await CustomFilterApi.updateFilter(filterId);
-            } else {
-                filterMetadata = await CommonFilterApi.updateFilter(filterId);
-            }
-
-            if (filterMetadata) {
-                updatedFiltersMetadata.push(filterMetadata);
-            }
-        });
-
-        await Promise.allSettled(updateTasks);
-
-        return updatedFiltersMetadata;
     }
 
     /**

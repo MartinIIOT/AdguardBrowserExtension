@@ -10,9 +10,13 @@ import { messageHandler } from '../../message-handler';
 import { SettingOption } from '../../schema';
 import { UserAgent } from '../../../common/user-agent';
 import { settingsStorage } from '../../storages';
-import { PageStatsApi, SettingsApi, notificationApi } from '../../api';
+import {
+    PageStatsApi,
+    SettingsApi,
+    notificationApi,
+    UiApi,
+} from '../../api';
 
-import { UiService } from './main';
 import { FramesApi, FrameData } from '../../api/ui/frames';
 
 export class PopupService {
@@ -53,7 +57,10 @@ export class PopupService {
 
         PageStatsApi.updateStats(rule.getFilterListId(), blockedCountIncrement);
         PageStatsApi.incrementTotalBlocked(blockedCountIncrement);
-        UiService.debounceUpdateTabIcon(tabId);
+
+        const tabContext = tabsApi.getTabContext(tabId);
+
+        UiApi.debounceUpdateTabIconAndContextMenu(tabContext);
     }
 
     private static async onChangeFilteringDisable({ data }) {
@@ -68,6 +75,6 @@ export class PopupService {
     private static getMainFrameInfo(tabId: number): FrameData {
         const tabContext = tabsApi.getTabContext(tabId);
 
-        return FramesApi.getMainFrameDataByTabContext(tabContext);
+        return FramesApi.getMainFrameData(tabContext);
     }
 }

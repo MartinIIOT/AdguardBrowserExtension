@@ -1,4 +1,3 @@
-import { debounce } from 'lodash';
 import browser from 'webextension-polyfill';
 import { tabsApi } from '@adguard/tswebextension';
 
@@ -10,24 +9,21 @@ import {
 } from '../../../common/messages';
 import { UserAgent } from '../../../common/user-agent';
 import { Engine } from '../../engine';
-import { settingsStorage } from '../../storages';
-import { SettingOption } from '../../schema';
-import { AntiBannerFiltersId, BACKGROUND_TAB_ID } from '../../../common/constants';
+import { AntiBannerFiltersId } from '../../../common/constants';
 import { listeners } from '../../notifier';
 
 import {
     toasts,
     FiltersApi,
     TabsApi,
-    getIconImageData,
     SettingsApi,
-    notificationApi,
     PagesApi,
+    AssistantApi,
+    UiApi,
 } from '../../api';
-import { FramesApi } from '../../api/ui/frames';
 
 export class UiService {
-    static async init() {
+    public static async init() {
         await toasts.init();
 
         messageHandler.addListener(MessageType.OPEN_TAB, TabsApi.openTab);
@@ -45,39 +41,26 @@ export class UiService {
             PagesApi.openSettingsPageWithCustomFilterModal,
         );
 
-        messageHandler.addListener(MessageType.OPEN_ASSISTANT, UiService.openAssistant);
+        messageHandler.addListener(MessageType.OPEN_ASSISTANT, AssistantApi.openAssistant);
         messageHandler.addListener(MessageType.INITIALIZE_FRAME_SCRIPT, UiService.initializeFrameScriptRequest);
 
-        tabsApi.onUpdate.subscribe((tab) => {
-            UiService.debounceUpdateTabIcon(tab.info.id);
-        });
-
-        tabsApi.onActivated.subscribe((tab) => {
-            UiService.debounceUpdateTabIcon(tab.info.id);
-        });
+        tabsApi.onUpdate.subscribe(UiApi.debounceUpdateTabIconAndContextMenu);
+        tabsApi.onActivated.subscribe(UiApi.debounceUpdateTabIconAndContextMenu);
     }
 
-    static async openAbusePage({ data }: OpenAbuseTabMessage): Promise<void> {
+    private static async openAbusePage({ data }: OpenAbuseTabMessage): Promise<void> {
         const { url, from } = data;
 
         await PagesApi.openAbusePage(url, from);
     }
 
-    static async openSiteReportPage({ data }: OpenSiteReportTabMessage): Promise<void> {
+    private static async openSiteReportPage({ data }: OpenSiteReportTabMessage): Promise<void> {
         const { url, from } = data;
 
         await PagesApi.openSiteReportPage(url, from);
     }
 
-    static async openAssistant(): Promise<void> {
-        const activeTab = await TabsApi.getActive();
-
-        if (activeTab) {
-            Engine.api.openAssistant(activeTab.id);
-        }
-    }
-
-    static initializeFrameScriptRequest() {
+    private static initializeFrameScriptRequest() {
         const enabledFilters = {};
         Object.values(AntiBannerFiltersId).forEach((filterId) => {
             const enabled = FiltersApi.isFilterEnabled(Number(filterId));
@@ -108,90 +91,5 @@ export class UiService {
                 EventNotifierTypes: listeners.events,
             },
         };
-    }
-
-    static debounceUpdateTabIcon(tabId: number) {
-        debounce(() => UiService.updateTabIcon(tabId), 100)();
-    }
-
-    static async updateTabIcon(tabId: number) {
-        let icon: Record<string, string>;
-        let badge: string;
-        let badgeColor = '#555';
-
-        if (tabId === BACKGROUND_TAB_ID) {
-            return;
-        }
-
-        try {
-            const tabContext = tabsApi.getTabContext(tabId);
-
-            if (!tabContext) {
-                return;
-            }
-
-            const {
-                urlFilteringDisabled,
-                documentAllowlisted,
-                applicationFilteringDisabled,
-                totalBlockedTab,
-            } = FramesApi.getMainFrameDataByTabContext(tabContext);
-
-            const disabled = urlFilteringDisabled
-                || documentAllowlisted
-                || applicationFilteringDisabled;
-
-            let blocked: number;
-
-            if (!disabled && !settingsStorage.get(SettingOption.DISABLE_SHOW_PAGE_STATS)) {
-                blocked = totalBlockedTab;
-            } else {
-                blocked = 0;
-            }
-
-            if (disabled) {
-                icon = {
-                    '19': browser.runtime.getURL('assets/icons/gray-19.png'),
-                    '38': browser.runtime.getURL('assets/icons/gray-38.png'),
-                };
-            } else {
-                icon = {
-                    '19': browser.runtime.getURL('assets/icons/green-19.png'),
-                    '38': browser.runtime.getURL('assets/icons/green-38.png'),
-                };
-            }
-
-            if (blocked === 0) {
-                badge = '';
-            } else if (blocked > 99) {
-                badge = '\u221E';
-            } else {
-                badge = String(blocked);
-            }
-
-            // If there's an active notification, indicate it on the badge
-            const notification = await notificationApi.getCurrentNotification();
-            if (notification) {
-                badge = notification.badgeText || badge;
-                badgeColor = notification.badgeBgColor || badgeColor;
-
-                if (notification.icons) {
-                    if (disabled) {
-                        icon = notification.icons.ICON_GRAY;
-                    } else {
-                        icon = notification.icons.ICON_GREEN;
-                    }
-                }
-            }
-
-            await browser.browserAction.setIcon({ tabId, imageData: await getIconImageData(icon) });
-
-            if (badge) {
-                await browser.browserAction.setBadgeText({ tabId, text: badge });
-                await browser.browserAction.setBadgeBackgroundColor({ tabId, color: badgeColor });
-            }
-        } catch (e) {
-            // do nothing
-        }
     }
 }
