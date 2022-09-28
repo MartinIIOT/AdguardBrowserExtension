@@ -31,6 +31,7 @@
     "plugin:jsdoc/recommended"
   ],
   "rules": {
+    "@typescript-eslint/explicit-function-return-type": "warn",
     "import/no-extraneous-dependencies": 0,
     "import/no-cycle": "off",
     "@typescript-eslint/no-use-before-define": "off",
