@@ -3,7 +3,6 @@ export * from './collections';
 export * from './filters';
 export * from './i18n';
 export * from './lazy';
-export * from './lru-cache';
 export * from './string-storage';
 export * from './url';
 export * from './version';

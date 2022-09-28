@@ -10,10 +10,10 @@ export class DocumentBlockApi {
                 // TODO: schema validation
                 trustedDomainsStorage.setCache(JSON.parse(storageData));
             } else {
-                trustedDomainsStorage.setData([]);
+                await trustedDomainsStorage.setData([]);
             }
         } catch (e) {
-            trustedDomainsStorage.setData([]);
+            await trustedDomainsStorage.setData([]);
         }
     }
 

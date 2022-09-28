@@ -44,7 +44,7 @@ export class UpdateApi {
         await storage.set(APP_VERSION_KEY, currentAppVersion);
 
         // clear persisted caches
-        UpdateApi.clearCache();
+        await UpdateApi.clearCache();
 
         // if schema version changes, process migration
         if (previousSchemaVersion !== currentSchemaVersion) {
@@ -154,7 +154,7 @@ export class UpdateApi {
         }
     }
 
-    private static clearCache() {
-        SafebrowsingApi.clearCache();
+    private static async clearCache() {
+        await SafebrowsingApi.clearCache();
     }
 }

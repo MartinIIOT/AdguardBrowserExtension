@@ -156,7 +156,7 @@ export class App {
          * - Adds listener for safebrowsing settings option switcher
          * - Adds listener for "add trusted domain" message
          */
-        SafebrowsingService.init();
+        await SafebrowsingService.init();
 
         /**
          * Initializes Document block module

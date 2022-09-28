@@ -8,8 +8,8 @@ import { messageHandler } from '../message-handler';
 import { MessageType } from '../../common/messages';
 
 export class SafebrowsingService {
-    public static init() {
-        SafebrowsingApi.initCache();
+    public static async init() {
+        await SafebrowsingApi.initCache();
 
         settingsEvents.addListener(
             SettingOption.DISABLE_SAFEBROWSING,
@@ -42,12 +42,12 @@ export class SafebrowsingService {
 
     private static async onAddTrustedDomain({ data }): Promise<void> {
         const { url } = data;
-        SafebrowsingApi.addToSafebrowsingTrusted(url);
+        await SafebrowsingApi.addToSafebrowsingTrusted(url);
 
         const tab = await TabsApi.getActive();
 
         if (tab?.id) {
-            browser.tabs.update(tab.id, { url });
+            await browser.tabs.update(tab.id, { url });
         }
     }
 }

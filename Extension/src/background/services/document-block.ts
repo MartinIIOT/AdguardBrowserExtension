@@ -21,7 +21,7 @@ export class DocumentBlockService {
         const tab = await TabsApi.getActive();
 
         if (tab?.id) {
-            browser.tabs.update(tab.id, { url });
+            await browser.tabs.update(tab.id, { url });
         }
     }
 }

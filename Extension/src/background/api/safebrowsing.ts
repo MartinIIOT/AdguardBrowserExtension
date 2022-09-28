@@ -29,15 +29,15 @@ export class SafebrowsingApi {
 
     private static SB_ALLOW_LIST = 'allowlist';
 
-    public static initCache() {
-        sbCache.init();
+    public static async initCache() {
+        await sbCache.init();
     }
 
     /**
      * Clears safebrowsing cache
      */
-    public static clearCache() {
-        sbCache.clear();
+    public static async clearCache() {
+        await sbCache.clear();
     }
 
     /**
@@ -46,13 +46,13 @@ export class SafebrowsingApi {
      *
      * @param url URL
      */
-    public static addToSafebrowsingTrusted(url: string) {
+    public static async addToSafebrowsingTrusted(url: string) {
         const host = UrlUtils.getHost(url);
         if (!host) {
             return;
         }
 
-        sbCache.set(SafebrowsingApi.createHash(host), SafebrowsingApi.SB_ALLOW_LIST);
+        await sbCache.set(SafebrowsingApi.createHash(host), SafebrowsingApi.SB_ALLOW_LIST);
     }
 
     /**
@@ -122,7 +122,7 @@ export class SafebrowsingApi {
         if (shortHashes.length === 0) {
             // In case we have not found anything in safebrowsingCache and all short hashes have been checked in
             // safebrowsingRequestsCache - means that there is no need to request backend again
-            sbCache.set(SafebrowsingApi.createHash(host), SafebrowsingApi.SB_ALLOW_LIST);
+            await sbCache.set(SafebrowsingApi.createHash(host), SafebrowsingApi.SB_ALLOW_LIST);
             return SafebrowsingApi.createResponse(SafebrowsingApi.SB_ALLOW_LIST);
         }
 
@@ -157,11 +157,11 @@ export class SafebrowsingApi {
         sbList = SafebrowsingApi.SB_ALLOW_LIST;
 
         if (response.status !== 204) {
-            sbList = SafebrowsingApi.processSbResponse(response.responseText, hashesMap)
+            sbList = await SafebrowsingApi.processSbResponse(response.responseText, hashesMap)
             || SafebrowsingApi.SB_ALLOW_LIST;
         }
 
-        sbCache.set(SafebrowsingApi.createHash(host), sbList);
+        await sbCache.set(SafebrowsingApi.createHash(host), sbList);
         return SafebrowsingApi.createResponse(sbList);
     }
 
@@ -196,34 +196,35 @@ export class SafebrowsingApi {
      * @param hashesMap  Hashes hosts map
      * @returns Safebrowsing list or null
      */
-    private static processSbResponse(responseText: string, hashesMap: { [key: string]: string }) {
+    private static async processSbResponse(responseText: string, hashesMap: { [key: string]: string }) {
         if (!responseText || responseText.length > 10 * 1024) {
             return null;
         }
 
         try {
-            let result;
-
-            const lines = responseText.split('\n')
+            const data = responseText.split('\n')
                 // filter empty lines
-                .filter(line => !!line);
+                .filter(line => !!line)
+                .map(line => {
+                    const row = line.split(':');
 
-            for (let i = 0; i < lines.length; i += 1) {
-                const r = lines[i].split(':');
-                const hash = r[2];
-                const list = r[0];
+                    return {
+                        hash: row[2],
+                        list: row[0],
+                    };
+                });
 
-                sbCache.set(hash, list);
+            const saveTasks = data.map(({ hash, list }) => sbCache.set(hash, list));
 
-                if (!result) {
-                    const host = hashesMap[hash];
-                    if (host) {
-                        result = list;
-                    }
-                }
+            await Promise.all(saveTasks);
+
+            const matched = data.find(({ hash }) => hashesMap[hash]);
+
+            if (matched) {
+                return matched.list;
             }
 
-            return result;
+            return null;
         } catch (ex) {
             log.error('Error parse safebrowsing response, cause {0}', ex);
         }
