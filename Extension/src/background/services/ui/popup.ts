@@ -55,12 +55,12 @@ export class PopupService {
 
         const blockedCountIncrement = 1;
 
-        PageStatsApi.updateStats(rule.getFilterListId(), blockedCountIncrement);
+        await PageStatsApi.updateStats(rule.getFilterListId(), blockedCountIncrement);
         PageStatsApi.incrementTotalBlocked(blockedCountIncrement);
 
         const tabContext = tabsApi.getTabContext(tabId);
 
-        UiApi.debounceUpdateTabIconAndContextMenu(tabContext);
+        await UiApi.updateTabIconAndContextMenu(tabContext);
     }
 
     private static async onChangeFilteringDisable({ data }) {

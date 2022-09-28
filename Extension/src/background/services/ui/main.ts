@@ -1,6 +1,7 @@
 import browser from 'webextension-polyfill';
-import { tabsApi } from '@adguard/tswebextension';
+import { tabsApi as tsWebExtTabApi } from '@adguard/tswebextension';
 
+import { log } from '../../../common/log';
 import { messageHandler } from '../../message-handler';
 import {
     MessageType,
@@ -21,6 +22,8 @@ import {
     AssistantApi,
     UiApi,
 } from '../../api';
+import { ContextMenuAction, contextMenuEvents } from '../../events';
+import { ForwardFrom } from '../../../common/forward';
 
 export class UiService {
     public static async init() {
@@ -29,9 +32,17 @@ export class UiService {
         messageHandler.addListener(MessageType.OPEN_TAB, TabsApi.openTab);
 
         messageHandler.addListener(MessageType.OPEN_SETTINGS_TAB, PagesApi.openSettingsPage);
+        contextMenuEvents.addListener(ContextMenuAction.OPEN_SETTINGS, PagesApi.openSettingsPage);
+
         messageHandler.addListener(MessageType.OPEN_FILTERING_LOG, PagesApi.openFilteringLogPage);
+        contextMenuEvents.addListener(ContextMenuAction.OPEN_LOG, PagesApi.openFilteringLogPage);
+
         messageHandler.addListener(MessageType.OPEN_ABUSE_TAB, UiService.openAbusePage);
+        contextMenuEvents.addListener(ContextMenuAction.COMPLAINT_WEBSITE, UiService.openAbusePageFromPContextMenu);
+
         messageHandler.addListener(MessageType.OPEN_SITE_REPORT_TAB, UiService.openSiteReportPage);
+        contextMenuEvents.addListener(ContextMenuAction.SECURITY_REPORT, UiService.openSiteReportPageFromContextMenu);
+
         messageHandler.addListener(MessageType.OPEN_THANKYOU_PAGE, PagesApi.openThankYouPage);
         messageHandler.addListener(MessageType.OPEN_EXTENSION_STORE, PagesApi.openExtensionStorePage);
         messageHandler.addListener(MessageType.OPEN_COMPARE_PAGE, PagesApi.openComparePage);
@@ -42,10 +53,13 @@ export class UiService {
         );
 
         messageHandler.addListener(MessageType.OPEN_ASSISTANT, AssistantApi.openAssistant);
+        contextMenuEvents.addListener(ContextMenuAction.BLOCK_SITE_ADS, AssistantApi.openAssistant);
+        contextMenuEvents.addListener(ContextMenuAction.BLOCK_SITE_ELEMENT, AssistantApi.openAssistant); // TODO
+
         messageHandler.addListener(MessageType.INITIALIZE_FRAME_SCRIPT, UiService.initializeFrameScriptRequest);
 
-        tabsApi.onUpdate.subscribe(UiApi.debounceUpdateTabIconAndContextMenu);
-        tabsApi.onActivated.subscribe(UiApi.debounceUpdateTabIconAndContextMenu);
+        tsWebExtTabApi.onUpdate.subscribe(UiApi.updateTabIconAndContextMenu);
+        tsWebExtTabApi.onActivated.subscribe(UiApi.updateTabIconAndContextMenu);
     }
 
     private static async openAbusePage({ data }: OpenAbuseTabMessage): Promise<void> {
@@ -54,10 +68,30 @@ export class UiService {
         await PagesApi.openAbusePage(url, from);
     }
 
+    private static async openAbusePageFromPContextMenu() {
+        const activeTab = await TabsApi.getActive();
+
+        if (activeTab?.url) {
+            await PagesApi.openAbusePage(activeTab.url, ForwardFrom.CONTEXT_MENU);
+        } else {
+            log.warn('Can`t open abuse page for active tab');
+        }
+    }
+
     private static async openSiteReportPage({ data }: OpenSiteReportTabMessage): Promise<void> {
         const { url, from } = data;
 
         await PagesApi.openSiteReportPage(url, from);
+    }
+
+    private static async openSiteReportPageFromContextMenu() {
+        const activeTab = await TabsApi.getActive();
+
+        if (activeTab?.url) {
+            await PagesApi.openSiteReportPage(activeTab.url, ForwardFrom.CONTEXT_MENU);
+        } else {
+            log.warn('Can`t open site report page for active tab');
+        }
     }
 
     private static initializeFrameScriptRequest() {

@@ -9,7 +9,11 @@ import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
 import { FiltersApi, FilterUpdateApi, toasts } from '../api';
 import { filterStateStorage, groupStateStorage } from '../storages';
-import { settingsEvents } from '../events';
+import {
+    ContextMenuAction,
+    contextMenuEvents,
+    settingsEvents,
+} from '../events';
 import { listeners } from '../notifier';
 
 export class FiltersService {
@@ -19,7 +23,9 @@ export class FiltersService {
         messageHandler.addListener(MessageType.DISABLE_ANTIBANNER_FILTER, FiltersService.onFilterDisable);
         messageHandler.addListener(MessageType.ENABLE_FILTERS_GROUP, FiltersService.onGroupEnable);
         messageHandler.addListener(MessageType.DISABLE_FILTERS_GROUP, FiltersService.onGroupDisable);
+
         messageHandler.addListener(MessageType.CHECK_ANTIBANNER_FILTERS_UPDATE, FiltersService.checkFiltersUpdate);
+        contextMenuEvents.addListener(ContextMenuAction.UPDATE_ANTIBANNER_FILTERS, FiltersService.checkFiltersUpdate);
 
         settingsEvents.addListener(SettingOption.USE_OPTIMIZED_FILTERS, FiltersService.onOptimizedFiltersSwitch);
     }

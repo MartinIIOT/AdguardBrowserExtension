@@ -8,7 +8,7 @@ import { AntiBannerFiltersId } from '../../common/constants';
 import { Engine } from '../engine';
 import { Categories, SettingsApi, TabsApi } from '../api';
 import { listeners } from '../notifier';
-import { settingsEvents } from '../events';
+import { ContextMenuAction, contextMenuEvents, settingsEvents } from '../events';
 import { fullscreenUserRulesEditor } from './fullscreen-user-rules-editor';
 
 export class SettingsService {
@@ -47,6 +47,16 @@ export class SettingsService {
         settingsEvents.addListener(
             SettingOption.DISABLE_FILTERING,
             SettingsService.onFilteringStateChange,
+        );
+
+        contextMenuEvents.addListener(
+            ContextMenuAction.ENABLE_PROTECTION,
+            SettingsService.enableFiltering,
+        );
+
+        contextMenuEvents.addListener(
+            ContextMenuAction.DISABLE_PROTECTION,
+            SettingsService.disableFiltering,
         );
     }
 
@@ -109,5 +119,13 @@ export class SettingsService {
         if (activeTab) {
             await browser.tabs.reload(activeTab.id);
         }
+    }
+
+    static async enableFiltering() {
+        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, false);
+    }
+
+    static async disableFiltering() {
+        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, true);
     }
 }

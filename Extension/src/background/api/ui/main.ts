@@ -2,7 +2,7 @@ import { BACKGROUND_TAB_ID, TabContext } from '@adguard/tswebextension';
 import { debounce } from 'lodash';
 
 import { ContextMenuApi } from './context-menu';
-import { FramesApi } from './frames';
+import { FrameData, FramesApi } from './frames';
 import { IconsApi } from './icons';
 
 export class UiApi {
@@ -15,11 +15,11 @@ export class UiApi {
 
         const frameData = FramesApi.getMainFrameData(tabContext);
 
-        await IconsApi.updateTabIcon(tabId, frameData);
         await ContextMenuApi.updateMenu(frameData);
+        UiApi.debounceUpdateTabIcon(tabId, frameData);
     }
 
-    public static debounceUpdateTabIconAndContextMenu(tabContext: TabContext) {
-        debounce(() => UiApi.updateTabIconAndContextMenu(tabContext), 100)();
+    private static debounceUpdateTabIcon(tabId: number, frameData: FrameData) {
+        debounce(() => IconsApi.updateTabIcon(tabId, frameData), 100)();
     }
 }

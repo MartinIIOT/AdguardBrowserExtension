@@ -77,13 +77,13 @@ export class Engine {
 
         const settings = SettingsApi.getTsWebExtConfiguration();
 
-        const allowlist: string[] = await DocumentBlockApi.getTrustedDomains();
+        let allowlist = await DocumentBlockApi.getTrustedDomains();
 
         if (AllowlistApi.isEnabled()) {
             if (settings.allowlistInverted) {
-                allowlist.concat(AllowlistApi.getInvertedAllowlistDomains());
+                allowlist = allowlist.concat(AllowlistApi.getInvertedAllowlistDomains());
             } else {
-                allowlist.concat(AllowlistApi.getAllowlistDomains());
+                allowlist = allowlist.concat(AllowlistApi.getAllowlistDomains());
             }
         }
 
