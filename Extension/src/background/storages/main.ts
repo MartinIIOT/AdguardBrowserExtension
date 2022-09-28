@@ -15,8 +15,8 @@ export class Storage implements StorageInterface<string, unknown, 'async'> {
         return (await this.storage.get(key))?.[key];
     }
 
-    public async remove(key: string) {
-        this.storage.remove(key);
+    public async remove(key: string): Promise<void> {
+        await this.storage.remove(key);
     }
 }
 

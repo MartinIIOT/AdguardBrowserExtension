@@ -16,7 +16,7 @@ export class UiApi {
         const frameData = FramesApi.getMainFrameData(tabContext);
 
         await IconsApi.updateTabIcon(tabId, frameData);
-        ContextMenuApi.updateMenu(frameData);
+        await ContextMenuApi.updateMenu(frameData);
     }
 
     public static debounceUpdateTabIconAndContextMenu(tabContext: TabContext) {

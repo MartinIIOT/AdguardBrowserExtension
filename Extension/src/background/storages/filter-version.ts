@@ -34,11 +34,13 @@ export class FilterVersionStorage extends StringStorage<
     }
 
     public refreshLastCheckTime(filtersIds: number[]) {
+        const now = Date.now();
+
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
 
             if (this.data[filterId]) {
-                this.data[filterId].lastCheckTime = Date.now();
+                this.data[filterId].lastCheckTime = now;
             }
         }
 

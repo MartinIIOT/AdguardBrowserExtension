@@ -201,12 +201,12 @@ export class FiltersApi {
      */
     public static getEnabledFilters() {
         const enabledFilters = filterStateStorage.getEnabledFilters();
-        const enableGroups = groupStateStorage.getEnabledGroups();
+        const enabledGroups = groupStateStorage.getEnabledGroups();
 
         return enabledFilters.filter(id => {
             const filterMetadata = FiltersApi.getFilterMetadata(id);
 
-            return enableGroups.some(groupId => groupId === filterMetadata?.groupId);
+            return enabledGroups.some(groupId => groupId === filterMetadata.groupId);
         });
     }
 

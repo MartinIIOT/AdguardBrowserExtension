@@ -51,7 +51,7 @@ async function getImageData(size: string, url: string) : Promise<[string, ImageD
  * see: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browserAction/setIcon
  *
  * @param path - browser.browserAction.setIcon 'path' property
- * @return { [key: string]: ImageData } - browser.browserAction.setIcon 'imageData' property
+ * @return browser.browserAction.setIcon 'imageData' property
  */
 export async function getIconImageData(path: Record<string, string>): Promise<Record<string, Action.ImageDataType>> {
     const imageDataEntriesPromises = Object.entries(path).map(([size, url]) => getImageData(size, url));

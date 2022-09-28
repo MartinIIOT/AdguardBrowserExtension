@@ -50,7 +50,7 @@ export class ContextMenuApi {
         [ContextMenuItems.UPDATE_ANTIBANNER_FILTERS]: ContextMenuApi.checkFiltersUpdate,
     };
 
-    public static updateMenu({
+    public static async updateMenu({
         applicationFilteringDisabled,
         urlFilteringDisabled,
         documentAllowlisted,
@@ -58,7 +58,7 @@ export class ContextMenuApi {
         canAddRemoveRule,
     }: FrameData) {
         // clean up context menu
-        browser.contextMenus.removeAll();
+        await browser.contextMenus.removeAll();
 
         if (applicationFilteringDisabled) {
             ContextMenuApi.addFilteringDisabledMenuItems();
@@ -138,7 +138,7 @@ export class ContextMenuApi {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.url) {
-            PagesApi.openAbusePage(activeTab.url, ForwardFrom.CONTEXT_MENU);
+            await PagesApi.openAbusePage(activeTab.url, ForwardFrom.CONTEXT_MENU);
         }
     }
 
@@ -146,7 +146,7 @@ export class ContextMenuApi {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.url) {
-            PagesApi.openSiteReportPage(activeTab.url, ForwardFrom.CONTEXT_MENU);
+            await PagesApi.openSiteReportPage(activeTab.url, ForwardFrom.CONTEXT_MENU);
         }
     }
 
