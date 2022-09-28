@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
-import { UserAgent } from '../../../common/user-agent';
-import { UiService } from '../../services';
+import { tabsApi as tsWebExtTabsApi } from '@adguard/tswebextension';
 
+import { UserAgent } from '../../../common/user-agent';
 import {
     notificationStorage,
     Notification,
@@ -10,6 +10,7 @@ import {
 } from '../../storages';
 import { TabsApi } from '../extension';
 import { LAST_NOTIFICATION_TIME_KEY, VIEWED_NOTIFICATIONS_KEY } from '../../../common/constants';
+import { UiApi } from './main';
 
 export class NotificationApi {
     private static checkTimeoutMs = 10 * 60 * 1000; // 10 minutes
@@ -67,10 +68,14 @@ export class NotificationApi {
             if (Array.isArray(viewedNotifications) && !viewedNotifications.includes(id)) {
                 viewedNotifications.push(id);
                 await storage.set(VIEWED_NOTIFICATIONS_KEY, viewedNotifications);
+
                 const tab = await TabsApi.getActive();
-                if (tab?.id) {
-                    await UiService.updateTabIcon(tab.id);
+                const tabContext = tsWebExtTabsApi.getTabContext(tab.id);
+
+                if (tabContext) {
+                    await UiApi.updateTabIconAndContextMenu(tabContext);
                 }
+
                 this.currentNotification = null;
             }
         }
@@ -93,8 +98,8 @@ export class NotificationApi {
         const currentTime = Date.now();
         const timeSinceLastNotification = currentTime - await NotificationApi.getLastNotificationTime();
 
-        if (timeSinceLastNotification < NotificationApi.minPeriodMs) {
         // Just a check to not show the notification too often
+        if (timeSinceLastNotification < NotificationApi.minPeriodMs) {
             return null;
         }
 
