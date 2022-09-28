@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "strict": true,
+    },
+    "include": [
+        "Extension/src/background",
+        "Extension/src/common",
+    ]
+}

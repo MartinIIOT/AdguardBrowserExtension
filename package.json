@@ -19,7 +19,8 @@
     "lint": "eslint ./Extension/src --ext .js,.jsx,.ts,.tsx",
     "increment": "yarn version --patch --no-git-tag-version",
     "prepare": "husky install",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "check-types": "tsc --project tsconfig.background.json --noEmit"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -64,6 +65,7 @@
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-typescript": "^16.1.0",
     "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-jsdoc": "^39.3.6",
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",

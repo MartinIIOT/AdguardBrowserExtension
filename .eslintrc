@@ -19,11 +19,16 @@
       "version": "detect"
     }
   },
+  "plugins": [
+    "@typescript-eslint",
+    "jsdoc"
+  ],
   "extends": [
     "airbnb",
     "airbnb-typescript",
     "airbnb/hooks",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsdoc/recommended"
   ],
   "rules": {
     "import/no-extraneous-dependencies": 0,
@@ -85,7 +90,13 @@
     "arrow-body-style": "off",
     "import/prefer-default-export": "off",
     "arrow-parens": "off",
-    "import/extensions": "off"
+    "import/extensions": "off",
+
+    // types described in ts
+    "jsdoc/require-param-type": "off",
+    "jsdoc/require-returns-type": "off",
+
+    "jsdoc/tag-lines": "off"
   },
   "globals": {
     "adguard": true,
