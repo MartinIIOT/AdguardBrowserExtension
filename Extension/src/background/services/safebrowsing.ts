@@ -1,12 +1,14 @@
 import browser, { WebRequest } from 'webextension-polyfill';
 import { RequestType } from '@adguard/tsurlfilter';
 import { RequestData, RequestEvents } from '@adguard/tswebextension';
-import { SafebrowsingApi } from '../api/safebrowsing';
+import { SafebrowsingApi, TabsApi } from '../api';
 import { SettingOption } from '../schema';
 import { settingsEvents } from '../events';
+import { messageHandler } from '../message-handler';
+import { MessageType } from '../../common/messages';
 
 export class SafebrowsingService {
-    static init() {
+    public static init() {
         SafebrowsingApi.initCache();
 
         settingsEvents.addListener(
@@ -15,6 +17,8 @@ export class SafebrowsingService {
         );
 
         RequestEvents.onHeadersReceived.addListener(SafebrowsingService.onHeaderReceived);
+
+        messageHandler.addListener(MessageType.OPEN_SAFEBROWSING_TRUSTED, SafebrowsingService.onAddTrustedDomain);
     }
 
     private static onHeaderReceived({ context }: RequestData<WebRequest.OnHeadersReceivedDetailsType>) {
@@ -33,6 +37,17 @@ export class SafebrowsingService {
                     browser.tabs.update(tabId, { url: safebrowsingUrl });
                 })
                 .catch(() => {});
+        }
+    }
+
+    private static async onAddTrustedDomain({ data }): Promise<void> {
+        const { url } = data;
+        SafebrowsingApi.addToSafebrowsingTrusted(url);
+
+        const tab = await TabsApi.getActive();
+
+        if (tab?.id) {
+            browser.tabs.update(tab.id, { url });
         }
     }
 }

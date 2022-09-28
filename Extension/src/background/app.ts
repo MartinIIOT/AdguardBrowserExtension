@@ -29,6 +29,7 @@ import {
     FilteringLogService,
     eventService,
     SafebrowsingService,
+    DocumentBlockService,
     localeDetect,
     NotificationService,
 } from './services';
@@ -153,8 +154,16 @@ export class App {
          * - Initializes persisted lru cache for hashes
          * - Adds listener for filtering web requests
          * - Adds listener for safebrowsing settings option switcher
+         * - Adds listener for "add trusted domain" message
          */
         SafebrowsingService.init();
+
+        /**
+         * Initializes Document block module
+         * - Initializes persisted cache for trusted domains
+         * - Adds listener for "add trusted domain" message
+         */
+        await DocumentBlockService.init();
 
         // Sets app uninstall url
         await App.setUninstallUrl();

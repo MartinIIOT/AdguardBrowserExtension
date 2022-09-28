@@ -6,3 +6,5 @@ export * from './ui';
 export * from './extension';
 export * from './install';
 export * from './update';
+export * from './safebrowsing';
+export * from './document-block';

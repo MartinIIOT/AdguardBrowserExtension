@@ -9,3 +9,4 @@ export * from './ui';
 export * from './safebrowsing';
 export * from './filters';
 export * from './locale-detect';
+export * from './document-block';

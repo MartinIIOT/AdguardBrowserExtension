@@ -1,3 +1,5 @@
+import browser from 'webextension-polyfill';
+import { SettingsConfig } from '@adguard/tswebextension';
 import { log } from '../../common/log';
 import {
     AppearanceTheme,
@@ -41,7 +43,7 @@ import {
     AllowlistApi,
 } from './filters';
 
-import { ADGUARD_SETTINGS_KEY, AntiBannerFiltersId } from '../../common/constants';
+import { ADGUARD_SETTINGS_KEY, AntiBannerFiltersId, DOCUMENT_BLOCK_PAGE_PATH } from '../../common/constants';
 import { settingsEvents } from '../events';
 import { listeners } from '../notifier';
 
@@ -82,8 +84,9 @@ export class SettingsApi {
         };
     }
 
-    public static getTsWebExtConfiguration() {
+    public static getTsWebExtConfiguration(): SettingsConfig {
         return {
+            documentBlockingPageUrl: browser.runtime.getURL(DOCUMENT_BLOCK_PAGE_PATH),
             collectStats: !settingsStorage.get(SettingOption.DISABLE_COLLECT_HITS),
             allowlistInverted: !settingsStorage.get(SettingOption.DEFAULT_ALLOWLIST_MODE),
             allowlistEnabled: settingsStorage.get(SettingOption.ALLOWLIST_ENABLED),

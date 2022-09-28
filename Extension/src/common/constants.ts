@@ -7,10 +7,14 @@ export const APP_VERSION_KEY = 'app-version';
 export const SCHEMA_VERSION_KEY = 'schema-version';
 export const ADGUARD_SETTINGS_KEY = 'adguard-settings';
 export const PAGE_STATISTIC_KEY = 'page-statistic';
+export const TRUSTED_DOCUMENTS_CACHE_KEY = 'trusted-documents';
 export const SB_LRU_CACHE_KEY = 'sb-lru-cache';
 export const SB_SUSPENDED_CACHE_KEY = 'safebrowsing-suspended-from';
 export const VIEWED_NOTIFICATIONS_KEY = 'viewed-notifications';
 export const LAST_NOTIFICATION_TIME_KEY = 'viewed-notification-time';
+
+export const SAFEBROWSING_PAGE_PATH = 'pages/safebrowsing.html';
+export const DOCUMENT_BLOCK_PAGE_PATH = 'pages/ad-blocked.html';
 
 /**
  * Filter ids used in the code on the background page and filtering log page

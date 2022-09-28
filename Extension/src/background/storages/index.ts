@@ -15,3 +15,4 @@ export * from './rule-conversion';
 export * from './safebrowsing';
 export * from './page-stats';
 export * from './notification';
+export * from './trusted-domains';

@@ -3,7 +3,7 @@ import SHA256 from 'crypto-js/sha256';
 
 import { log } from '../../common/log';
 import { strings } from '../../common/strings';
-import { SB_SUSPENDED_CACHE_KEY } from '../../common/constants';
+import { SB_SUSPENDED_CACHE_KEY, SAFEBROWSING_PAGE_PATH } from '../../common/constants';
 
 import {
     storage,
@@ -180,7 +180,7 @@ export class SafebrowsingApi {
     ): string {
         const listName = sbList || 'malware';
         const isMalware = strings.contains(listName, 'malware');
-        let url = 'pages/safebrowsing.html';
+        let url = SAFEBROWSING_PAGE_PATH;
         url += `?malware=${isMalware}`;
         url += `&host=${encodeURIComponent(UrlUtils.getHost(requestUrl))}`;
         url += `&url=${encodeURIComponent(requestUrl)}`;

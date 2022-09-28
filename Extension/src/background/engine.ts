@@ -9,6 +9,7 @@ import {
     AllowlistApi,
     UserRulesApi,
     SettingsApi,
+    DocumentBlockApi,
 } from './api';
 
 export type { Message as EngineMessage } from '@adguard/tswebextension';
@@ -76,13 +77,13 @@ export class Engine {
 
         const settings = SettingsApi.getTsWebExtConfiguration();
 
-        let allowlist: string[] = [];
+        const allowlist: string[] = await DocumentBlockApi.getTrustedDomains();
 
         if (AllowlistApi.isEnabled()) {
             if (settings.allowlistInverted) {
-                allowlist = AllowlistApi.getInvertedAllowlistDomains();
+                allowlist.concat(AllowlistApi.getInvertedAllowlistDomains());
             } else {
-                allowlist = AllowlistApi.getAllowlistDomains();
+                allowlist.concat(AllowlistApi.getAllowlistDomains());
             }
         }
 
