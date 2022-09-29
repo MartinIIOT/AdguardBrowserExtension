@@ -73,7 +73,7 @@ export class SettingsService {
             filtersInfo: {
                 rulesCount: Engine.api.getRulesCount(),
             },
-            filtersMetadata: Categories.getFiltersMetadata(),
+            filtersMetadata: Categories.getCategories(),
             fullscreenUserRulesEditorIsOpen: fullscreenUserRulesEditor.isOpen(),
         };
     }

@@ -4,7 +4,7 @@ import { StorageInterface } from '../../common/storage';
  * Class for managing data that is persisted as string
  */
 export class StringStorage<K, V, Mode extends 'sync' | 'async'> {
-    protected key: K;
+    public key: K;
 
     protected storage: StorageInterface<K, unknown, Mode>;
 

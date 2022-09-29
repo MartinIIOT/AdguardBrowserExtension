@@ -3,16 +3,17 @@ import { Action } from 'webextension-polyfill';
 const cache = new Map<string, ImageData>();
 
 /**
- * Download image and convert it to ImageData
+ * Download image and convert it to {@link ImageData}
  *
  * @param size - icon size in px
  * @param url - icon url
+ * @returns image pixel data
  */
 function loadImageData(size: number, url: string): Promise<ImageData> {
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.src = url;
-        img.onload = () => {
+        img.onload = (): void => {
             const canvas = document.createElement('canvas');
             document.documentElement.appendChild(canvas);
             canvas.width = size;
@@ -32,6 +33,8 @@ function loadImageData(size: number, url: string): Promise<ImageData> {
  *
  * @param size - icon size in px
  * @param url - icon url
+ *
+ * @returns entry with image size and {@link ImageData}
  */
 async function getImageData(size: string, url: string) : Promise<[string, ImageData]> {
     const imageData = cache.get(url);
@@ -48,10 +51,10 @@ async function getImageData(size: string, url: string) : Promise<[string, ImageD
  * Match urls from browserAction.setIcon 'path' property with cached ImageData values
  * and return 'imageData' object for this action.
  *
- * see: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browserAction/setIcon
+ * @see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/browserAction/setIcon
  *
  * @param path - browser.browserAction.setIcon 'path' property
- * @return browser.browserAction.setIcon 'imageData' property
+ * @returns browser.browserAction.setIcon 'imageData' property
  */
 export async function getIconImageData(path: Record<string, string>): Promise<Record<string, Action.ImageDataType>> {
     const imageDataEntriesPromises = Object.entries(path).map(([size, url]) => getImageData(size, url));

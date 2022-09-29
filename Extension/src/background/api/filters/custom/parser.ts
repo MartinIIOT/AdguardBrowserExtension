@@ -18,6 +18,10 @@ export class CustomFilterParser {
 
     /**
      * Parses filter metadata from rules header
+     *
+     * @param rules - lines of raw filter data text
+     *
+     * @returns parsed filter data
      */
     static parseFilterDataFromHeader(rules: string[]): CustomFilterParsedData {
         return {
@@ -31,7 +35,12 @@ export class CustomFilterParser {
     }
 
     /**
-     * Parses data from specified rules header
+     * Finds value of specified header tag in filter rules text
+     *
+     * @param tagName - filter header tag name
+     * @param rules - lines of filter rules text
+     *
+     * @returns value of specified header tag
      */
     private static parseTag(tagName: string, rules: string[]): string {
         let result = '';
@@ -59,7 +68,11 @@ export class CustomFilterParser {
     }
 
     /**
-     * Parses expires string in meta
+     * Parses string value of 'Expires' header tag
+     *
+     * @param str - line of rule text with 'Expires' tag
+     *
+     * @returns parsed value of 'Expires' header tag
      */
     private static parseExpiresStr(str: string): number {
         const regexp = /(\d+)\s+(day|hour)/;

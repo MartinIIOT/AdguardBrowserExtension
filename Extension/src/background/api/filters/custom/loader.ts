@@ -1,18 +1,22 @@
 import { network } from '../../network';
 
 /**
- * Helper class for custom filters downloading
+ * Helper class for custom filters downloading with specified request time limitation
  */
 export class CustomFilterLoader {
     /**
-     * Custom filter downloading limit in ms
+     * Custom filter rules downloading limit in ms
      */
     private static DOWNLOAD_LIMIT_MS = 3 * 1000;
 
     /**
-     * Limits filter download with timeout
+     * Limits custom filter rules downloading with timeout
+     *
+     * @param url - custom filter download url
+     * @throws error if filter was not downloaded in {@link DOWNLOAD_LIMIT_MS}
+     * @returns downloaded custom filter rules
      */
-    public static async downloadRulesWithTimeout(url: string) {
+    public static async downloadRulesWithTimeout(url: string): Promise<string[]> {
         return Promise.race([
             network.downloadFilterRulesBySubscriptionUrl(url),
             new Promise((_, reject) => {

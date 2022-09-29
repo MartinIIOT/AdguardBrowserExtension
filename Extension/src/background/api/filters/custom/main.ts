@@ -15,6 +15,9 @@ import { network } from '../../network';
 import { CustomFilterParsedData, CustomFilterParser } from './parser';
 import { CustomFilterLoader } from './loader';
 
+/**
+ * Data transfer object for {@link CustomFilterApi} methods
+ */
 export type CustomFilterDTO = {
     customUrl: string;
     title?: string;
@@ -22,13 +25,40 @@ export type CustomFilterDTO = {
     enabled?: boolean;
 };
 
+/**
+ * Full info about downloaded custom filter, returned
+ * in 'Add custom filter' modal window if filter was not added before
+ */
 export type CustomFilterInfo = CustomFilterParsedData & {
     customUrl: string,
     rulesCount: number,
 };
 
-export type GetCustomFilterInfoResult = { filter: CustomFilterInfo } | { errorAlreadyExists: boolean } | null;
+/**
+ * Response of {@link CustomFilterApi.getFilterInfo} for 'Add custom filter' modal window with data,
+ * returned on creating new custom filter
+ */
+export type CreateCustomFilterResponse = {
+    filter: CustomFilterInfo
+};
 
+/**
+ * Response of {@link CustomFilterApi.getFilterInfo} for 'Add custom filter' modal window with data,
+ * returned if custom filter with subscription url has already existed.
+ */
+export type CustomFilterAlreadyExistResponse = {
+    errorAlreadyExists: boolean
+};
+
+/**
+ * Response of {@link CustomFilterApi.getFilterInfo} for 'Add custom filter' modal window
+ */
+export type GetCustomFilterInfoResult = CreateCustomFilterResponse | CustomFilterAlreadyExistResponse | null;
+
+/**
+ * Parsed custom filter data from remote source
+ * It is downloaded while creating and updating custom filter in {@link CustomFilterApi.getRemoteFilterData}
+ */
 export type GetRemoteCustomFilterResult = {
     rules: string[],
     checksum: string | null,
@@ -36,31 +66,54 @@ export type GetRemoteCustomFilterResult = {
 };
 
 /**
- * API for managing custom filters
+ * API for managing custom filters data.
+ *
+ * Custom filter subscription is divided into several stages:
+ * - User requests custom filter data by subscription url
+ * - App downloads filter data and check, if filter was loaded before
+ * - App shows 'Add custom filter' modal window with parsed data
+ * - If user confirms subscription, filter data will be saved in app storages
+ *
+ * This class also provided methods for updating and removing custom filters.
+ *
+ * Custom metadata is stored in {@link customFilterMetadataStorage}.
+ * Filters states is stored in {@link filterStateStorage}.
+ * Filters versions is stored in {@link filterVersionStorage}.
+ * Filters rules is stored in {@link FiltersStorage}.
  */
 export class CustomFilterApi {
     /**
-     * Read stringified custom filter metadata from settings storage
-     * if data is not exist, set empty array
+     * Reads stringified {@link CustomFilterMetadata} array from persisted storage
+     * and save it in cache.
+     * if data is not exist, set empty array.
      */
-    public static init() {
+    public static init(): void {
         try {
             const storageData = customFilterMetadataStorage.read();
             if (typeof storageData === 'string') {
                 customFilterMetadataStorage.setCache(JSON.parse(storageData));
             } else {
+                log.info('Custom filter metadata storage is empty, set default value');
                 customFilterMetadataStorage.setData([]);
             }
         } catch (e) {
+            log.warn('Can`t parse custom filter metadata from persisted storage, reset to default');
             customFilterMetadataStorage.setData([]);
         }
     }
 
     /**
-     * Get custom filter info for modal window
+     * Gets Custom filter info for modal window.
+     * Checks if custom filter with passed url is exist.
+     * If url is new, downloads filter data from remote source, parse it and create new {@link CustomFilterInfo}
      *
      * @param url - filter subscription url
      * @param title - user-defined filter title
+     *
+     * @returns
+     * - {@link CreateCustomFilterResponse} on new filter subscription,
+     * - {@link CustomFilterAlreadyExistResponse} if custom filter was added before
+     * - null, if filter rules is not downloaded
      */
     public static async getFilterInfo(url: string, title?: string): Promise<GetCustomFilterInfoResult> {
         // Check if filter from this url was added before
@@ -88,12 +141,27 @@ export class CustomFilterApi {
     }
 
     /**
-     * Add custom filter
+     * Creates and save new custom filter data in linked storages from passed {@link CustomFilterDTO}
+     *
+     *
+     * Downloads filter data by {@link CustomFilterDTO.customUrl} and parse it.
+     * Create new {@link CustomFilterMetadata} record and save it in {@link customFilterMetadataStorage},
+     * Based on parsed data.
+     * Create new {@link FilterState} and save it in {@link filterStateStorage}.
+     * Create new {@link FilterVersionData} and save it in {@link filterVersionStorage}.
+     * Filters rules is saved in {@link FiltersStorage}.
+     *
+     * @param filterData - Custom filter data transfer object, received from modal window
+     *
+     * @returns created filter metadata
      */
     public static async createFilter(filterData: CustomFilterDTO): Promise<CustomFilterMetadata> {
         const { customUrl } = filterData;
+
+        // download and parse custom filter data
         const { rules, parsed, checksum } = await CustomFilterApi.getRemoteFilterData(customUrl);
 
+        // create new filter id
         const filterId = CustomFilterApi.genFilterId();
 
         log.info(`Create new custom filter with id ${filterId}`);
@@ -147,16 +215,28 @@ export class CustomFilterApi {
     }
 
     /**
-     * Add custom filters
+     * Creates new custom filters from passed DTO array
+     *
+     * @param filtersData - array of {@link CustomFilterDTO}
      */
-    public static async createFilters(filtersData: CustomFilterDTO[]) {
+    public static async createFilters(filtersData: CustomFilterDTO[]): Promise<void> {
         const tasks = filtersData.map(filterData => CustomFilterApi.createFilter(filterData));
 
         await Promise.allSettled(tasks);
     }
 
     /**
-     * Update custom filter
+     * Updates custom filter data by id
+     *
+     * Gets subscription url from {@link customFilterMetadataStorage}.
+     * Downloads data from remote source.
+     * Checks, if new filter version available.
+     * If filter need for update, save new filter data in storages.
+     *
+     * @param filterId - Custom filter id
+     *
+     * @returns updated filter metadata or null, if filter is not existed
+     * or new version is not available.
      */
     public static async updateFilter(filterId: number): Promise<CustomFilterMetadata | null> {
         log.info(`Update Custom filter ${filterId} ...`);
@@ -182,7 +262,11 @@ export class CustomFilterApi {
     }
 
     /**
-     * Remove custom filter
+     * Remove custom filter data from storages
+     *
+     * If custom filter was enabled, reload filter engine after removing.
+     *
+     * @param filterId - custom filter id
      */
     public static async removeFilter(filterId: number): Promise<void> {
         log.info(`Remove Custom filter ${filterId} ...`);
@@ -203,27 +287,39 @@ export class CustomFilterApi {
 
     /**
      * Check if filter is custom
+     *
+     * @param filterId - filter id
+     *
+     * @returns true, if filter is custom, else returns false
      */
     public static isCustomFilter(filterId: number): boolean {
         return filterId >= CUSTOM_FILTERS_START_ID;
     }
 
     /**
-     * Get custom filter metadata
+     * Get custom filter metadata for {@link customFilterMetadataStorage}
+     *
+     * @param filterId - custom filter id
+     *
+     * @returns custom filter metadata or undefined, if custom filter doesn't exist
      */
-    public static getFilterMetadata(filterId: number): CustomFilterMetadata {
+    public static getFilterMetadata(filterId: number): CustomFilterMetadata | undefined {
         return customFilterMetadataStorage.getById(filterId);
     }
 
     /**
      * Get metadata for all custom filters
+     *
+     * @returns array of metadata records for all custom filters
      */
     public static getFiltersMetadata(): CustomFilterMetadata[] {
         return customFilterMetadataStorage.getData();
     }
 
     /**
-     * Get custom filters data
+     * Get saved custom filters data transfer objects
+     *
+     * @returns array of existed custom filters DTO's
      */
     public static getFiltersData(): CustomFilterDTO[] {
         const filtersMetadata = CustomFilterApi.getFiltersMetadata();
@@ -242,7 +338,15 @@ export class CustomFilterApi {
     }
 
     /**
-     * Update filter metadata, version state and stored rules
+     * Save new custom version, state and stored rules on update
+     *
+     * @param filterMetadata - current custom filter metadata
+     * @param downloadedData - downloaded filter data
+     * @param downloadedData.rules - new rules
+     * @param downloadedData.checksum - new checksum
+     * @param downloadedData.parsed - new parsed data
+     *
+     * @returns updated custom filter metadata
      */
     private static async updateFilterData(
         filterMetadata: CustomFilterMetadata,
@@ -273,7 +377,12 @@ export class CustomFilterApi {
     }
 
     /**
-     * Gets new filter id for custom filter
+     * Generate new filter id for new custom filter.
+     *
+     * Custom filters ids starts from {@link CUSTOM_FILTERS_START_ID}.
+     * Every new custom filter id is incremented on 1 from last one.
+     *
+     * @returns generated filter id
      */
     private static genFilterId(): number {
         let max = 0;
@@ -287,7 +396,11 @@ export class CustomFilterApi {
     }
 
     /**
-     * Count md5 checksum for the filter content
+     * Count md5 checksum for the filter rules content
+     *
+     * @param rules - array of filter rules lines
+     *
+     * @returns - md5 checksum of filter rules text
      */
     private static getChecksum(rules: string[]): string {
         const rulesText = rules.join('\n');
@@ -295,7 +408,14 @@ export class CustomFilterApi {
     }
 
     /**
-     * Check if custom filter need to update
+     * Check if custom filter data need to update
+     *
+     * @param filter - current custom filter metadata
+     * @param downloadedData - downloaded filter data
+     * @param downloadedData.checksum - checksum of downloaded filter text
+     * @param downloadedData.parsed - new parsed data
+     *
+     * @returns true, if filter data need to update, else returns false
      */
     private static isFilterNeedUpdate(
         filter: CustomFilterMetadata,
@@ -315,7 +435,11 @@ export class CustomFilterApi {
     }
 
     /**
-     * Load filter from specified url
+     * Load filter data from specified url and parse it
+     *
+     * @param url - custom filter subscription url
+     *
+     * @returns downloaded and parsed filter data
      */
     private static async getRemoteFilterData(url: string): Promise<GetRemoteCustomFilterResult> {
         log.info(`Get custom filter data from ${url}`);

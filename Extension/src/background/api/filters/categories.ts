@@ -13,6 +13,9 @@ import {
 } from '../../storages';
 import { FiltersApi } from './main';
 
+/**
+ * Filter data displayed in category section on options page
+ */
 export type CategoriesFilterData = (
     CommonFilterMetadata | CustomFilterMetadata &
     FilterState &
@@ -20,21 +23,42 @@ export type CategoriesFilterData = (
     { tagsDetails: TagMetadata[] }
 );
 
-export type CategoryData = (
+/**
+ * Groups data displayed on options page
+ */
+export type CategoriesGroupData = (
     GroupMetadata &
     GroupState &
     { filters?: CategoriesFilterData[] }
 );
 
 /**
- * Helper class for aggregate filter groups data
+ * Aggregated data for options page
+ */
+export type CategoriesData = {
+    categories: CategoriesGroupData[],
+    filters: CategoriesFilterData[]
+};
+
+/**
+ * Helper class for aggregate filters and groups data for options page from next storages:
+ * - {@link metadataStorage} - groups, tags and common filters metadata
+ * - {@link customFilterMetadataStorage} - custom filter metadata
+ * - {@link filterStateStorage} - filters states
+ * - {@link filterVersionStorage} - filters versions
+ * - {@link groupStateStorage} - groups states
  */
 export class Categories {
-    static getFiltersMetadata() {
+    /**
+     * Get aggregated filters category data for option page
+     *
+     * @returns categories aggregated data
+     */
+    public static getCategories(): CategoriesData {
         const groups = Categories.getGroups();
         const filters = Categories.getFilters();
 
-        const categories: CategoryData[] = [];
+        const categories: CategoriesGroupData[] = [];
 
         for (let i = 0; i < groups.length; i += 1) {
             const category = groups[i];
@@ -48,7 +72,14 @@ export class Categories {
         };
     }
 
-    private static getTagsDetails(tagsIds: number[]) {
+    /**
+     * Get tags metadata from {@link metadataStorage}
+     *
+     * @param tagsIds - tags ids
+     *
+     * @returns aggregated groups data
+     */
+    private static getTagsDetails(tagsIds: number[]): TagMetadata[] {
         const tagsMetadata = metadataStorage.getTags();
 
         const tagsDetails: TagMetadata[] = [];
@@ -76,7 +107,14 @@ export class Categories {
         return tagsDetails;
     }
 
-    private static getFilters() {
+    /**
+     * Get filters data from {@link metadataStorage},
+     * {@link customFilterMetadataStorage}, {@link filterStateStorage} and
+     * {@link filterVersionStorage}.
+     *
+     * @returns aggregated filters data
+     */
+    private static getFilters(): CategoriesFilterData[] {
         const filtersMetadata = FiltersApi.getFiltersMetadata();
 
         const result: CategoriesFilterData[] = [];
@@ -103,10 +141,15 @@ export class Categories {
         return result;
     }
 
-    private static getGroups() {
+    /**
+     * Get groups data from {@link metadataStorage} and {@link groupStateStorage}
+     *
+     * @returns aggregated groups data
+     */
+    private static getGroups(): CategoriesGroupData[] {
         const groupsMetadata = metadataStorage.getGroups();
 
-        const result: CategoryData[] = [];
+        const result: CategoriesGroupData[] = [];
 
         for (let i = 0; i < groupsMetadata.length; i += 1) {
             const groupMetadata = groupsMetadata[i];
@@ -122,7 +165,14 @@ export class Categories {
         return result;
     }
 
-    private static selectFiltersByGroupId(groupId: number, filters: CategoriesFilterData[]) {
+    /**
+     * Get filters data for specified group
+     *
+     * @param groupId - group id
+     * @param filters - aggregated filters data
+     * @returns aggregated filters data for specified group
+     */
+    private static selectFiltersByGroupId(groupId: number, filters: CategoriesFilterData[]): CategoriesFilterData[] {
         return filters.filter(filter => filter.groupId === groupId);
     }
 }
