@@ -18,11 +18,21 @@ import { network } from '../network';
 import { CustomFilterApi } from './custom';
 
 /**
- * API for managing common app filters
+ * API for managing common filter data.
+ *
+ * This class providing methods for reading common filter metadata from {@link metadataStorage.data.filters},
+ * installation and updating common filters data, stored in next storages:
+ * - {@link filterStateStorage} - filters states
+ * - {@link filterVersionStorage} - filters versions
+ * - {@link FiltersStorage}  - filter rules
  */
 export class CommonFilterApi {
     /**
      * Get common filter metadata
+     *
+     * @param filterId - filter id
+     *
+     * @returns common filter metadata
      */
     public static getFilterMetadata(filterId: number): CommonFilterMetadata {
         return metadataStorage.getFilter(filterId);
@@ -30,6 +40,8 @@ export class CommonFilterApi {
 
     /**
      * Get common filters metadata
+     *
+     * @returns common filters metadata array
      */
     public static getFiltersMetadata(): CommonFilterMetadata[] {
         return metadataStorage.getFilters();
@@ -39,6 +51,8 @@ export class CommonFilterApi {
      * Checks if filter is common
      *
      * @param filterId - filter id
+     *
+     * @returns true, if filter is common, else returns false
      */
     public static isCommonFilter(filterId: number): boolean {
         return !CustomFilterApi.isCustomFilter(filterId)
@@ -48,6 +62,10 @@ export class CommonFilterApi {
 
     /**
      * Update common filter
+     *
+     * @param filterId - filter id
+     *
+     * @returns updated filter metadata or null, if update is not required
      */
     public static async updateFilter(filterId: number): Promise<CommonFilterMetadata | null> {
         log.info(`Update filter ${filterId}`);
@@ -76,10 +94,11 @@ export class CommonFilterApi {
 
     /**
      * Download filter rules from backend and update filter state and metadata
+     *
      * @param filterId - filter id
      * @param remote - is filter rules loaded from backend
      */
-    public static async loadFilterRulesFromBackend(filterId: number, remote: boolean) {
+    public static async loadFilterRulesFromBackend(filterId: number, remote: boolean): Promise<void> {
         const isOptimized = settingsStorage.get(SettingOption.USE_OPTIMIZED_FILTERS);
 
         const rules = await network.downloadFilterRules(filterId, remote, isOptimized) as string[];
@@ -111,7 +130,7 @@ export class CommonFilterApi {
      *
      * Called on extension installation
      */
-    public static async initDefaultFilters() {
+    public static async initDefaultFilters(): Promise<void> {
         groupStateStorage.enableGroups([
             1,
             ANTIBANNER_GROUPS_ID.LANGUAGE_FILTERS_GROUP_ID,
@@ -137,6 +156,8 @@ export class CommonFilterApi {
 
     /**
      * Get language-specific filters by user locale
+     *
+     * @returns list of language-specific filters ids
      */
     private static getLangSuitableFilters(): number[] {
         let filterIds: number[] = [];
@@ -157,7 +178,11 @@ export class CommonFilterApi {
 
     /**
      * Checks if common filter need update.
-     * Matches version from metadata with data in filter version storage.
+     * Matches version from updated metadata with data in filter version storage.
+     *
+     * @param filterMetadata - updated filter metadata
+     *
+     * @returns true, if filter update is required, else returns false.
      */
     private static isFilterNeedUpdate(filterMetadata: CommonFilterMetadata): boolean {
         log.info(`Check if filter ${filterMetadata.filterId} need to update`);

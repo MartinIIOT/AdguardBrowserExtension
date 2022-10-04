@@ -19,7 +19,7 @@ export class UserRulesApi {
      * Parse data from user rules list
      * If it's undefined, sets empty user rules list
      */
-    static async init() {
+    static async init(): Promise<void> {
         const userRules = await FiltersStorage.get(AntiBannerFiltersId.USER_FILTER_ID);
 
         if (!userRules) {
@@ -29,22 +29,26 @@ export class UserRulesApi {
 
     /**
      * Checks, if user list is enabled
+     *
+     * @returns true, if user list is enabled, else returns false
      */
-    static isEnabled() {
+    static isEnabled(): boolean {
         return settingsStorage.get(SettingOption.USER_FILTER_ENABLED);
     }
 
     /**
-     * Returns rules from user list
+     * Get rules from user list
      */
-    static async getUserRules() {
+    static async getUserRules(): Promise<string[]> {
         return FiltersStorage.get(AntiBannerFiltersId.USER_FILTER_ID);
     }
 
     /**
      * Add rule to user list
+     *
+     * @param rule - rule text
      */
-    static async addUserRule(rule: string) {
+    static async addUserRule(rule: string): Promise<void> {
         const userRules = await UserRulesApi.getUserRules();
 
         userRules.push(rule);
@@ -54,8 +58,10 @@ export class UserRulesApi {
 
     /**
      * Remove rule from user list
+     *
+     * @param rule - rule text
      */
-    static async removeUserRule(rule: string) {
+    static async removeUserRule(rule: string): Promise<void> {
         const userRules = await UserRulesApi.getUserRules();
 
         await UserRulesApi.setUserRules(userRules.filter(r => r !== rule));
@@ -63,8 +69,10 @@ export class UserRulesApi {
 
     /**
      * Set user rule list to storage
+     *
+     * @param rules - list of rule strings
      */
-    static async setUserRules(rules: string[]) {
+    static async setUserRules(rules: string[]): Promise<void> {
         await FiltersStorage.set(AntiBannerFiltersId.USER_FILTER_ID, rules);
 
         listeners.notifyListeners(listeners.USER_FILTER_UPDATED);
@@ -72,6 +80,8 @@ export class UserRulesApi {
 
     /**
      * Get persisted rules during switches between common and fullscreen modes
+     *
+     * @returns - user rules editor content
      */
     static getEditorStorageData(): string | undefined {
         return editorStorage.get();
@@ -79,6 +89,8 @@ export class UserRulesApi {
 
     /**
      * Set persisted rules during switches between common and fullscreen modes
+     *
+     * @param data - user rules editor content
      */
     static setEditorStorageData(data: string): void {
         editorStorage.set(data);
@@ -86,11 +98,15 @@ export class UserRulesApi {
 
     /**
      * Converts rules text lines with conversion map
+     *
+     * @param rules - list of rule strings
+     *
+     * @returns list of converted rule strings
      */
     static convertRules(rules: string[]): string[] {
         ruleConversionStorage.clear();
 
-        const result = [];
+        const result: string[] = [];
         for (let i = 0; i < rules.length; i += 1) {
             const line = rules[i];
             let converted = [];
@@ -118,6 +134,9 @@ export class UserRulesApi {
 
     /**
      * Returns source rule text if the rule has been converted
+     *
+     * @param rule - converted rule text
+     * @returns source rule text, if exist, else undefined
      */
     static getSourceRule(rule: string): string | undefined {
         return ruleConversionStorage.get(rule);

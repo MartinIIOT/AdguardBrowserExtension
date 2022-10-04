@@ -22,19 +22,19 @@ export class FilterTags {
 
     static PURPOSE_MOBILE_TAG_ID = 19;
 
-    static getFiltersByTagId(tagId: number, filters: FilterMetadata[]) {
+    static getFiltersByTagId(tagId: number, filters: FilterMetadata[]): FilterMetadata[] {
         return filters.filter(f => f.tags.indexOf(tagId) >= 0);
     }
 
-    static getRecommendedFilters(filters: FilterMetadata[]) {
+    static getRecommendedFilters(filters: FilterMetadata[]): FilterMetadata[] {
         return FilterTags.getFiltersByTagId(FilterTags.RECOMMENDED_TAG_ID, filters);
     }
 
-    static isRecommendedFilter(filter: FilterMetadata) {
+    static isRecommendedFilter(filter: FilterMetadata): boolean {
         return filter.tags.includes(FilterTags.RECOMMENDED_TAG_ID);
     }
 
-    static isMobileFilter(filter: FilterMetadata) {
+    static isMobileFilter(filter: FilterMetadata): boolean {
         return filter.tags.includes(FilterTags.PURPOSE_MOBILE_TAG_ID);
     }
 

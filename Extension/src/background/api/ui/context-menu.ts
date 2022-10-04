@@ -15,7 +15,7 @@ export class ContextMenuApi {
         documentAllowlisted,
         userAllowlisted,
         canAddRemoveRule,
-    }: FrameData) {
+    }: FrameData): Promise<void> {
         // clean up context menu
         await browser.contextMenus.removeAll();
 

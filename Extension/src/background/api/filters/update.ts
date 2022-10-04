@@ -36,7 +36,7 @@ export class FilterUpdateApi {
      * Check installed filters update on initialization
      * by matching update period via filters version check and expires timestamps
      */
-    public static async autoUpdateFilters() {
+    public static async autoUpdateFilters(): Promise<void> {
         const updatePeriod = settingsStorage.get(SettingOption.FILTERS_UPDATE_PERIOD);
 
         // auto update disabled
@@ -71,9 +71,11 @@ export class FilterUpdateApi {
     }
 
     /**
-    * Update filters
-    */
-    private static async updateFilters(filtersIds: number[]) {
+     * Update filters
+     *
+     * @param filtersIds - list of filters ids to update
+     */
+    private static async updateFilters(filtersIds: number[]): Promise<FilterMetadata[]> {
         /**
          * Reload common filters metadata from backend for correct
          * version matching on update check.

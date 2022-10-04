@@ -21,7 +21,7 @@ export class Engine {
 
     static messageHandler = Engine.api.getMessageHandler();
 
-    static async start() {
+    static async start(): Promise<void> {
         const configuration = await Engine.getConfiguration();
 
         log.info('Start tswebextension...');
@@ -34,7 +34,7 @@ export class Engine {
         });
     }
 
-    static async update() {
+    static async update(): Promise<void> {
         const configuration = await Engine.getConfiguration();
 
         log.info('Update tswebextension configuration...');
@@ -77,13 +77,13 @@ export class Engine {
 
         const settings = SettingsApi.getTsWebExtConfiguration();
 
-        let allowlist = await DocumentBlockApi.getTrustedDomains();
+        let allowlist = [];
 
         if (AllowlistApi.isEnabled()) {
             if (settings.allowlistInverted) {
-                allowlist = allowlist.concat(AllowlistApi.getInvertedAllowlistDomains());
+                allowlist = AllowlistApi.getInvertedAllowlistDomains();
             } else {
-                allowlist = allowlist.concat(AllowlistApi.getAllowlistDomains());
+                allowlist = AllowlistApi.getAllowlistDomains();
             }
         }
 
@@ -108,12 +108,15 @@ export class Engine {
             userrules = UserRulesApi.convertRules(userrules);
         }
 
+        const trustedDomains = await DocumentBlockApi.getTrustedDomains();
+
         return {
             verbose: false,
             filters,
             userrules,
             allowlist,
             settings,
+            trustedDomains,
         };
     }
 }

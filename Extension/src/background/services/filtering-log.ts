@@ -27,10 +27,11 @@ import {
     FilteringLogApi,
     filteringLogApi,
     SettingsApi,
+    FilteringLogTabInfo,
 } from '../api';
 
 export class FilteringLogService {
-    static init() {
+    static init(): void {
         messageHandler.addListener(MessageType.GET_FILTERING_LOG_DATA, FilteringLogService.onGetFilteringLogData);
         messageHandler.addListener(MessageType.SYNCHRONIZE_OPEN_TABS, FilteringLogService.onSyncOpenTabs);
         messageHandler.addListener(
@@ -84,18 +85,18 @@ export class FilteringLogService {
         }
     }
 
-    static onSendRequest({ data }: SendRequestEvent) {
+    static onSendRequest({ data }: SendRequestEvent): void {
         const { tabId, ...eventData } = data;
 
         filteringLogApi.addEventData(tabId, eventData);
     }
 
-    static onPageReload(event: PageReloadEvent) {
+    static onPageReload(event: PageReloadEvent): void {
         const { tabId } = event.data;
         filteringLogApi.clearEventsByTabId(tabId);
     }
 
-    static onApplyBasicRule({ data }: ApplyBasicRuleEvent) {
+    static onApplyBasicRule({ data }: ApplyBasicRuleEvent): void {
         const {
             tabId,
             eventId,
@@ -103,11 +104,11 @@ export class FilteringLogService {
         } = data;
 
         filteringLogApi.updateEventData(tabId, eventId, {
-            requestRule: FilteringLogApi.createEventRuleData(rule),
+            requestRule: FilteringLogApi.createNetworkRuleEventData(rule),
         });
     }
 
-    static onApplyCosmeticRule({ data }: ApplyCosmeticRuleEvent) {
+    static onApplyCosmeticRule({ data }: ApplyCosmeticRuleEvent): void {
         const {
             tabId,
             rule,
@@ -116,11 +117,11 @@ export class FilteringLogService {
 
         filteringLogApi.addEventData(tabId, {
             ...eventData,
-            requestRule: FilteringLogApi.createEventRuleData(rule),
+            requestRule: FilteringLogApi.createCosmeticRuleEventData(rule),
         });
     }
 
-    static onApplyCspRule({ data }: ApplyCspRuleEvent) {
+    static onApplyCspRule({ data }: ApplyCspRuleEvent): void {
         const {
             tabId,
             rule,
@@ -129,32 +130,32 @@ export class FilteringLogService {
 
         filteringLogApi.addEventData(tabId, {
             ...eventData,
-            requestRule: FilteringLogApi.createEventRuleData(rule),
+            requestRule: FilteringLogApi.createNetworkRuleEventData(rule),
         });
     }
 
-    static onRemoveParam({ data }: RemoveParamEvent) {
+    static onRemoveParam({ data }: RemoveParamEvent): void {
         const { tabId } = data;
 
         filteringLogApi.addEventData(tabId, data);
     }
 
-    static onRemoveheader({ data }: RemoveHeaderEvent) {
+    static onRemoveheader({ data }: RemoveHeaderEvent): void {
         const { tabId, rule, ...eventData } = data;
 
         filteringLogApi.addEventData(tabId, {
             ...eventData,
-            requestRule: FilteringLogApi.createEventRuleData(rule),
+            requestRule: FilteringLogApi.createNetworkRuleEventData(rule),
         });
     }
 
-    static onReceiveResponse({ data }: ReceiveResponseEvent) {
+    static onReceiveResponse({ data }: ReceiveResponseEvent): void {
         const { eventId, tabId, statusCode } = data;
 
         filteringLogApi.updateEventData(tabId, eventId, { statusCode });
     }
 
-    static onCookie(event: CookieEvent) {
+    static onCookie(event: CookieEvent): void {
         if (filteringLogApi.isExistingCookieEvent(event)) {
             return;
         }
@@ -163,71 +164,71 @@ export class FilteringLogService {
 
         filteringLogApi.addEventData(tabId, {
             ...eventData,
-            requestRule: FilteringLogApi.createEventRuleData(rule),
+            requestRule: FilteringLogApi.createNetworkRuleEventData(rule),
         });
     }
 
-    static onScriptInjection(event: JsInjectEvent) {
+    static onScriptInjection(event: JsInjectEvent): void {
         const { tabId, rule, ...eventData } = event.data;
 
         filteringLogApi.addEventData(tabId, {
             ...eventData,
-            requestRule: FilteringLogApi.createEventRuleData(rule),
+            requestRule: FilteringLogApi.createCosmeticRuleEventData(rule),
         });
     }
 
-    static onReplaceRuleApply({ data }: ReplaceRuleApplyEvent) {
+    static onReplaceRuleApply({ data }: ReplaceRuleApplyEvent): void {
         const { tabId, rules, eventId } = data;
 
         filteringLogApi.updateEventData(tabId, eventId, {
             requestRule: { replaceRule: true },
-            replaceRules: rules.map(rule => FilteringLogApi.createEventRuleData(rule)),
+            replaceRules: rules.map(rule => FilteringLogApi.createNetworkRuleEventData(rule)),
         });
     }
 
-    static onStealthAction({ data }: StealthActionEvent) {
+    static onStealthAction({ data }: StealthActionEvent): void {
         const { tabId, eventId, stealthActions } = data;
 
         filteringLogApi.updateEventData(tabId, eventId, { stealthActions });
     }
 
-    static onTabCreate(tabContext: TabContext) {
+    static onTabCreate(tabContext: TabContext): void {
         const { info, isSyntheticTab } = tabContext;
 
         filteringLogApi.createTabInfo(info, isSyntheticTab);
     }
 
-    static onTabUpdate(tabContext: TabContext) {
+    static onTabUpdate(tabContext: TabContext): void {
         const { info } = tabContext;
 
         filteringLogApi.updateTabInfo(info);
     }
 
-    static onTabRemove(tabContext: TabContext) {
+    static onTabRemove(tabContext: TabContext): void {
         const { info: { id } } = tabContext;
 
         filteringLogApi.removeTabInfo(id);
     }
 
-    static onClearEventsByTabId({ data }) {
+    static onClearEventsByTabId({ data }): void {
         filteringLogApi.clearEventsByTabId(data.tabId, data.ignorePreserveLog);
     }
 
-    static onSetPreserveLogState({ data }) {
+    static onSetPreserveLogState({ data }): void {
         filteringLogApi.setPreserveLogState(data.state);
     }
 
-    static async onRefreshPage({ data }) {
+    static async onRefreshPage({ data }): Promise<void> {
         await browser.tabs.reload(data.tabId);
     }
 
-    static onGetFilteringLogInfoById({ data }) {
+    static onGetFilteringLogInfoById({ data }): FilteringLogTabInfo {
         const { tabId } = data;
 
         return filteringLogApi.getFilteringInfoByTabId(tabId);
     }
 
-    static async onSyncOpenTabs() {
+    static async onSyncOpenTabs(): Promise<number[]> {
         return filteringLogApi.synchronizeOpenTabs();
     }
 

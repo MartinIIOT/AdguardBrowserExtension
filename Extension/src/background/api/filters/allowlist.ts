@@ -266,7 +266,6 @@ export class AllowlistApi {
             if (typeof storageData === 'string') {
                 storage.setCache(JSON.parse(storageData));
             } else {
-                log.info(`${storage.key} storage is empty, set default value`);
                 storage.setData(defaultData);
             }
         } catch (e) {

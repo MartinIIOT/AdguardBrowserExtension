@@ -116,8 +116,8 @@ export const backToSchool22Notification: Notification = {
     },
     text: '',
     url: 'https://link.adtidy.org/forward.html?action=back_to_school&app=browser_extension',
-    from: '30 August 2022 12:00:00',
-    to: '4 September 2022 23:59:00',
+    from: '29 September 2022 18:00:00',
+    to: '30 September 2022 23:59:00',
     type: 'animated',
     icons: {
         ICON_GREEN: {

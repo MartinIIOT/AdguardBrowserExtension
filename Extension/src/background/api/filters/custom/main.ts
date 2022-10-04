@@ -93,7 +93,6 @@ export class CustomFilterApi {
             if (typeof storageData === 'string') {
                 customFilterMetadataStorage.setCache(JSON.parse(storageData));
             } else {
-                log.info('Custom filter metadata storage is empty, set default value');
                 customFilterMetadataStorage.setData([]);
             }
         } catch (e) {

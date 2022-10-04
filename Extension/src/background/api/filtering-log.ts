@@ -16,348 +16,384 @@
  */
 import { Tabs } from 'webextension-polyfill';
 import {
-    CosmeticRule,
-    CosmeticRuleType,
-    NetworkRule,
-    NetworkRuleOption,
-} from '@adguard/tsurlfilter';
-import {
     BACKGROUND_TAB_ID,
     ContentType,
     CookieEvent,
     isExtensionUrl,
+    CosmeticRule,
+    NetworkRule,
+    CosmeticRuleType,
+    NetworkRuleOption,
 } from '@adguard/tswebextension';
-import { AntiBannerFiltersId } from '../../common/constants';
 
+import { AntiBannerFiltersId } from '../../common/constants';
 import { listeners } from '../notifier';
 import { TabsApi } from './extension/tabs';
 import { UserRulesApi } from './filters';
 
 export type FilteringEventRuleData = {
-     filterId: number,
-     ruleText: string,
-     isImportant?: boolean,
-     documentLevelRule?: boolean,
-     isStealthModeRule?: boolean,
-     allowlistRule?: boolean,
-     cspRule?: boolean,
-     modifierValue?: string,
-     cookieRule?: boolean,
-     contentRule?: boolean,
-     cssRule?: boolean,
-     scriptRule?: boolean,
-     appliedRuleText?: string,
- };
+    filterId: number,
+    ruleText: string,
+    isImportant?: boolean,
+    documentLevelRule?: boolean,
+    isStealthModeRule?: boolean,
+    allowlistRule?: boolean,
+    cspRule?: boolean,
+    modifierValue?: string,
+    cookieRule?: boolean,
+    contentRule?: boolean,
+    cssRule?: boolean,
+    scriptRule?: boolean,
+    appliedRuleText?: string,
+};
 
 export type FilteringLogEvent = {
-     eventId: string,
-     requestUrl?: string,
-     requestDomain?: string,
-     frameUrl?: string,
-     frameDomain?: string,
-     requestType?: ContentType,
-     timestamp?: number,
-     requestThirdParty?: boolean,
-     method?: string,
-     statusCode?: number,
-     requestRule?: FilteringEventRuleData,
-     removeParam?: boolean,
-     removeHeader?: boolean,
-     headerName?: string,
-     element?: string,
-     cookieName?: string,
-     cookieValue?: string,
-     isModifyingCookieRule?: boolean,
- };
+    eventId: string,
+    requestUrl?: string,
+    requestDomain?: string,
+    frameUrl?: string,
+    frameDomain?: string,
+    requestType?: ContentType,
+    timestamp?: number,
+    requestThirdParty?: boolean,
+    method?: string,
+    statusCode?: number,
+    requestRule?: FilteringEventRuleData,
+    removeParam?: boolean,
+    removeHeader?: boolean,
+    headerName?: string,
+    element?: string,
+    cookieName?: string,
+    cookieValue?: string,
+    isModifyingCookieRule?: boolean,
+};
 
 export type FilteringLogTabInfo = {
-     tabId: number,
-     title: string,
-     isExtensionTab: boolean,
-     filteringEvents: FilteringLogEvent[],
- };
+    tabId: number,
+    title: string,
+    isExtensionTab: boolean,
+    filteringEvents: FilteringLogEvent[],
+};
 
 export class FilteringLogApi {
-     private static REQUESTS_SIZE_PER_TAB = 1000;
+    private static REQUESTS_SIZE_PER_TAB = 1000;
 
-     private preserveLogEnabled = false;
+    private preserveLogEnabled = false;
 
-     private openedFilteringLogsPages = 0;
+    private openedFilteringLogsPages = 0;
 
-     private tabsInfoMap: Record<number, FilteringLogTabInfo> = {};
+    private tabsInfoMap: Record<number, FilteringLogTabInfo> = {};
 
-     /**
-      * Checks if filtering log page is open
-      */
-     public isOpen() {
-         return this.openedFilteringLogsPages > 0;
-     }
-
-     /**
-      * Returns info if preserve log is enabled
-      */
-     public isPreserveLogEnabled() {
-         return this.preserveLogEnabled;
-     }
-
-     /**
-      * Allows to toggle preserve log state
-      */
-     public setPreserveLogState(enabled: boolean) {
-         this.preserveLogEnabled = enabled;
-     }
-
-     /**
-      * We collect filtering events if opened at least one page of log
-      */
-     public onOpenFilteringLogPage() {
-         this.openedFilteringLogsPages += 1;
-     }
-
-     /**
-      * Cleanup when last page of log closes
-      */
-     public onCloseFilteringLogPage() {
-         this.openedFilteringLogsPages = Math.max(this.openedFilteringLogsPages - 1, 0);
-         if (this.openedFilteringLogsPages === 0) {
-             // Clear events
-             Object.keys(this.tabsInfoMap).forEach((tabId) => {
-                 const tabInfo = this.tabsInfoMap[tabId];
-                 tabInfo.filteringEvents = [];
-             });
-         }
-     }
-
-     /**
-      * Create tab info
-      */
-     public createTabInfo(tab: Tabs.Tab, isSyntheticTab = false) {
-         const { id, title, url } = tab;
-
-         // Background tab can't be added
-         // Synthetic tabs are used to send initial requests from new tab in chrome
-         if (id === BACKGROUND_TAB_ID || isSyntheticTab) {
-             return;
-         }
-
-         const tabInfo: FilteringLogTabInfo = {
-             tabId: id,
-             title,
-             isExtensionTab: isExtensionUrl(url),
-             filteringEvents: [],
-         };
-
-         this.tabsInfoMap[id] = tabInfo;
-
-         listeners.notifyListeners(listeners.TAB_ADDED, tabInfo);
-     }
-
-     /**
-     * Update tab title and url
+    /**
+     * Checks if filtering log page is opened
+     *
+     * @returns true, if filtering log page is opened, else false
      */
-     public updateTabInfo(tab: Tabs.Tab) {
-         const { id, title, url } = tab;
+    public isOpen(): boolean {
+        return this.openedFilteringLogsPages > 0;
+    }
 
-         // Background tab can't be updated
-         if (id === BACKGROUND_TAB_ID) {
-             return;
-         }
+    /**
+     * Checks if preserve log is enabled
+     *
+     * @returns true, if preserve log is enabled, else false
+     */
+    public isPreserveLogEnabled(): boolean {
+        return this.preserveLogEnabled;
+    }
 
-         const tabInfo = this.getFilteringInfoByTabId(id);
+    /**
+     * Set preserve log state
+     *
+     * @param enabled - is preserve log enabled
+     */
+    public setPreserveLogState(enabled: boolean): void {
+        this.preserveLogEnabled = enabled;
+    }
 
-         if (!tabInfo) {
-             this.createTabInfo(tab);
-             return;
-         }
+    /**
+     * We collect filtering events if opened at least one page of log
+     */
+    public onOpenFilteringLogPage(): void {
+        this.openedFilteringLogsPages += 1;
+    }
 
-         tabInfo.title = title;
-         tabInfo.isExtensionTab = isExtensionUrl(url);
+    /**
+     * Cleanup when last page of log closes
+     */
+    public onCloseFilteringLogPage(): void {
+        this.openedFilteringLogsPages = Math.max(this.openedFilteringLogsPages - 1, 0);
+        if (this.openedFilteringLogsPages === 0) {
+            // Clear events
+            Object.keys(this.tabsInfoMap).forEach((tabId) => {
+                const tabInfo = this.tabsInfoMap[tabId];
+                tabInfo.filteringEvents = [];
+            });
+        }
+    }
 
-         // this.tabsInfoMap[id] = tabInfo;
+    /**
+     * Create tab info
+     *
+     * @param tab - {@link browser.Tabs.Tab} data
+     * @param isSyntheticTab - is tab is used to send initial requests from new tab in chrome
+     */
+    public createTabInfo(tab: Tabs.Tab, isSyntheticTab = false): void {
+        const { id, title, url } = tab;
 
-         listeners.notifyListeners(listeners.TAB_UPDATE, tabInfo);
-     }
+        // Background tab can't be added
+        // Synthetic tabs are used to send initial requests from new tab in chrome
+        if (id === BACKGROUND_TAB_ID || isSyntheticTab) {
+            return;
+        }
 
-     /**
-      * Removes tab info
-      */
-     public removeTabInfo(id: number) {
-         // Background tab can't be removed
-         if (id === BACKGROUND_TAB_ID) {
-             return;
-         }
+        const tabInfo: FilteringLogTabInfo = {
+            tabId: id,
+            title,
+            isExtensionTab: isExtensionUrl(url),
+            filteringEvents: [],
+        };
 
-         const tabInfo = this.tabsInfoMap[id];
+        this.tabsInfoMap[id] = tabInfo;
 
-         if (tabInfo) {
-             listeners.notifyListeners(listeners.TAB_CLOSE, tabInfo);
-         }
-         delete this.tabsInfoMap[id];
-     }
+        listeners.notifyListeners(listeners.TAB_ADDED, tabInfo);
+    }
 
-     /**
-      * Get filtering info for tab
-      */
-     public getFilteringInfoByTabId(tabId: number): FilteringLogTabInfo {
-         return this.tabsInfoMap[tabId];
-     }
+    /**
+     * Update tab title and url
+     *
+     * @param tab - {@link browser.Tabs.Tab} data
+     */
+    public updateTabInfo(tab: Tabs.Tab): void {
+        const { id, title, url } = tab;
 
-     /**
-      * Synchronize currently opened tabs with out state
-      */
-     public async synchronizeOpenTabs() {
-         const tabs = await TabsApi.getAll();
+        // Background tab can't be updated
+        if (id === BACKGROUND_TAB_ID) {
+            return;
+        }
 
-         // As Object.keys() returns strings we convert them to integers,
-         // because tabId is integer in extension API
-         const tabIdsToRemove = Object.keys(this.tabsInfoMap).map(id => Number(id));
+        const tabInfo = this.getFilteringInfoByTabId(id);
 
-         for (let i = 0; i < tabs.length; i += 1) {
-             const openTab = tabs[i];
-             const tabInfo = this.tabsInfoMap[openTab.id];
+        if (!tabInfo) {
+            this.createTabInfo(tab);
+            return;
+        }
 
-             if (!tabInfo) {
-                 this.createTabInfo(openTab);
-             } else {
-                 // update tab
-                 this.updateTabInfo(openTab);
-             }
-             const index = tabIdsToRemove.indexOf(openTab.id);
-             if (index >= 0) {
-                 tabIdsToRemove.splice(index, 1);
-             }
-         }
-         for (let j = 0; j < tabIdsToRemove.length; j += 1) {
-             this.removeTabInfo(tabIdsToRemove[j]);
-         }
+        tabInfo.title = title;
+        tabInfo.isExtensionTab = isExtensionUrl(url);
 
-         const syncTabs = [];
+        // this.tabsInfoMap[id] = tabInfo;
 
-         Object.keys(this.tabsInfoMap).forEach((tabId) => {
-             syncTabs.push(this.tabsInfoMap[tabId]);
-         });
+        listeners.notifyListeners(listeners.TAB_UPDATE, tabInfo);
+    }
 
-         return syncTabs;
-     }
+    /**
+     * Removes tab info
+     *
+     * @param id - tab id
+     */
+    public removeTabInfo(id: number): void {
+        // Background tab can't be removed
+        if (id === BACKGROUND_TAB_ID) {
+            return;
+        }
 
-     /**
-      * Remove log requests for tab
-      */
-     public clearEventsByTabId(tabId: number, ignorePreserveLog = false) {
-         const tabInfo = this.tabsInfoMap[tabId];
+        const tabInfo = this.tabsInfoMap[id];
 
-         const preserveLog = ignorePreserveLog ? false : this.preserveLogEnabled;
+        if (tabInfo) {
+            listeners.notifyListeners(listeners.TAB_CLOSE, tabInfo);
+        }
+        delete this.tabsInfoMap[id];
+    }
 
-         if (tabInfo && !preserveLog) {
-             tabInfo.filteringEvents = [];
-             listeners.notifyListeners(listeners.TAB_RESET, tabInfo);
-         }
-     }
+    /**
+     * Get filtering info for tab
+     *
+     * @param tabId - tab id
+     *
+     * @returns tab data for filtering log window
+     */
+    public getFilteringInfoByTabId(tabId: number): FilteringLogTabInfo {
+        return this.tabsInfoMap[tabId];
+    }
 
-     public addEventData(tabId: number, data: FilteringLogEvent) {
-         const tabInfo = this.getFilteringInfoByTabId(tabId);
-         if (!tabInfo || !this.isOpen) {
-             return;
-         }
+    /**
+     * Synchronize currently opened tabs with out state
+     */
+    public async synchronizeOpenTabs(): Promise<number[]> {
+        const tabs = await TabsApi.getAll();
 
-         tabInfo.filteringEvents.push(data);
+        // As Object.keys() returns strings we convert them to integers,
+        // because tabId is integer in extension API
+        const tabIdsToRemove = Object.keys(this.tabsInfoMap).map(id => Number(id));
 
-         if (tabInfo.filteringEvents.length > FilteringLogApi.REQUESTS_SIZE_PER_TAB) {
-             // don't remove first item, cause it's request to main frame
-             tabInfo.filteringEvents.splice(1, 1);
-         }
+        for (let i = 0; i < tabs.length; i += 1) {
+            const openTab = tabs[i];
+            const tabInfo = this.tabsInfoMap[openTab.id];
 
-         listeners.notifyListeners(listeners.LOG_EVENT_ADDED, tabInfo, data);
-     }
+            if (!tabInfo) {
+                this.createTabInfo(openTab);
+            } else {
+                // update tab
+                this.updateTabInfo(openTab);
+            }
+            const index = tabIdsToRemove.indexOf(openTab.id);
+            if (index >= 0) {
+                tabIdsToRemove.splice(index, 1);
+            }
+        }
+        for (let j = 0; j < tabIdsToRemove.length; j += 1) {
+            this.removeTabInfo(tabIdsToRemove[j]);
+        }
 
-     public updateEventData(tabId: number, eventId: string, data: unknown) {
-         const tabInfo = this.getFilteringInfoByTabId(tabId);
-         if (!tabInfo || !this.isOpen) {
-             return;
-         }
+        const syncTabs: number[] = [];
 
-         const { filteringEvents } = tabInfo;
+        Object.keys(this.tabsInfoMap).forEach((tabId) => {
+            syncTabs.push(this.tabsInfoMap[tabId]);
+        });
 
-         let event = filteringEvents.find(e => e.eventId === eventId);
+        return syncTabs;
+    }
 
-         if (event) {
-             event = Object.assign(event, data);
+    /**
+     * Remove log requests for tab
+     *
+     * @param tabId - tab id
+     * @param ignorePreserveLog - is {@link preserveLogEnabled} flag ignored
+     */
+    public clearEventsByTabId(tabId: number, ignorePreserveLog = false): void {
+        const tabInfo = this.tabsInfoMap[tabId];
 
-             listeners.notifyListeners(listeners.LOG_EVENT_ADDED, tabInfo, event);
-         }
-     }
+        const preserveLog = ignorePreserveLog ? false : this.preserveLogEnabled;
 
-     public isExistingCookieEvent = ({ data }: CookieEvent) => {
-         const {
-             tabId,
-             cookieName,
-             cookieValue,
-             frameDomain,
-         } = data;
+        if (tabInfo && !preserveLog) {
+            tabInfo.filteringEvents = [];
+            listeners.notifyListeners(listeners.TAB_RESET, tabInfo);
+        }
+    }
 
-         const tabInfo = this.getFilteringInfoByTabId(tabId);
-         const filteringEvents = tabInfo?.filteringEvents;
+    public addEventData(tabId: number, data: FilteringLogEvent): void {
+        const tabInfo = this.getFilteringInfoByTabId(tabId);
+        if (!tabInfo || !this.isOpen) {
+            return;
+        }
 
-         if (!filteringEvents) {
-             return false;
-         }
+        tabInfo.filteringEvents.push(data);
 
-         return filteringEvents.some(event => {
-             return event.frameDomain === frameDomain
-             && event.cookieName === cookieName
-             && event.cookieValue === cookieValue;
-         });
-     };
+        if (tabInfo.filteringEvents.length > FilteringLogApi.REQUESTS_SIZE_PER_TAB) {
+            // don't remove first item, cause it's request to main frame
+            tabInfo.filteringEvents.splice(1, 1);
+        }
 
-     public static createEventRuleData(rule: NetworkRule | CosmeticRule): FilteringEventRuleData {
-         const data = Object.create(null);
+        listeners.notifyListeners(listeners.LOG_EVENT_ADDED, tabInfo, data);
+    }
 
-         const filterId = rule.getFilterListId();
-         const ruleText = rule.getText();
+    public updateEventData(tabId: number, eventId: string, data: unknown): void {
+        const tabInfo = this.getFilteringInfoByTabId(tabId);
+        if (!tabInfo || !this.isOpen) {
+            return;
+        }
 
-         data.filterId = filterId;
-         data.ruleText = ruleText;
+        const { filteringEvents } = tabInfo;
 
-         if (rule instanceof NetworkRule) {
-             if (rule.isOptionEnabled(NetworkRuleOption.Important)) {
-                 data.isImportant = true;
-             }
+        let event = filteringEvents.find(e => e.eventId === eventId);
 
-             if (rule.isDocumentLevelAllowlistRule()) {
-                 data.documentLevelRule = true;
-             }
+        if (event) {
+            event = Object.assign(event, data);
 
-             if (rule.getFilterListId() === AntiBannerFiltersId.STEALTH_MODE_FILTER_ID) {
-                 data.isStealthModeRule = true;
-             }
+            listeners.notifyListeners(listeners.LOG_EVENT_ADDED, tabInfo, event);
+        }
+    }
 
-             data.allowlistRule = rule.isAllowlist();
-             data.cspRule = rule.isOptionEnabled(NetworkRuleOption.Csp);
-             data.modifierValue = rule.getAdvancedModifierValue();
-             data.cookieRule = rule.isOptionEnabled(NetworkRuleOption.Cookie);
-         } else if (rule instanceof CosmeticRule) {
-             const ruleType = rule.getType();
+    public isExistingCookieEvent({ data }: CookieEvent): boolean {
+        const {
+            tabId,
+            cookieName,
+            cookieValue,
+            frameDomain,
+        } = data;
 
-             if (ruleType === CosmeticRuleType.Html) {
-                 data.contentRule = true;
-             } else if (ruleType === CosmeticRuleType.ElementHiding
-                 || ruleType === CosmeticRuleType.Css) {
-                 data.cssRule = true;
-             } else if (ruleType === CosmeticRuleType.Js) {
-                 data.scriptRule = true;
-             }
-         }
+        const tabInfo = this.getFilteringInfoByTabId(tabId);
+        const filteringEvents = tabInfo?.filteringEvents;
 
-         if (filterId === AntiBannerFiltersId.USER_FILTER_ID) {
-             const originalRule = UserRulesApi.getSourceRule(rule.getText());
-             if (originalRule) {
-                 data.ruleText = originalRule;
-                 data.appliedRuleText = rule.getText();
-             }
-         }
+        if (!filteringEvents) {
+            return false;
+        }
 
-         return data;
-     }
+        return filteringEvents.some(event => {
+            return event.frameDomain === frameDomain
+                && event.cookieName === cookieName
+                && event.cookieValue === cookieValue;
+        });
+    }
+
+    public static createNetworkRuleEventData(rule: NetworkRule): FilteringEventRuleData {
+        const data = Object.create(null);
+
+        const filterId = rule.getFilterListId();
+        const ruleText = rule.getText();
+
+        data.filterId = filterId;
+        data.ruleText = ruleText;
+
+        if (rule.isOptionEnabled(NetworkRuleOption.Important)) {
+            data.isImportant = true;
+        }
+
+        if (rule.isDocumentLevelAllowlistRule()) {
+            data.documentLevelRule = true;
+        }
+
+        if (rule.getFilterListId() === AntiBannerFiltersId.STEALTH_MODE_FILTER_ID) {
+            data.isStealthModeRule = true;
+        }
+
+        data.allowlistRule = rule.isAllowlist();
+        data.cspRule = rule.isOptionEnabled(NetworkRuleOption.Csp);
+        data.modifierValue = rule.getAdvancedModifierValue();
+        data.cookieRule = rule.isOptionEnabled(NetworkRuleOption.Cookie);
+
+        if (filterId === AntiBannerFiltersId.USER_FILTER_ID) {
+            const originalRule = UserRulesApi.getSourceRule(rule.getText());
+            if (originalRule) {
+                data.ruleText = originalRule;
+                data.appliedRuleText = rule.getText();
+            }
+        }
+
+        return data;
+    }
+
+    public static createCosmeticRuleEventData(rule: CosmeticRule): FilteringEventRuleData {
+        const data = Object.create(null);
+
+        const filterId = rule.getFilterListId();
+        const ruleText = rule.getText();
+
+        data.filterId = filterId;
+        data.ruleText = ruleText;
+
+        const ruleType = rule.getType();
+
+        if (ruleType === CosmeticRuleType.Html) {
+            data.contentRule = true;
+        } else if (ruleType === CosmeticRuleType.ElementHiding
+            || ruleType === CosmeticRuleType.Css) {
+            data.cssRule = true;
+        } else if (ruleType === CosmeticRuleType.Js) {
+            data.scriptRule = true;
+        }
+
+        if (filterId === AntiBannerFiltersId.USER_FILTER_ID) {
+            const originalRule = UserRulesApi.getSourceRule(rule.getText());
+            if (originalRule) {
+                data.ruleText = originalRule;
+                data.appliedRuleText = rule.getText();
+            }
+        }
+
+        return data;
+    }
 }
 
 export const filteringLogApi = new FilteringLogApi();

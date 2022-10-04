@@ -25,7 +25,7 @@ export class PageStatsApi {
     /**
      * Init page stats storage
      */
-    public static async init() {
+    public static async init(): Promise<void> {
         try {
             const storageData = await pageStatsStorage.read();
             if (typeof storageData === 'string') {
@@ -40,7 +40,9 @@ export class PageStatsApi {
     }
 
     /**
-     * Total count of blocked requests
+     * Get total count of blocked requests
+     *
+     * @returns total count of blocked requests
      */
     public static getTotalBlocked(): number {
         return pageStatsStorage.getTotalBlocked() || 0;
@@ -48,28 +50,33 @@ export class PageStatsApi {
 
     /**
      * Increment total count of blocked requests
+     *
+     * @param value - increment value
      */
-    public static incrementTotalBlocked(blocked: number) {
+    public static incrementTotalBlocked(value: number): void {
         const totalBlocked = PageStatsApi.getTotalBlocked();
-        pageStatsStorage.setTotalBlocked(totalBlocked + blocked);
+        pageStatsStorage.setTotalBlocked(totalBlocked + value);
     }
 
     /**
      * Resets stats
      */
-    public static reset() {
-        return pageStatsStorage.setData({});
+    public static async reset(): Promise<void> {
+        await pageStatsStorage.setData({});
     }
 
     /**
      * Updates stats data
      *
      * We store last 24 hours, 30 days and all past months stats
+     *
+     * @param filterId - filter id
+     * @param blocked - count of blocked requests
      */
-    public static updateStats(
+    public static async updateStats(
         filterId: number,
         blocked: number,
-    ) {
+    ): Promise<void> {
         const blockedGroup = metadataStorage.getGroupByFilterId(filterId);
 
         if (!blockedGroup) {
@@ -86,7 +93,7 @@ export class PageStatsApi {
         }
 
         const created = PageStatsStorage.createStatsData(groupId, blocked);
-        return pageStatsStorage.setStatisticsData(created);
+        await pageStatsStorage.setStatisticsData(created);
     }
 
     /**
