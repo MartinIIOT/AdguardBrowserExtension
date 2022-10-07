@@ -1,5 +1,10 @@
 import browser from 'webextension-polyfill';
-import { tabsApi as tsWebExtTabApi } from '@adguard/tswebextension';
+import {
+    ApplyBasicRuleEvent,
+    defaultFilteringLog,
+    FilteringEventType,
+    tabsApi as tsWebExtTabApi,
+} from '@adguard/tswebextension';
 
 import { log } from '../../../common/log';
 import { messageHandler } from '../../message-handler';
@@ -21,12 +26,13 @@ import {
     PagesApi,
     AssistantApi,
     UiApi,
+    PageStatsApi,
 } from '../../api';
 import { ContextMenuAction, contextMenuEvents } from '../../events';
 import { ForwardFrom } from '../../../common/forward';
 
 export class UiService {
-    public static async init() {
+    public static async init(): Promise<void> {
         await toasts.init();
 
         messageHandler.addListener(MessageType.OPEN_TAB, TabsApi.openTab);
@@ -58,8 +64,10 @@ export class UiService {
 
         messageHandler.addListener(MessageType.INITIALIZE_FRAME_SCRIPT, UiService.initializeFrameScriptRequest);
 
-        tsWebExtTabApi.onUpdate.subscribe(UiApi.updateTabIconAndContextMenu);
-        tsWebExtTabApi.onActivated.subscribe(UiApi.updateTabIconAndContextMenu);
+        tsWebExtTabApi.onUpdate.subscribe(UiApi.update);
+        tsWebExtTabApi.onActivated.subscribe(UiApi.update);
+
+        defaultFilteringLog.addEventListener(FilteringEventType.APPLY_BASIC_RULE, UiService.onBasicRuleApply);
     }
 
     private static async openAbusePage({ data }: OpenAbuseTabMessage): Promise<void> {
@@ -68,7 +76,7 @@ export class UiService {
         await PagesApi.openAbusePage(url, from);
     }
 
-    private static async openAbusePageFromPContextMenu() {
+    private static async openAbusePageFromPContextMenu(): Promise<void> {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.url) {
@@ -84,7 +92,7 @@ export class UiService {
         await PagesApi.openSiteReportPage(url, from);
     }
 
-    private static async openSiteReportPageFromContextMenu() {
+    private static async openSiteReportPageFromContextMenu(): Promise<void> {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.url) {
@@ -125,5 +133,22 @@ export class UiService {
                 EventNotifierTypes: listeners.events,
             },
         };
+    }
+
+    private static async onBasicRuleApply({ data }: ApplyBasicRuleEvent): Promise<void> {
+        const { rule, tabId } = data;
+
+        const blockedCountIncrement = 1;
+
+        await PageStatsApi.updateStats(rule.getFilterListId(), blockedCountIncrement);
+        PageStatsApi.incrementTotalBlocked(blockedCountIncrement);
+
+        const tabContext = tsWebExtTabApi.getTabContext(tabId);
+
+        if (!tabContext) {
+            return;
+        }
+
+        await UiApi.update(tabContext);
     }
 }

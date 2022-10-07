@@ -6,11 +6,11 @@ import {
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
 import { SettingOption } from '../schema';
-import { UserRulesApi } from '../api';
+import { SettingsApi, UserRulesApi } from '../api';
 import { settingsEvents } from '../events';
 
 export class UserRulesService {
-    static async init() {
+    public static async init(): Promise<void> {
         await UserRulesApi.init();
 
         messageHandler.addListener(MessageType.GET_USER_RULES, UserRulesService.getUserRules);
@@ -29,7 +29,7 @@ export class UserRulesService {
         );
     }
 
-    static async getUserRules() {
+    private static async getUserRules() {
         const userRules = await UserRulesApi.getUserRules();
 
         const content = userRules.join('\n');
@@ -37,52 +37,52 @@ export class UserRulesService {
         return { content, appVersion: browser.runtime.getManifest().version };
     }
 
-    static async getUserRulesEditorData() {
+    private static async getUserRulesEditorData() {
         const userRules = await UserRulesApi.getUserRules();
 
         const content = userRules.join('\n');
 
         return {
             userRules: content,
-            // TODO settings: settings.getAllSettings(),
+            settings: SettingsApi.getData(),
         };
     }
 
-    static async addUserRule(rule: string) {
+    private static async addUserRule(rule: string): Promise<void> {
         await UserRulesApi.addUserRule(rule);
         await Engine.update();
     }
 
-    static async handleUserRulesSave(message: SaveUserRulesMessage) {
+    private static async handleUserRulesSave(message: SaveUserRulesMessage): Promise<void> {
         const { value } = message.data;
 
         await UserRulesApi.setUserRules(value.split('\n'));
         await Engine.update();
     }
 
-    static async handleUserRuleAdd(message) {
+    private static async handleUserRuleAdd(message): Promise<void> {
         const { ruleText } = message.data;
 
         await UserRulesApi.addUserRule(ruleText);
         await Engine.update();
     }
 
-    static async handleUserRuleRemove(message) {
+    private static async handleUserRuleRemove(message): Promise<void> {
         const { ruleText } = message.data;
 
         await UserRulesApi.removeUserRule(ruleText);
         await Engine.update();
     }
 
-    static async handleEnableStateChange() {
+    private static async handleEnableStateChange(): Promise<void> {
         await Engine.update();
     }
 
-    static getEditorStorageContent(): string {
+    private static getEditorStorageContent(): string {
         return UserRulesApi.getEditorStorageData();
     }
 
-    static setEditorStorageContent(message): void {
+    private static setEditorStorageContent(message): void {
         const { content } = message.data;
 
         UserRulesApi.setEditorStorageData(content);

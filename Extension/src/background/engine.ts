@@ -19,7 +19,7 @@ export class Engine {
 
     static messageHandlerName = MESSAGE_HANDLER_NAME;
 
-    static messageHandler = Engine.api.getMessageHandler();
+    static handleMessage = Engine.api.getMessageHandler();
 
     static async start(): Promise<void> {
         const configuration = await Engine.getConfiguration();
@@ -77,7 +77,7 @@ export class Engine {
 
         const settings = SettingsApi.getTsWebExtConfiguration();
 
-        let allowlist = [];
+        let allowlist: string[] = [];
 
         if (AllowlistApi.isEnabled()) {
             if (settings.allowlistInverted) {

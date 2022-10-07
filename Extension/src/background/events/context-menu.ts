@@ -23,14 +23,14 @@ export type ContextMenuListener = () => unknown | Promise<unknown>;
 export class ContextMenuEvents {
     private listenersMap = new Map();
 
-    public addListener<T extends ContextMenuAction>(type: T, listener: ContextMenuListener) {
+    public addListener<T extends ContextMenuAction>(type: T, listener: ContextMenuListener): void {
         if (this.listenersMap.has(type)) {
             throw new Error(`${type} listener has already been registered`);
         }
         this.listenersMap.set(type, listener);
     }
 
-    public async publishEvent<T extends ContextMenuAction>(type: T) {
+    public async publishEvent<T extends ContextMenuAction>(type: T): Promise<void> {
         const listener = this.listenersMap.get(type);
         if (listener) {
             return Promise.resolve(listener());

@@ -6,6 +6,7 @@ import {
 } from '@adguard/tswebextension';
 import { AntiBannerFiltersId } from '../../../common/constants';
 import { SettingOption } from '../../schema';
+import { appStorage } from '../../storages';
 import { PageStatsApi } from '../filters';
 import { SettingsApi } from '../settings';
 
@@ -29,7 +30,7 @@ export type FrameData = {
 };
 
 /**
- * Helper class for retrieving frame data from both tswebextension and app state
+ * Helper class for retrieving main frame data from both tswebextension and app state
  */
 export class FramesApi {
     public static getMainFrameData({
@@ -46,11 +47,11 @@ export class FramesApi {
             url = mainFrame?.url;
         }
 
-        const domainName = getDomain(url);
+        const domainName = url ? getDomain(url) : null;
 
         const urlFilteringDisabled = !url || !isHttpRequest(url);
 
-        const applicationAvailable = !urlFilteringDisabled;
+        const applicationAvailable = appStorage.get('isInit') && !urlFilteringDisabled;
 
         let frameRule: FrameRule | undefined;
         let documentAllowlisted = false;

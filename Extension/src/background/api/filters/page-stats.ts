@@ -52,10 +52,16 @@ export class PageStatsApi {
      * Increment total count of blocked requests
      *
      * @param value - increment value
+     *
+     * @returns incremented total blocked value
      */
-    public static incrementTotalBlocked(value: number): void {
-        const totalBlocked = PageStatsApi.getTotalBlocked();
-        pageStatsStorage.setTotalBlocked(totalBlocked + value);
+    public static incrementTotalBlocked(value: number): number {
+        let totalBlocked = PageStatsApi.getTotalBlocked();
+
+        totalBlocked += value;
+
+        pageStatsStorage.setTotalBlocked(totalBlocked);
+        return totalBlocked;
     }
 
     /**

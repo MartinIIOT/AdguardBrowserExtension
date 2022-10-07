@@ -17,12 +17,8 @@ export const DEFAULT_ALLOWLIST = [];
 
 export const DEFAULT_INVERTED_ALLOWLIST = [];
 
-function isPromoInfoDisabled(): boolean {
-    return (!UserAgent.isWindows && !UserAgent.isMacOs) || UserAgent.isEdge;
-}
-
 export const defaultSettings: Settings = {
-    [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: isPromoInfoDisabled(),
+    [SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO]: (!UserAgent.isWindows && !UserAgent.isMacOs) || UserAgent.isEdge,
     [SettingOption.DISABLE_SAFEBROWSING]: true,
     [SettingOption.DISABLE_COLLECT_HITS]: true,
     [SettingOption.DEFAULT_ALLOWLIST_MODE]: true,

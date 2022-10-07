@@ -6,7 +6,7 @@ import {
     FilteringEventType,
     SendRequestEvent,
     ReceiveResponseEvent,
-    PageReloadEvent,
+    TabReloadEvent,
     RemoveParamEvent,
     RemoveHeaderEvent,
     ApplyCosmeticRuleEvent,
@@ -49,7 +49,7 @@ export class FilteringLogService {
         tabsApi.onDelete.subscribe(FilteringLogService.onTabRemove);
 
         defaultFilteringLog.addEventListener(FilteringEventType.SEND_REQUEST, FilteringLogService.onSendRequest);
-        defaultFilteringLog.addEventListener(FilteringEventType.PAGE_RELOAD, FilteringLogService.onPageReload);
+        defaultFilteringLog.addEventListener(FilteringEventType.TAB_RELOAD, FilteringLogService.onTabReload);
         defaultFilteringLog.addEventListener(
             FilteringEventType.RECEIVE_RESPONSE,
             FilteringLogService.onReceiveResponse,
@@ -91,7 +91,7 @@ export class FilteringLogService {
         filteringLogApi.addEventData(tabId, eventData);
     }
 
-    static onPageReload(event: PageReloadEvent): void {
+    static onTabReload(event: TabReloadEvent): void {
         const { tabId } = event.data;
         filteringLogApi.clearEventsByTabId(tabId);
     }

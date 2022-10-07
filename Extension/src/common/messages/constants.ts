@@ -1,5 +1,5 @@
-import { ForwardFrom } from './forward';
-import { SettingOption, Settings } from '../background/schema';
+import { ForwardFrom } from '../forward';
+import { SettingOption, Settings } from '../../background/schema';
 
 /**
  * Message types used for message passing between background page and
@@ -81,6 +81,8 @@ export enum MessageType {
   SET_EDITOR_STORAGE_CONTENT = 'setEditorStorageContent',
   CONVERT_RULES_TEXT = 'convertRulesText',
   SET_FILTERING_LOG_WINDOW_STATE = 'setFilteringLogWindowState',
+  APP_INITIALIZED = 'appInitialized',
+  UPDATE_TOTAL_BLOCKED = 'updateTotalBlocked',
 }
 
 export type GetTabInfoForPopupMessage = {
@@ -210,6 +212,22 @@ export type SubscribeToCustomFilterMessage = {
   }
 };
 
+export type AppInitializedMessage = {
+  type: MessageType.APP_INITIALIZED
+};
+
+export type UpdateTotalBlockedMessage = {
+  type: MessageType.UPDATE_TOTAL_BLOCKED
+  data: {
+    totalBlocked: number,
+    totalBlockedTab: number,
+  }
+};
+
+export type OnCheckRequestFilterReadyMessage = {
+  type: MessageType.CHECK_REQUEST_FILTER_READY
+};
+
 export type Message = (
   | GetTabInfoForPopupMessage
   | ChangeApplicationFilteringDisabledMessage
@@ -230,6 +248,9 @@ export type Message = (
   | RemoveAllowlistDomainMessage
   | LoadCustomFilterInfoMessage
   | SubscribeToCustomFilterMessage
+  | AppInitializedMessage
+  | UpdateTotalBlockedMessage
+  | OnCheckRequestFilterReadyMessage
 ) &
   MessageCommonProps;
 

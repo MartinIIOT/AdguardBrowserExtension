@@ -51,7 +51,7 @@
     tldts "^5.6.45"
     webextension-polyfill "^0.8.0"
 
-"@adguard/tsurlfilter@^2.0.0-alpha.11":
+"@adguard/tsurlfilter@^2.0.0-alpha.15":
   version "2.0.0-alpha.15"
   resolved "https://registry.yarnpkg.com/@adguard/tsurlfilter/-/tsurlfilter-2.0.0-alpha.15.tgz#513b3ce6292ba2fe56a128e68a44f349ad7b6808"
   integrity sha512-d9X5uDK2nphKxFd4rk7OuNH/xjyG+6bQgeCytwxKW2XTNl5oWbkQqOn5B5NKOjuFW33URY0y+3c718McgYKtkQ==
@@ -65,15 +65,15 @@
     punycode "2.1.1"
     tldts "5.6.45"
 
-"@adguard/tswebextension@^0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@adguard/tswebextension/-/tswebextension-0.0.23.tgz#9d67f8a8d028e5989e5f679b321c55e2770b2dea"
-  integrity sha512-wJ5t8a1HoWbo+njoegLqF1kDkbv4Y9tjLwbQjqB57OI3wTOexcZUHSktNuyE549GD+MvEa6uzAy01eCyLSbDyg==
+"@adguard/tswebextension@^0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@adguard/tswebextension/-/tswebextension-0.0.25.tgz#c332227ae428cc8d2edd157973847c31da19d47a"
+  integrity sha512-TF1epvkQBu5V4DZZXqq4J7kcgj6crTz71lauyySRebY5H/GypnEJwD8vlzreudk5CkwV29dNbXNo40lgkJZELw==
   dependencies:
     "@adguard/assistant" "^4.3.62"
     "@adguard/filters-downloader" "^1.1.13"
     "@adguard/scriptlets" "^1.6.24"
-    "@adguard/tsurlfilter" "^2.0.0-alpha.11"
+    "@adguard/tsurlfilter" "^2.0.0-alpha.15"
     bowser "2.11.0"
     commander "9.4.0"
     deepmerge "4.2.2"

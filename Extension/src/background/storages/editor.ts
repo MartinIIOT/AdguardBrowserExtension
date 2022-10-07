@@ -5,11 +5,11 @@
 export class EditorStorage {
     private data: string | undefined;
 
-    set(data: string) {
+    set(data: string): void {
         this.data = data;
     }
 
-    get() {
+    get(): string {
         return this.data;
     }
 }

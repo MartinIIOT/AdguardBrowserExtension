@@ -1,12 +1,18 @@
+export type AppStorageData = {
+    isInit: boolean,
+    clientId?: string,
+};
 export class AppStorage {
-    private clientId: string | undefined;
+    private data: AppStorageData = {
+        isInit: false,
+    };
 
-    public getClientId(): string | undefined {
-        return this.clientId;
+    public get<T extends keyof AppStorageData>(key: T): AppStorageData[T] {
+        return this.data[key];
     }
 
-    public setClientId(id: string) {
-        this.clientId = id;
+    public set<T extends keyof AppStorageData>(key: T, value: AppStorageData[T]): void {
+        this.data[key] = value;
     }
 }
 

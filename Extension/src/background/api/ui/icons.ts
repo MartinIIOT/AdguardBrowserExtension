@@ -15,7 +15,7 @@ export class IconsApi {
             applicationFilteringDisabled,
             totalBlockedTab,
         }: FrameData,
-    ) {
+    ): Promise<void> {
         let icon: Record<string, string>;
         let badge: string;
         let badgeColor = '#555';

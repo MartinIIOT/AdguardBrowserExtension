@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import browser from 'webextension-polyfill';
 
-import { MessageType } from '../common/messages';
+import { MessageType, sendMessage } from '../common/messages';
 import { log } from '../common/log';
 
 import { messageHandler } from './message-handler';
+import { ConnectionHandler } from './connection-handler';
 import { Engine } from './engine';
 import { appStorage, settingsStorage, storage } from './storages';
 import {
@@ -56,8 +57,10 @@ export class App {
      * Initializes all app services
      * and handle webextension API events for first install and update scenario
      */
-    static async init() {
-        // Initializes message handler as soon as possible to prevent connection errors from extension pages
+    static async init(): Promise<void> {
+        // Initializes connection and message handler as soon as possible
+        // to prevent connection errors from extension pages
+        ConnectionHandler.init();
         messageHandler.init();
 
         // get application run info
@@ -84,7 +87,7 @@ export class App {
         /**
          * Initializes App storage data
          */
-        await App.initAppData();
+        await App.initClientId();
 
         /**
          * Initializes Settings storage data
@@ -92,12 +95,12 @@ export class App {
         await SettingsApi.init();
 
         /**
-          * Initializes Filters data:
-          * - Loads app i18n metadata and caches it in i18n-metadata storage
-          * - Loads app metadata, apply localization from i18n-metadata storage and caches it in metadata storage
-          * - Initializes storages for userrules, allowlist, custom filters metadata and page-stats
-          * - Initializes storages for filters state, groups state and filters versions, based on app metadata
-          */
+         * Initializes Filters data:
+         * - Loads app i18n metadata and caches it in i18n-metadata storage
+         * - Loads app metadata, apply localization from i18n-metadata storage and caches it in metadata storage
+         * - Initializes storages for userrules, allowlist, custom filters metadata and page-stats
+         * - Initializes storages for filters state, groups state and filters versions, based on app metadata
+         */
         await FiltersApi.init();
 
         /**
@@ -189,12 +192,18 @@ export class App {
 
         // Runs tswebextension
         await Engine.start();
+
+        appStorage.set('isInit', true);
+
+        await sendMessage<MessageType.APP_INITIALIZED>({ type: MessageType.APP_INITIALIZED });
     }
 
     /**
      * Handles engine status request from filters-download page
+     *
+     * @returns true, if filter engine is initialized, else false.
      */
-    private static onCheckRequestFilterReady() {
+    private static onCheckRequestFilterReady(): boolean {
         const ready = Engine.api.isStarted;
 
         /**
@@ -206,13 +215,13 @@ export class App {
             messageHandler.removeListener(MessageType.CHECK_REQUEST_FILTER_READY);
         }
 
-        return { ready };
+        return ready;
     }
 
     /**
      * Sets app uninstall url
      */
-    private static async setUninstallUrl() {
+    private static async setUninstallUrl(): Promise<void> {
         try {
             await browser.runtime.setUninstallURL(App.uninstallUrl);
         } catch (e) {
@@ -220,14 +229,14 @@ export class App {
         }
     }
 
-    private static async initAppData() {
+    private static async initClientId(): Promise<void> {
         const clientId = await storage.get(CLIENT_ID_KEY);
 
         if (typeof clientId !== 'string') {
             throw new Error('client id is not found');
         }
 
-        appStorage.setClientId(clientId);
+        appStorage.set('clientId', clientId);
     }
 }
 

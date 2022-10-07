@@ -93,6 +93,10 @@ class PopupStore {
 
         const response = await messenger.getTabInfoForPopup(currentTab?.id);
 
+        if (!response) {
+            return;
+        }
+
         runInAction(() => {
             const {
                 frameInfo,

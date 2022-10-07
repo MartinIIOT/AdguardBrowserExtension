@@ -20,7 +20,7 @@ import { CustomFilterApi } from './custom';
 /**
  * API for managing common filter data.
  *
- * This class providing methods for reading common filter metadata from {@link metadataStorage.data.filters},
+ * This class provides methods for reading common filter metadata from {@link metadataStorage.data.filters},
  * installation and updating common filters data, stored in next storages:
  * - {@link filterStateStorage} - filters states
  * - {@link filterVersionStorage} - filters versions

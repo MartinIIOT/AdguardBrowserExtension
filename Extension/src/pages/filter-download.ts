@@ -32,33 +32,33 @@ export class FilterDownload {
 
     private static openThankyouPageTimeoutMs = 1000;
 
-    public static init() {
+    public static init(): void {
         document.addEventListener('DOMContentLoaded', FilterDownload.onDOMContentLoaded);
     }
 
-    private static onDOMContentLoaded() {
+    private static onDOMContentLoaded(): void {
         FilterDownload.nanobar.go(15);
 
         FilterDownload.checkRequestFilterReady();
     }
 
-    private static async checkRequestFilterReady() {
+    private static async checkRequestFilterReady(): Promise<void> {
         try {
-            const response = await messenger.sendMessage(MessageType.CHECK_REQUEST_FILTER_READY);
+            const ready = await messenger.sendMessage(MessageType.CHECK_REQUEST_FILTER_READY);
 
-            if (response.ready) {
+            if (ready) {
                 FilterDownload.onEngineLoaded();
             } else {
                 setTimeout(FilterDownload.checkRequestFilterReady, FilterDownload.checkRequestTimeoutMs);
             }
         } catch (e) {
             log.error(e);
-            // retry request, if mesage handler is not ready
+            // retry request, if message handler is not ready
             setTimeout(FilterDownload.checkRequestFilterReady, FilterDownload.checkRequestTimeoutMs);
         }
     }
 
-    private static onEngineLoaded() {
+    private static onEngineLoaded(): void {
         FilterDownload.nanobar.go(100);
         setTimeout(() => {
             if (window) {

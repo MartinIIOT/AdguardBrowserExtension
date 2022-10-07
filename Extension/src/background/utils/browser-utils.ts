@@ -19,9 +19,23 @@ import { appStorage } from '../storages';
 
 import { Version } from './version';
 
+/**
+ * Helper class for working with browser extension context
+ */
 export class BrowserUtils {
-    static getExtensionParams(): string[] {
-        const persistedClientId = appStorage.getClientId();
+    /**
+     * {@link BrowserUtils.getExtensionParams} gets extension specified query params
+     *
+     * This method called on app metadata, i18n metadata and thankyou page url calculation
+     *
+     * @see NetworkSettings#filtersMetadataUrl
+     * @see NetworkSettings#filtersI18nMetadataUrl
+     * @see PagesApi.openThankYouPage
+     *
+     * @returns extension specified query params array
+     */
+    public static getExtensionParams(): string[] {
+        const persistedClientId = appStorage.get('clientId');
 
         if (typeof persistedClientId !== 'string') {
             throw new Error('client id is not found');
@@ -41,9 +55,13 @@ export class BrowserUtils {
     }
 
     /**
-     * Retrieve languages from navigator
+     * {@link BrowserUtils.getNavigatorLanguages} retrieves locales from navigator
+     *
+     * @param limit - limit of returned locales
+     *
+     * @returns array of locales
      */
-    static getNavigatorLanguages(limit?: number): string[] {
+    public static getNavigatorLanguages(limit?: number): string[] {
         let languages: string[] = [];
         // https://developer.mozilla.org/ru/docs/Web/API/NavigatorLanguage/languages
         if (Array.isArray(navigator.languages)) {
@@ -57,48 +75,66 @@ export class BrowserUtils {
     }
 
     /**
-     * Checks if version matches simple (without labels) semantic versioning scheme
+     * {@link BrowserUtils.isSemver} checks if version matches simple (without labels) semantic versioning scheme
      * https://semver.org/
+     *
+     * @param version - version string
+     *
+     * @returns true, if string matches simple (without labels) semantic versioning scheme, else returns false
      */
-    static isSemver(version: string): boolean {
+    public static isSemver(version: string): boolean {
         const semverRegex = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
         return semverRegex.test(version);
     }
 
     /**
-     * Checks if left version is greater than the right version
+     * {@link BrowserUtils.isGreaterVersion} checks if left version is greater than the right version
+     *
+     * @param leftVersion - semver string
+     * @param rightVersion - semver string
+     *
+     * @returns true, if left version is greater than the right version, else returns false
      */
-    static isGreaterVersion(leftVersion: string, rightVersion: string) {
+    public static isGreaterVersion(leftVersion: string, rightVersion: string): boolean {
         const left = new Version(leftVersion);
         const right = new Version(rightVersion);
         return left.compare(right) > 0;
     }
 
     /**
-     * Checks if left version is greater than the right version or equals
+     * {@link BrowserUtils.isGreaterOrEqualsVersion} checks if left version is greater than the right version or equals
+     *
+     * @param leftVersion - semver string
+     * @param rightVersion - semver string
+     *
+     * @returns true, if left version is greater than the right version or equals, else returns false
      */
-    static isGreaterOrEqualsVersion(leftVersion: string, rightVersion: string) {
+    public static isGreaterOrEqualsVersion(leftVersion: string, rightVersion: string): boolean {
         const left = new Version(leftVersion);
         const right = new Version(rightVersion);
         return left.compare(right) >= 0;
     }
 
     /**
-     * Returns major number of version
+     * {@link BrowserUtils.getMajorVersionNumber} gets major number of version
      *
-     * @param version
+     * @param version - semver string
+     *
+     * @returns major part of semver
      */
-    static getMajorVersionNumber(version) {
+    public static getMajorVersionNumber(version: string): string {
         const v = new Version(version);
         return v.data[0];
     }
 
     /**
-     * Returns minor number of version
+     * {@link BrowserUtils.getMinorVersionNumber} gets minor number of version
      *
-     * @param version
+     * @param version - semver string
+     *
+     * @returns minor part of semver
      */
-    static getMinorVersionNumber(version) {
+    public static getMinorVersionNumber(version: string): string {
         const v = new Version(version);
         return v.data[1];
     }

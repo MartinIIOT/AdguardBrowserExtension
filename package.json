@@ -99,7 +99,7 @@
     "@adguard/scriptlets": "^1.6.39",
     "@adguard/translate": "^0.2.5",
     "@adguard/tsurlfilter": "^1.0.35",
-    "@adguard/tswebextension": "^0.0.23",
+    "@adguard/tswebextension": "^0.0.25",
     "@babel/runtime": "^7.15.3",
     "@xstate/react": "^1.5.1",
     "ace-builds": "^1.8.1",

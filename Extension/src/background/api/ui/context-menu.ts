@@ -16,44 +16,48 @@ export class ContextMenuApi {
         userAllowlisted,
         canAddRemoveRule,
     }: FrameData): Promise<void> {
-        // clean up context menu
-        await browser.contextMenus.removeAll();
+        try {
+            // clean up context menu
+            await browser.contextMenus.removeAll();
 
-        if (applicationFilteringDisabled) {
-            ContextMenuApi.addFilteringDisabledMenuItems();
-        } else if (urlFilteringDisabled) {
-            ContextMenuApi.addUrlFilteringDisabledContextMenuAction();
-        } else {
-            if (documentAllowlisted && !userAllowlisted) {
-                ContextMenuApi.addMenuItem(ContextMenuAction.SITE_EXCEPTION);
-            } else if (canAddRemoveRule) {
-                if (documentAllowlisted) {
-                    ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_ON);
-                } else {
-                    ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_OFF);
+            if (applicationFilteringDisabled) {
+                ContextMenuApi.addFilteringDisabledMenuItems();
+            } else if (urlFilteringDisabled) {
+                ContextMenuApi.addUrlFilteringDisabledContextMenuAction();
+            } else {
+                if (documentAllowlisted && !userAllowlisted) {
+                    ContextMenuApi.addMenuItem(ContextMenuAction.SITE_EXCEPTION);
+                } else if (canAddRemoveRule) {
+                    if (documentAllowlisted) {
+                        ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_ON);
+                    } else {
+                        ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_OFF);
+                    }
                 }
-            }
-            ContextMenuApi.addSeparator();
+                ContextMenuApi.addSeparator();
 
-            if (!documentAllowlisted) {
-                ContextMenuApi.addMenuItem(ContextMenuAction.BLOCK_SITE_ADS);
-                ContextMenuApi.addMenuItem(ContextMenuAction.BLOCK_SITE_ELEMENT, {
-                    contexts: ['image', 'video', 'audio'],
-                });
-            }
+                if (!documentAllowlisted) {
+                    ContextMenuApi.addMenuItem(ContextMenuAction.BLOCK_SITE_ADS);
+                    ContextMenuApi.addMenuItem(ContextMenuAction.BLOCK_SITE_ELEMENT, {
+                        contexts: ['image', 'video', 'audio'],
+                    });
+                }
 
-            ContextMenuApi.addMenuItem(ContextMenuAction.SECURITY_REPORT);
-            ContextMenuApi.addMenuItem(ContextMenuAction.COMPLAINT_WEBSITE);
-            ContextMenuApi.addSeparator();
-            ContextMenuApi.addMenuItem(ContextMenuAction.UPDATE_ANTIBANNER_FILTERS);
-            ContextMenuApi.addSeparator();
-            ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_SETTINGS);
-            ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_LOG);
-            ContextMenuApi.addMenuItem(ContextMenuAction.DISABLE_PROTECTION);
+                ContextMenuApi.addMenuItem(ContextMenuAction.SECURITY_REPORT);
+                ContextMenuApi.addMenuItem(ContextMenuAction.COMPLAINT_WEBSITE);
+                ContextMenuApi.addSeparator();
+                ContextMenuApi.addMenuItem(ContextMenuAction.UPDATE_ANTIBANNER_FILTERS);
+                ContextMenuApi.addSeparator();
+                ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_SETTINGS);
+                ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_LOG);
+                ContextMenuApi.addMenuItem(ContextMenuAction.DISABLE_PROTECTION);
+            }
+        } catch (e) {
+            // do nothing
         }
     }
 
-    private static addFilteringDisabledMenuItems() {
+    private static addFilteringDisabledMenuItems(): void {
         ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_DISABLED);
         ContextMenuApi.addSeparator();
         ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_LOG);
@@ -61,7 +65,7 @@ export class ContextMenuApi {
         ContextMenuApi.addMenuItem(ContextMenuAction.ENABLE_PROTECTION);
     }
 
-    private static addUrlFilteringDisabledContextMenuAction() {
+    private static addUrlFilteringDisabledContextMenuAction(): void {
         ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_DISABLED);
         ContextMenuApi.addSeparator();
         ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_LOG);
@@ -69,7 +73,7 @@ export class ContextMenuApi {
         ContextMenuApi.addMenuItem(ContextMenuAction.UPDATE_ANTIBANNER_FILTERS);
     }
 
-    private static addMenuItem(action: ContextMenuAction, options: AddMenuItemOptions = {}) {
+    private static addMenuItem(action: ContextMenuAction, options: AddMenuItemOptions = {}): void {
         const { messageArgs, ...rest } = options;
 
         browser.contextMenus.create({
@@ -82,7 +86,7 @@ export class ContextMenuApi {
         });
     }
 
-    private static addSeparator() {
+    private static addSeparator(): void {
         browser.contextMenus.create({
             type: 'separator',
             contexts: ['all'],
