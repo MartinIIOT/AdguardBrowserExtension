@@ -1,3 +1,4 @@
+import { Windows } from 'webextension-polyfill';
 import { ForwardFrom } from '../forward';
 import { SettingOption, Settings } from '../../background/schema';
 
@@ -265,8 +266,60 @@ export type UpdateTotalBlockedMessage = {
   }
 };
 
-export type OnCheckRequestFilterReadyMessage = {
+export type CheckRequestFilterReadyMessage = {
   type: MessageType.CHECK_REQUEST_FILTER_READY
+};
+
+export type GetFilteringLogDataMessage = {
+  type: MessageType.GET_FILTERING_LOG_DATA,
+};
+
+export type SynchronizeOpenTabsMessage = {
+  type: MessageType.SYNCHRONIZE_OPEN_TABS,
+};
+
+export type OpenFilteringLogPageMessage = {
+  type: MessageType.ON_OPEN_FILTERING_LOG_PAGE
+};
+
+export type CloseFilteringLogPageMessage = {
+  type: MessageType.ON_CLOSE_FILTERING_LOG_PAGE
+};
+
+export type ClearEventsByTabIdMessage = {
+  type: MessageType.CLEAR_EVENTS_BY_TAB_ID
+  data: {
+    tabId: number,
+    ignorePreserveLog: boolean,
+  }
+};
+
+export type SetPreserveLogStateMessage = {
+  type: MessageType.SET_PRESERVE_LOG_STATE
+  data: {
+    state: boolean,
+  }
+};
+
+export type SetFilteringLogWindowStateMessage = {
+  type: MessageType.SET_FILTERING_LOG_WINDOW_STATE,
+  data: {
+    windowState: Windows.CreateCreateDataType
+  }
+};
+
+export type PageRefreshMessage = {
+  type: MessageType.REFRESH_PAGE,
+  data: {
+    tabId: number,
+  }
+};
+
+export type GetFilteringInfoByTabIdMessage = {
+  type: MessageType.GET_FILTERING_INFO_BY_TAB_ID,
+  data: {
+    tabId: number,
+  }
 };
 
 export type Message = (
@@ -298,7 +351,15 @@ export type Message = (
   | SubscribeToCustomFilterMessage
   | AppInitializedMessage
   | UpdateTotalBlockedMessage
-  | OnCheckRequestFilterReadyMessage
+  | GetFilteringLogDataMessage
+  | CheckRequestFilterReadyMessage
+  | OpenFilteringLogPageMessage
+  | CloseFilteringLogPageMessage
+  | ClearEventsByTabIdMessage
+  | SetPreserveLogStateMessage
+  | PageRefreshMessage
+  | GetFilteringInfoByTabIdMessage
+  | SetFilteringLogWindowStateMessage
 ) &
   MessageCommonProps;
 

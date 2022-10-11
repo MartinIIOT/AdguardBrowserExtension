@@ -121,18 +121,23 @@ const FilteringLog = observer(() => {
                 outerHeight,
                 screenTop,
                 screenLeft,
+                screen,
             } = window;
 
-            // eslint-disable-next-line no-restricted-globals
-            const isFullscreen = innerWidth === screen.width && innerHeight === screen.height;
+            const isFullscreen = outerWidth === screen.width && outerHeight === screen.height;
 
-            messenger.setFilteringLogWindowState({
-                width: outerWidth,
-                height: outerHeight,
-                top: screenTop,
-                left: screenLeft,
-                isFullscreen,
-            });
+            if (isFullscreen) {
+                messenger.setFilteringLogWindowState({
+                    state: 'fullscreen',
+                });
+            } else {
+                messenger.setFilteringLogWindowState({
+                    width: outerWidth,
+                    height: outerHeight,
+                    top: screenTop,
+                    left: screenLeft,
+                });
+            }
         };
 
         const throttledWindowStateHandler = throttle(windowStateHandler, RESIZE_THROTTLE);

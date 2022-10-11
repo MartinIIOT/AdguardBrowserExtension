@@ -15,7 +15,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { MessageType } from '../common/constants';
+import { MessageType } from '../common/messages';
 import { UserAgent } from '../common/user-agent';
 import { messenger } from './services/messenger';
 

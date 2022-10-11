@@ -7,7 +7,7 @@ import {
     runInAction,
 } from 'mobx';
 import { messenger } from '../../services/messenger';
-import { MessageType } from '../../../common/constants';
+import { MessageType } from '../../../common/messages';
 
 class FullscreenUserRulesStore {
     @observable settings = null;

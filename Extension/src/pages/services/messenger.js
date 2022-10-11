@@ -2,7 +2,7 @@ import browser from 'webextension-polyfill';
 import { nanoid } from 'nanoid';
 
 import { log } from '../../common/log';
-import { MessageType, APP_MESSAGE_HANDLER_NAME } from '../../common/constants';
+import { MessageType, APP_MESSAGE_HANDLER_NAME } from '../../common/messages';
 
 class Messenger {
     onMessage = browser.runtime.onMessage;

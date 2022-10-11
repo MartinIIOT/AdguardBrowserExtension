@@ -4,7 +4,7 @@ import classnames from 'classnames';
 
 import { popupStore } from '../../stores/PopupStore';
 import { messenger } from '../../../services/messenger';
-import { MessageType } from '../../../../common/constants';
+import { MessageType } from '../../../../common/messages';
 
 import './promo-notification.pcss';
 

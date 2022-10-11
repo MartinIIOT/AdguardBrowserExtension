@@ -17,7 +17,7 @@
  */
 
 import { contentPage } from './content-script';
-import { MessageType } from '../common/constants';
+import { MessageType } from '../common/messages';
 import { messenger } from '../pages/services/messenger';
 import { SettingOption } from '../background/schema';
 

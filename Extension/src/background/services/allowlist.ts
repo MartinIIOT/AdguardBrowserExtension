@@ -6,7 +6,7 @@ import {
     SaveAllowlistDomainsMessage,
     AddAllowlistDomainPopupMessage,
     RemoveAllowlistDomainMessage,
-} from '../../common/constants';
+} from '../../common/messages';
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
 import { SettingOption } from '../schema';

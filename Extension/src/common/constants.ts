@@ -1,5 +1,3 @@
-export * from './messages';
-
 export const APP_SCHEMA_VERSION = 1;
 
 export const CLIENT_ID_KEY = 'client-id';
@@ -12,6 +10,7 @@ export const SB_LRU_CACHE_KEY = 'sb-lru-cache';
 export const SB_SUSPENDED_CACHE_KEY = 'safebrowsing-suspended-from';
 export const VIEWED_NOTIFICATIONS_KEY = 'viewed-notifications';
 export const LAST_NOTIFICATION_TIME_KEY = 'viewed-notification-time';
+export const FILTERING_LOG_WINDOW_STATE = 'filtering-log-window-state';
 
 export const SAFEBROWSING_PAGE_PATH = 'pages/safebrowsing.html';
 export const DOCUMENT_BLOCK_PAGE_PATH = 'pages/ad-blocked.html';

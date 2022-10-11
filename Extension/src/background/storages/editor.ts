@@ -9,7 +9,7 @@ export class EditorStorage {
         this.data = data;
     }
 
-    get(): string {
+    get(): string | undefined {
         return this.data;
     }
 }

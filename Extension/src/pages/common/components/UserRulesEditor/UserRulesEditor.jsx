@@ -15,7 +15,8 @@ import { reactTranslator } from '../../../../common/translators/reactTranslator'
 import { Popover } from '../ui/Popover';
 import { Icon } from '../ui/Icon';
 import { messenger } from '../../../services/messenger';
-import { MessageType, NOTIFIER_TYPES } from '../../../../common/constants';
+import { MessageType } from '../../../../common/messages';
+import { NOTIFIER_TYPES } from '../../../../common/constants';
 import { handleFileUpload } from '../../../helpers';
 import { log } from '../../../../common/log';
 import { ToggleWrapButton } from './ToggleWrapButton';

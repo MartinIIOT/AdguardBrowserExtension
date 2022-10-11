@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { SettingsSection } from '../Settings/SettingsSection';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { UserRulesEditor } from '../../../common/components/UserRulesEditor';
-import { MessageType } from '../../../../common/constants';
+import { MessageType } from '../../../../common/messages';
 import { rootStore } from '../../stores/RootStore';
 import { messenger } from '../../../services/messenger';
 import { UserRulesSwitcher } from './UserRulesSwitcher';

@@ -7,7 +7,7 @@ import {
     ResetCustomRulesForPageMessage,
     SaveUserRulesMessage,
     SetEditorStorageContentMessage,
-} from '../../common/constants';
+} from '../../common/messages';
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
 import { SettingOption } from '../schema';
@@ -104,7 +104,7 @@ export class UserRulesService {
         await browser.tabs.reload(tabId);
     }
 
-    private static getEditorStorageContent(): string {
+    private static getEditorStorageContent(): string | undefined {
         return UserRulesApi.getEditorStorageData();
     }
 

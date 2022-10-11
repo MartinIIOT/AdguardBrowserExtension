@@ -4,7 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { Forward, ForwardAction, ForwardFrom } from '../../../../common/forward';
 
-import { MessageType } from '../../../../common/constants';
+import { MessageType } from '../../../../common/messages';
 import { getParams } from '../../getParams';
 import { messenger } from '../../../services/messenger';
 

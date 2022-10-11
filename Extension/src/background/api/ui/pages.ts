@@ -1,4 +1,4 @@
-import browser from 'webextension-polyfill';
+import browser, { Windows } from 'webextension-polyfill';
 import { UserAgent } from '../../../common/user-agent';
 import {
     Forward,
@@ -8,10 +8,10 @@ import {
 } from '../../../common/forward';
 import { Engine } from '../../engine';
 import { UrlUtils } from '../../utils/url';
-import { settingsStorage } from '../../storages';
+import { storage, settingsStorage } from '../../storages';
 import { SettingOption } from '../../schema';
 import { BrowserUtils } from '../../utils/browser-utils';
-import { AntiBannerFiltersId } from '../../../common/constants';
+import { AntiBannerFiltersId, FILTERING_LOG_WINDOW_STATE } from '../../../common/constants';
 
 import { TabsApi } from '../extension';
 import { Prefs } from '../../prefs';
@@ -20,6 +20,13 @@ export class PagesApi {
     public static settingsUrl = PagesApi.getExtensionPageUrl('options.html');
 
     public static filteringLogUrl = PagesApi.getExtensionPageUrl('filtering-log.html');
+
+    public static defaultFilteringLogWindowState: Windows.CreateCreateDataType = {
+        width: 1000,
+        height: 650,
+        top: 0,
+        left: 0,
+    };
 
     public static filtersDownloadPageUrl = PagesApi.getExtensionPageUrl('filter-download.html');
 
@@ -63,10 +70,13 @@ export class PagesApi {
 
         const url = PagesApi.filteringLogUrl + (activeTab.id ? `#${activeTab.id}` : '');
 
+        const windowStateString = await storage.get(FILTERING_LOG_WINDOW_STATE) as string | undefined;
+
         await TabsApi.openWindow({
             focusIfOpen: true,
             url,
             type: 'popup',
+            ...(windowStateString ? JSON.parse(windowStateString) : PagesApi.defaultFilteringLogWindowState),
         });
     }
 

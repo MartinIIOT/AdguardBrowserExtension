@@ -2,7 +2,7 @@ import {
     AddAndEnableFilterMessage,
     DisableAntiBannerFilterMessage,
     MessageType,
-} from '../../common/constants';
+} from '../../common/messages';
 import { SettingOption } from '../schema';
 
 import { messageHandler } from '../message-handler';

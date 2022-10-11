@@ -135,7 +135,7 @@ export class UserRulesApi {
         const result: string[] = [];
         for (let i = 0; i < rules.length; i += 1) {
             const line = rules[i];
-            let converted = [];
+            let converted: string[] = [];
             try {
                 converted = RuleConverter.convertRule(line);
             } catch (e) {

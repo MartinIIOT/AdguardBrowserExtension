@@ -16,5 +16,9 @@ import {
 export async function sendMessage<T extends MessageType>(
     message: Omit<ExtractedMessage<T>, 'handlerName'>,
 ): Promise<unknown> {
-    return browser.runtime.sendMessage({ handlerName: APP_MESSAGE_HANDLER_NAME, ...message });
+    try {
+        return await browser.runtime.sendMessage({ handlerName: APP_MESSAGE_HANDLER_NAME, ...message });
+    } catch (e) {
+        // do nothing
+    }
 }

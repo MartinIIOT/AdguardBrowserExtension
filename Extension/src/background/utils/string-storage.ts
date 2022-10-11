@@ -8,7 +8,7 @@ export class StringStorage<K, V, Mode extends 'sync' | 'async'> {
 
     protected storage: StorageInterface<K, unknown, Mode>;
 
-    protected data: V;
+    protected data: V | undefined;
 
     constructor(
         key: K,
@@ -18,7 +18,7 @@ export class StringStorage<K, V, Mode extends 'sync' | 'async'> {
         this.storage = storage;
     }
 
-    public getData(): V {
+    public getData(): V | undefined {
         return this.data;
     }
 

@@ -17,7 +17,7 @@
 import { format } from 'date-fns';
 
 import { messenger } from '../../services/messenger';
-import { MessageType } from '../../../common/constants';
+import { MessageType } from '../../../common/messages';
 
 /**
  * Export types.

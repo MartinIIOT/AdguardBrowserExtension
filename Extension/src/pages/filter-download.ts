@@ -17,7 +17,7 @@
 
 import Nanobar from 'nanobar';
 
-import { MessageType } from '../common/constants';
+import { MessageType } from '../common/messages';
 import { log } from '../common/log';
 import { messenger } from './services/messenger';
 

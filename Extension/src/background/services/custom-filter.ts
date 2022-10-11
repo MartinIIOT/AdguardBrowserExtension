@@ -2,12 +2,12 @@ import browser, { WebNavigation } from 'webextension-polyfill';
 import { RequestType } from '@adguard/tsurlfilter';
 import { tabsApi } from '@adguard/tswebextension';
 import {
-    BACKGROUND_TAB_ID,
     MessageType,
     LoadCustomFilterInfoMessage,
     SubscribeToCustomFilterMessage,
     RemoveAntiBannerFilterMessage,
-} from '../../common/constants';
+} from '../../common/messages';
+import { BACKGROUND_TAB_ID } from '../../common/constants';
 import { CustomFilterApi } from '../api';
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
