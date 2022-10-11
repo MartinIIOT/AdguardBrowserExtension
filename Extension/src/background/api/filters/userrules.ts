@@ -1,4 +1,4 @@
-import { RuleConverter } from '@adguard/tsurlfilter';
+import { RuleConverter, RuleSyntaxUtils } from '@adguard/tsurlfilter';
 
 import { log } from '../../../common/log';
 import { AntiBannerFiltersId } from '../../../common/constants';
@@ -19,7 +19,7 @@ export class UserRulesApi {
      * Parse data from user rules list
      * If it's undefined, sets empty user rules list
      */
-    static async init(): Promise<void> {
+    public static async init(): Promise<void> {
         const userRules = await FiltersStorage.get(AntiBannerFiltersId.USER_FILTER_ID);
 
         if (!userRules) {
@@ -32,14 +32,29 @@ export class UserRulesApi {
      *
      * @returns true, if user list is enabled, else returns false
      */
-    static isEnabled(): boolean {
+    public static isEnabled(): boolean {
         return settingsStorage.get(SettingOption.USER_FILTER_ENABLED);
+    }
+
+    /**
+     * Checks, if user list contains rules for specified url
+     *
+     * @param url - page url
+     *
+     * @returns true, if user list contains rules for {@link url}, else returns false
+     */
+    public static async hasRulesForUrl(url: string): Promise<boolean> {
+        const userRules = await UserRulesApi.getUserRules();
+        return userRules.some(userRuleString => RuleSyntaxUtils.isRuleForUrl(
+            userRuleString,
+            url,
+        ));
     }
 
     /**
      * Get rules from user list
      */
-    static async getUserRules(): Promise<string[]> {
+    public static async getUserRules(): Promise<string[]> {
         return FiltersStorage.get(AntiBannerFiltersId.USER_FILTER_ID);
     }
 
@@ -48,7 +63,7 @@ export class UserRulesApi {
      *
      * @param rule - rule text
      */
-    static async addUserRule(rule: string): Promise<void> {
+    public static async addUserRule(rule: string): Promise<void> {
         const userRules = await UserRulesApi.getUserRules();
 
         userRules.push(rule);
@@ -61,10 +76,21 @@ export class UserRulesApi {
      *
      * @param rule - rule text
      */
-    static async removeUserRule(rule: string): Promise<void> {
+    public static async removeUserRule(rule: string): Promise<void> {
         const userRules = await UserRulesApi.getUserRules();
 
         await UserRulesApi.setUserRules(userRules.filter(r => r !== rule));
+    }
+
+    /**
+     * Remove rules for specified url from user list
+     *
+     * @param url - page url
+     */
+    public static async removeRulesByUrl(url: string): Promise<void> {
+        const userRules = await UserRulesApi.getUserRules();
+
+        await UserRulesApi.setUserRules(userRules.filter(rule => !RuleSyntaxUtils.isRuleForUrl(rule, url)));
     }
 
     /**
@@ -72,7 +98,7 @@ export class UserRulesApi {
      *
      * @param rules - list of rule strings
      */
-    static async setUserRules(rules: string[]): Promise<void> {
+    public static async setUserRules(rules: string[]): Promise<void> {
         await FiltersStorage.set(AntiBannerFiltersId.USER_FILTER_ID, rules);
 
         listeners.notifyListeners(listeners.USER_FILTER_UPDATED);
@@ -83,7 +109,7 @@ export class UserRulesApi {
      *
      * @returns - user rules editor content
      */
-    static getEditorStorageData(): string | undefined {
+    public static getEditorStorageData(): string | undefined {
         return editorStorage.get();
     }
 
@@ -92,7 +118,7 @@ export class UserRulesApi {
      *
      * @param data - user rules editor content
      */
-    static setEditorStorageData(data: string): void {
+    public static setEditorStorageData(data: string): void {
         editorStorage.set(data);
     }
 
@@ -103,7 +129,7 @@ export class UserRulesApi {
      *
      * @returns list of converted rule strings
      */
-    static convertRules(rules: string[]): string[] {
+    public static convertRules(rules: string[]): string[] {
         ruleConversionStorage.clear();
 
         const result: string[] = [];
@@ -138,7 +164,7 @@ export class UserRulesApi {
      * @param rule - converted rule text
      * @returns source rule text, if exist, else undefined
      */
-    static getSourceRule(rule: string): string | undefined {
+    public static getSourceRule(rule: string): string | undefined {
         return ruleConversionStorage.get(rule);
     }
 }

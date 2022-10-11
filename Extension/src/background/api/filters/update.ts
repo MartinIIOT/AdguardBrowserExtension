@@ -75,7 +75,7 @@ export class FilterUpdateApi {
      *
      * @param filtersIds - list of filters ids to update
      */
-    private static async updateFilters(filtersIds: number[]): Promise<FilterMetadata[]> {
+    public static async updateFilters(filtersIds: number[]): Promise<FilterMetadata[]> {
         /**
          * Reload common filters metadata from backend for correct
          * version matching on update check.

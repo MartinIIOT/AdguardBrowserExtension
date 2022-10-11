@@ -1,13 +1,29 @@
 import browser from 'webextension-polyfill';
+
 import {
+    AddUserRuleMessage,
     MessageType,
+    RemoveUserRuleMessage,
+    ResetCustomRulesForPageMessage,
     SaveUserRulesMessage,
+    SetEditorStorageContentMessage,
 } from '../../common/constants';
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
 import { SettingOption } from '../schema';
-import { SettingsApi, UserRulesApi } from '../api';
+import { SettingsApi, SettingsData, UserRulesApi } from '../api';
 import { settingsEvents } from '../events';
+import { Prefs } from '../prefs';
+
+export type GetUserRulesResponse = {
+    content: string,
+    appVersion: string,
+};
+
+export type GetUserRulesEditorDataResponse = {
+    userRules: string,
+    settings: SettingsData,
+};
 
 export class UserRulesService {
     public static async init(): Promise<void> {
@@ -20,6 +36,7 @@ export class UserRulesService {
         messageHandler.addListener(MessageType.REMOVE_USER_RULE, UserRulesService.handleUserRuleRemove);
         messageHandler.addListener(MessageType.GET_EDITOR_STORAGE_CONTENT, UserRulesService.getEditorStorageContent);
         messageHandler.addListener(MessageType.SET_EDITOR_STORAGE_CONTENT, UserRulesService.setEditorStorageContent);
+        messageHandler.addListener(MessageType.RESET_CUSTOM_RULES_FOR_PAGE, UserRulesService.resetCustomRulesForPage);
 
         Engine.api.onAssistantCreateRule.subscribe(UserRulesService.addUserRule);
 
@@ -29,15 +46,15 @@ export class UserRulesService {
         );
     }
 
-    private static async getUserRules() {
+    private static async getUserRules(): Promise<GetUserRulesResponse> {
         const userRules = await UserRulesApi.getUserRules();
 
         const content = userRules.join('\n');
 
-        return { content, appVersion: browser.runtime.getManifest().version };
+        return { content, appVersion: Prefs.version };
     }
 
-    private static async getUserRulesEditorData() {
+    private static async getUserRulesEditorData(): Promise<GetUserRulesEditorDataResponse> {
         const userRules = await UserRulesApi.getUserRules();
 
         const content = userRules.join('\n');
@@ -60,14 +77,14 @@ export class UserRulesService {
         await Engine.update();
     }
 
-    private static async handleUserRuleAdd(message): Promise<void> {
+    private static async handleUserRuleAdd(message: AddUserRuleMessage): Promise<void> {
         const { ruleText } = message.data;
 
         await UserRulesApi.addUserRule(ruleText);
         await Engine.update();
     }
 
-    private static async handleUserRuleRemove(message): Promise<void> {
+    private static async handleUserRuleRemove(message: RemoveUserRuleMessage): Promise<void> {
         const { ruleText } = message.data;
 
         await UserRulesApi.removeUserRule(ruleText);
@@ -78,11 +95,20 @@ export class UserRulesService {
         await Engine.update();
     }
 
+    private static async resetCustomRulesForPage(message: ResetCustomRulesForPageMessage): Promise<void> {
+        const { url, tabId } = message.data;
+
+        await UserRulesApi.removeRulesByUrl(url);
+        await Engine.update();
+
+        await browser.tabs.reload(tabId);
+    }
+
     private static getEditorStorageContent(): string {
         return UserRulesApi.getEditorStorageData();
     }
 
-    private static setEditorStorageContent(message): void {
+    private static setEditorStorageContent(message: SetEditorStorageContentMessage): void {
         const { content } = message.data;
 
         UserRulesApi.setEditorStorageData(content);

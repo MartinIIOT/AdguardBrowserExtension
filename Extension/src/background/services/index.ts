@@ -10,3 +10,4 @@ export * from './safebrowsing';
 export * from './filters';
 export * from './locale-detect';
 export * from './document-block';
+export * from './filter-update';

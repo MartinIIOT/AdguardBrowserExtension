@@ -38,9 +38,6 @@ export class ContextMenuApi {
 
                 if (!documentAllowlisted) {
                     ContextMenuApi.addMenuItem(ContextMenuAction.BLOCK_SITE_ADS);
-                    ContextMenuApi.addMenuItem(ContextMenuAction.BLOCK_SITE_ELEMENT, {
-                        contexts: ['image', 'video', 'audio'],
-                    });
                 }
 
                 ContextMenuApi.addMenuItem(ContextMenuAction.SECURITY_REPORT);

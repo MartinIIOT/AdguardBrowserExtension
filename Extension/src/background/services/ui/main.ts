@@ -60,7 +60,6 @@ export class UiService {
 
         messageHandler.addListener(MessageType.OPEN_ASSISTANT, AssistantApi.openAssistant);
         contextMenuEvents.addListener(ContextMenuAction.BLOCK_SITE_ADS, AssistantApi.openAssistant);
-        contextMenuEvents.addListener(ContextMenuAction.BLOCK_SITE_ELEMENT, AssistantApi.openAssistant); // TODO
 
         messageHandler.addListener(MessageType.INITIALIZE_FRAME_SCRIPT, UiService.initializeFrameScriptRequest);
 

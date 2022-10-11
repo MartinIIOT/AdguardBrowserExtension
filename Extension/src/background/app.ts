@@ -16,7 +16,6 @@ import {
     SettingsApi,
     UpdateApi,
     InstallApi,
-    FilterUpdateApi,
 } from './api';
 
 import {
@@ -33,6 +32,7 @@ import {
     DocumentBlockService,
     localeDetect,
     NotificationService,
+    filterUpdateService,
 } from './services';
 import {
     Forward,
@@ -104,9 +104,9 @@ export class App {
         await FiltersApi.init();
 
         /**
-         * Check installed filters updates
+         * initialize filters updates
          */
-        await FilterUpdateApi.autoUpdateFilters();
+        await filterUpdateService.init();
 
         /**
          * Initializes app notifications:

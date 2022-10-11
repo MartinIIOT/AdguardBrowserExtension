@@ -3,7 +3,6 @@ export const enum ContextMenuAction {
     SITE_FILTERING_DISABLED = 'context_site_filtering_disabled',
     SITE_EXCEPTION = 'context_site_exception',
     BLOCK_SITE_ADS = 'context_block_site_ads',
-    BLOCK_SITE_ELEMENT = 'context_block_site_element',
     SECURITY_REPORT = 'context_security_report',
     COMPLAINT_WEBSITE = 'context_complaint_website',
     SITE_FILTERING_ON = 'context_site_filtering_on',

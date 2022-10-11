@@ -47,6 +47,12 @@ import { ADGUARD_SETTINGS_KEY, AntiBannerFiltersId, DOCUMENT_BLOCK_PAGE_PATH } f
 import { settingsEvents } from '../events';
 import { listeners } from '../notifier';
 
+export type SettingsData = {
+    names: typeof SettingOption,
+    defaultValues: Settings,
+    values: Settings,
+};
+
 export class SettingsApi {
     public static async init() {
         const data = await storage.get(ADGUARD_SETTINGS_KEY);
@@ -76,7 +82,7 @@ export class SettingsApi {
         return settingsStorage.get(key);
     }
 
-    public static getData() {
+    public static getData(): SettingsData {
         return {
             names: SettingOption,
             defaultValues: defaultSettings,

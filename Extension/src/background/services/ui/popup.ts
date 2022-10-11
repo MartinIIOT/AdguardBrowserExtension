@@ -9,6 +9,7 @@ import {
     PageStatsApi,
     SettingsApi,
     notificationApi,
+    UserRulesApi,
 } from '../../api';
 
 import { FramesApi } from '../../api/ui/frames';
@@ -40,7 +41,7 @@ export class PopupService {
                     isEdgeBrowser: UserAgent.isEdge || UserAgent.isEdgeChromium,
                     notification: await notificationApi.getCurrentNotification(),
                     isDisableShowAdguardPromoInfo: settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
-                    hasCustomRulesToReset: false, // TODO,
+                    hasCustomRulesToReset: await UserRulesApi.hasRulesForUrl(tabContext.info.url),
                 },
             };
         }

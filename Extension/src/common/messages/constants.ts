@@ -179,6 +179,47 @@ export type SaveUserRulesMessage = {
   }
 };
 
+export type GetUserRulesMessage = {
+  type: MessageType.GET_USER_RULES
+};
+
+export type GetUserRulesEditorDataMessage = {
+  type: MessageType.GET_USER_RULES_EDITOR_DATA
+};
+
+export type AddUserRuleMessage = {
+  type: MessageType.ADD_USER_RULE
+  data: {
+    ruleText: string,
+  }
+};
+
+export type RemoveUserRuleMessage = {
+  type: MessageType.REMOVE_USER_RULE
+  data: {
+    ruleText: string,
+  }
+};
+
+export type ResetCustomRulesForPageMessage = {
+  type: MessageType.RESET_CUSTOM_RULES_FOR_PAGE
+  data: {
+    url: string,
+    tabId: number,
+  }
+};
+
+export type GetEditorStorageContentMessage = {
+  type: MessageType.GET_EDITOR_STORAGE_CONTENT
+};
+
+export type SetEditorStorageContentMessage = {
+  type: MessageType.SET_EDITOR_STORAGE_CONTENT
+  data: {
+    content: string,
+  }
+};
+
 export type AddAllowlistDomainPopupMessage = {
   type: MessageType.ADD_ALLOWLIST_DOMAIN_POPUP
   data: {
@@ -244,6 +285,13 @@ export type Message = (
   | RemoveAntiBannerFilterMessage
   | SaveAllowlistDomainsMessage
   | SaveUserRulesMessage
+  | GetUserRulesMessage
+  | GetUserRulesEditorDataMessage
+  | AddUserRuleMessage
+  | RemoveUserRuleMessage
+  | ResetCustomRulesForPageMessage
+  | GetEditorStorageContentMessage
+  | SetEditorStorageContentMessage
   | AddAllowlistDomainPopupMessage
   | RemoveAllowlistDomainMessage
   | LoadCustomFilterInfoMessage
