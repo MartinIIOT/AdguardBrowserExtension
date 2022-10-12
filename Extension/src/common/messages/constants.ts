@@ -334,6 +334,20 @@ export type GetFilteringInfoByTabIdMessage = {
   }
 };
 
+export type EnableFiltersGroupMessage = {
+  type: MessageType.EnableFiltersGroup,
+  data: {
+    groupId: number,
+  }
+};
+
+export type DisableFiltersGroupMessage = {
+  type: MessageType.DisableFiltersGroup,
+  data: {
+    groupId: number,
+  }
+};
+
 export type Message = (
   | GetTabInfoForPopupMessage
   | ChangeApplicationFilteringDisabledMessage
@@ -372,6 +386,8 @@ export type Message = (
   | PageRefreshMessage
   | GetFilteringInfoByTabIdMessage
   | SetFilteringLogWindowStateMessage
+  | EnableFiltersGroupMessage
+  | DisableFiltersGroupMessage
 ) &
   MessageCommonProps;
 

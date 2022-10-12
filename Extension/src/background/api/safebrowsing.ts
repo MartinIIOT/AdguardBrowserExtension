@@ -29,14 +29,14 @@ export class SafebrowsingApi {
 
     private static SB_ALLOW_LIST = 'allowlist';
 
-    public static async initCache() {
+    public static async initCache(): Promise<void> {
         await sbCache.init();
     }
 
     /**
      * Clears safebrowsing cache
      */
-    public static async clearCache() {
+    public static async clearCache(): Promise<void> {
         await sbCache.clear();
     }
 
@@ -46,7 +46,7 @@ export class SafebrowsingApi {
      *
      * @param url URL
      */
-    public static async addToSafebrowsingTrusted(url: string) {
+    public static async addToSafebrowsingTrusted(url: string): Promise<void> {
         const host = UrlUtils.getHost(url);
         if (!host) {
             return;
@@ -62,7 +62,7 @@ export class SafebrowsingApi {
      * @param requestUrl Request URL
      * @param referrerUrl Referrer URL
      */
-    public static async checkSafebrowsingFilter(requestUrl: string, referrerUrl: string) {
+    public static async checkSafebrowsingFilter(requestUrl: string, referrerUrl: string): Promise<string> {
         const safebrowsingDisabled = settingsStorage.get(SettingOption.DisableSafebrowsing);
 
         if (safebrowsingDisabled) {
@@ -84,8 +84,12 @@ export class SafebrowsingApi {
 
     /**
      * Performs lookup to safebrowsing service
+     *
+     * @param requestUrl - request url
+     *
+     * @returns safebrowsing list we've detected or undefined
      */
-    private static async lookupUrl(requestUrl: string) {
+    private static async lookupUrl(requestUrl: string): Promise<string | undefined> {
         const host = UrlUtils.getHost(requestUrl);
         if (!host) {
             return;
@@ -196,7 +200,10 @@ export class SafebrowsingApi {
      * @param hashesMap  Hashes hosts map
      * @returns Safebrowsing list or null
      */
-    private static async processSbResponse(responseText: string, hashesMap: { [key: string]: string }) {
+    private static async processSbResponse(
+        responseText: string,
+        hashesMap: { [key: string]: string },
+    ): Promise<string | null> {
         if (!responseText || responseText.length > 10 * 1024) {
             return null;
         }
@@ -233,6 +240,7 @@ export class SafebrowsingApi {
 
     /**
      * Creates lookup callback parameter
+     *
      * @param sbList    Safebrowsing list we've detected or null
      * @returns Safebrowsing list or null if this list is SB_ALLOW_LIST (means that site was allowlisted).
      */
@@ -243,19 +251,23 @@ export class SafebrowsingApi {
     /**
      * Resumes previously suspended work of SafebrowsingFilter
      */
-    private static async resumeSafebrowsing() {
+    private static async resumeSafebrowsing(): Promise<void> {
         await storage.remove(SB_SUSPENDED_CACHE_KEY);
     }
 
     /**
      * Suspend work of SafebrowsingFilter (in case of backend error)
      */
-    private static async suspendSafebrowsing() {
+    private static async suspendSafebrowsing(): Promise<void> {
         await storage.set(SB_SUSPENDED_CACHE_KEY, Date.now());
     }
 
     /**
      * Calculates hash for host string
+     *
+     * @param host - host string
+     *
+     * @returns host SHA256 hash
      */
     private static createHash(host: string): string {
         return SHA256(`${host}/`).toString().toUpperCase();
@@ -264,6 +276,10 @@ export class SafebrowsingApi {
     /**
      * Calculates SHA256 hashes for strings in hosts and then
      * gets prefixes for calculated hashes
+     *
+     * @param hosts -list of hosts
+     *
+     * @returns key value record, where key is calculated hash and value is host
      */
     private static createHashesMap(hosts: string[]): { [key: string]: string } {
         const result = Object.create(null);
@@ -279,8 +295,12 @@ export class SafebrowsingApi {
 
     /**
      * Checks safebrowsing cache
+     *
+     * @param hosts - list of hosts
+     *
+     * @returns matched safebrowsing list name or null
      */
-    private static checkHostsInSbCache(hosts: string[]) {
+    private static checkHostsInSbCache(hosts: string[]): string | null {
         for (let i = 0; i < hosts.length; i += 1) {
             const sbList = sbCache.get(SafebrowsingApi.createHash(hosts[i]));
             if (sbList) {
@@ -293,8 +313,12 @@ export class SafebrowsingApi {
     /**
      * Extracts hosts from one host.
      * This method returns all sub-domains and IP address of the specified host.
+     *
+     * @param host - host string
+     *
+     * @returns list of sub-domains and ip addresses strings
      */
-    private static extractHosts(host: string) {
+    private static extractHosts(host: string): string[] {
         const hosts = [];
         if (UrlUtils.isIpv4(host) || UrlUtils.isIpv6(host)) {
             hosts.push(host);

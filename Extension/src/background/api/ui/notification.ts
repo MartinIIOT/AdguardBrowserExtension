@@ -30,7 +30,7 @@ export class NotificationApi {
     /**
      * Scans notifications list and prepares them to be used (or removes expired)
      */
-    public init() {
+    public init(): void {
         notificationStorage.forEach((notification, notificationKey, map) => {
             notification.text = NotificationApi.getNotificationText(notification);
 
@@ -48,9 +48,10 @@ export class NotificationApi {
 
     /**
      * Marks current notification as viewed
-     * @param withDelay if true, do this after a 30 sec delay
+     *
+     * @param withDelay - if true, do this after a 30 sec delay
      */
-    public async setNotificationViewed(withDelay: boolean) {
+    public async setNotificationViewed(withDelay: boolean): Promise<void> {
         if (withDelay) {
             clearTimeout(this.timeoutId);
 
@@ -73,7 +74,7 @@ export class NotificationApi {
                 const tabContext = tsWebExtTabsApi.getTabContext(tab.id);
 
                 if (tabContext) {
-                    await UiApi.updateTabIconAndContextMenu(tabContext);
+                    await UiApi.update(tabContext);
                 }
 
                 this.currentNotification = null;
@@ -138,6 +139,7 @@ export class NotificationApi {
 
     /**
      * Scans notification locales and returns the one matching navigator.language
+     *
      * @param {*} notification notification object
      * @returns {string} matching text or null
      */
@@ -168,7 +170,7 @@ export class NotificationApi {
      * Gets the last time a notification was shown.
      * If it was not shown yet, initialized with the current time.
      */
-    private static async getLastNotificationTime() {
+    private static async getLastNotificationTime(): Promise<number> {
         let lastTime = Number(await storage.get(LAST_NOTIFICATION_TIME_KEY) || 0);
 
         if (lastTime === 0) {

@@ -11,8 +11,10 @@ import { RunInfo } from '../../utils';
 export class InstallApi {
     /**
      * Generate client id
+     *
+     * @returns client id string
      */
-    public static genClientId() {
+    public static genClientId(): string {
         const result: string[] = [];
         const suffix = (Date.now()) % 1e8;
         const symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890';
@@ -24,9 +26,14 @@ export class InstallApi {
     }
 
     /**
-     * Create client id and initialize default data
+     * Initializes app install
+     *
+     * @param runInfo - info about extension start up
+     * @param runInfo.currentAppVersion - current extension version
+     * @param runInfo.currentSchemaVersion - current data schema version
+     *
      */
-    public static async install({ currentAppVersion, currentSchemaVersion }: RunInfo) {
+    public static async install({ currentAppVersion, currentSchemaVersion }: RunInfo): Promise<void> {
         const clientId = InstallApi.genClientId();
         await storage.set(CLIENT_ID_KEY, clientId);
 

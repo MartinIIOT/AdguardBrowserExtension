@@ -18,7 +18,10 @@ export class StringStorage<K, V, Mode extends 'sync' | 'async'> {
         this.storage = storage;
     }
 
-    public getData(): V | undefined {
+    public getData(): V {
+        if (!this.data) {
+            throw new Error('Data is not set!');
+        }
         return this.data;
     }
 

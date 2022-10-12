@@ -139,19 +139,19 @@ export class PagesApi {
         });
     }
 
-    public static getExtensionPageUrl(path: string) {
+    public static getExtensionPageUrl(path: string): string {
         return `${Prefs.baseUrl}pages/${path}`;
     }
 
-    public static async openFiltersDownloadPage() {
+    public static async openFiltersDownloadPage(): Promise<void> {
         await TabsApi.openTab({ url: PagesApi.filtersDownloadPageUrl });
     }
 
-    public static async openComparePage() {
+    public static async openComparePage(): Promise<void> {
         await TabsApi.openTab({ url: PagesApi.comparePageUrl });
     }
 
-    public static async openThankYouPage() {
+    public static async openThankYouPage(): Promise<void> {
         const params = BrowserUtils.getExtensionParams();
         params.push(`_locale=${encodeURIComponent(browser.i18n.getUILanguage())}`);
         const thankYouUrl = `${PagesApi.thankYouPageUrl}?${params.join('&')}`;
@@ -165,11 +165,11 @@ export class PagesApi {
         }
     }
 
-    public static async openExtensionStorePage() {
+    public static async openExtensionStorePage(): Promise<void> {
         await TabsApi.openTab({ url: PagesApi.extensionStoreUrl });
     }
 
-    private static getExtensionStoreUrl() {
+    private static getExtensionStoreUrl(): string {
         let action = ForwardAction.ChromeStore;
 
         if (UserAgent.isOpera) {

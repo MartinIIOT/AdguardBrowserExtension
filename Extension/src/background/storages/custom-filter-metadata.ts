@@ -16,6 +16,7 @@ export type CustomFilterMetadata = {
     version: string,
     expires: number,
     timeUpdated: number,
+    languages?: string[],
 };
 
 /**
@@ -29,7 +30,7 @@ export class CustomFilterMetadataStorage extends StringStorage<
     /**
      * Get custom filter metadata by filter id
      */
-    public getById(filterId: number): CustomFilterMetadata {
+    public getById(filterId: number): CustomFilterMetadata | undefined {
         return this.getData().find(f => f.filterId === filterId);
     }
 

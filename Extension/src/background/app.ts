@@ -103,9 +103,7 @@ export class App {
          */
         await FiltersApi.init();
 
-        /**
-         * initialize filters updates
-         */
+        // Initialize filters updates
         await filterUpdateService.init();
 
         /**

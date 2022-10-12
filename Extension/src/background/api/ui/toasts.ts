@@ -16,7 +16,7 @@ export class Toasts {
 
     private styles: string;
 
-    public async init() {
+    public async init(): Promise<void> {
         const response = await fetch(Toasts.stylesUrl);
         this.styles = await response.text();
     }
@@ -47,13 +47,13 @@ export class Toasts {
         }
     }
 
-    public showFiltersEnabledAlertMessage(filters: FilterMetadata[]) {
+    public showFiltersEnabledAlertMessage(filters: FilterMetadata[]): void {
         const { title, text } = Toasts.getFiltersEnabledResultMessage(filters);
 
         this.showAlertMessage(title, text);
     }
 
-    public showFiltersUpdatedAlertMessage(success: boolean, filters?: FilterMetadata[]) {
+    public showFiltersUpdatedAlertMessage(success: boolean, filters?: FilterMetadata[]): void {
         const { title, text } = Toasts.getFiltersUpdateResultMessage(success, filters);
 
         this.showAlertMessage(title, text);
@@ -62,12 +62,15 @@ export class Toasts {
     /**
      * Shows application updated popup
      *
+     * @param currentVersion -  app current semver string
+     * @param previousVersion -  app previous semver string
+     * @param triesCount - count of show popup tries
      */
     public async showApplicationUpdatedPopup(
         currentVersion: string,
         previousVersion: string,
         triesCount = 1,
-    ) {
+    ): Promise<void> {
         const promoNotification = await notificationApi.getCurrentNotification();
         if (!promoNotification
             && BrowserUtils.getMajorVersionNumber(
@@ -131,7 +134,10 @@ export class Toasts {
         }
     }
 
-    private static getFiltersEnabledResultMessage(enabledFilters: FilterMetadata[]) {
+    private static getFiltersEnabledResultMessage(enabledFilters: FilterMetadata[]): {
+        title: string,
+        text: string[],
+    } {
         const title = translator.getMessage('alert_popup_filter_enabled_title');
 
         const text = enabledFilters
@@ -147,7 +153,10 @@ export class Toasts {
     private static getFiltersUpdateResultMessage(
         success: boolean,
         updatedFilters?: FilterMetadata[],
-    ) {
+    ): {
+        title: string,
+        text: string,
+    } {
         if (!success || !updatedFilters) {
             return {
                 title: translator.getMessage('options_popup_update_title_error'),
@@ -188,8 +197,13 @@ export class Toasts {
 
     /**
      * Depending on version numbers select proper message for description
+     *
+     * @param currentVersion - current semver of app
+     * @param previousVersion - previous semver of app
+     *
+     * @returns message text
      */
-    private static getUpdateDescriptionMessage(currentVersion: string, previousVersion: string) {
+    private static getUpdateDescriptionMessage(currentVersion: string, previousVersion: string): string {
         if ((
             BrowserUtils.getMajorVersionNumber(currentVersion) > BrowserUtils.getMajorVersionNumber(previousVersion)
         ) || (

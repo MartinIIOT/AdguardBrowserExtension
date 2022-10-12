@@ -135,7 +135,7 @@ export class FiltersApi {
     }
 
     /**
-     * Load and enable filters.
+     * Loads and enables specified filters.
      * Called on filter option switch.
      *
      * @param filtersIds - filters ids
@@ -148,6 +148,16 @@ export class FiltersApi {
 
         // we enable filters groups if it was never enabled or disabled early
         FiltersApi.enableGroupsWereNotToggled(filtersIds);
+    }
+
+    /**
+     * Disables specified filters.
+     * Called on filter option switch.
+     *
+     * @param filtersIds - filters ids
+     */
+    public static disableFilters(filtersIds: number[]): void {
+        filterStateStorage.disableFilters(filtersIds);
     }
 
     /**

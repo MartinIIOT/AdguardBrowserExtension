@@ -1,14 +1,22 @@
 import {
     AddAndEnableFilterMessage,
     DisableAntiBannerFilterMessage,
+    DisableFiltersGroupMessage,
+    EnableFiltersGroupMessage,
     MessageType,
 } from '../../common/messages';
 import { SettingOption } from '../schema';
 
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
-import { FiltersApi, FilterUpdateApi, toasts } from '../api';
-import { filterStateStorage, groupStateStorage } from '../storages';
+import {
+    FilterMetadata,
+    FiltersApi,
+    FilterUpdateApi,
+    toasts,
+    Categories,
+    PageStatsApi,
+} from '../api';
 import {
     ContextMenuAction,
     contextMenuEvents,
@@ -17,20 +25,20 @@ import {
 import { listeners } from '../notifier';
 
 export class FiltersService {
-    static async init() {
+    public static async init(): Promise<void> {
         // TODO: debounce message events
         messageHandler.addListener(MessageType.AddAndEnableFilter, FiltersService.onFilterEnable);
         messageHandler.addListener(MessageType.DisableAntibannerFilter, FiltersService.onFilterDisable);
         messageHandler.addListener(MessageType.EnableFiltersGroup, FiltersService.onGroupEnable);
         messageHandler.addListener(MessageType.DisableFiltersGroup, FiltersService.onGroupDisable);
-
         messageHandler.addListener(MessageType.CheckAntibannerFiltersUpdate, FiltersService.checkFiltersUpdate);
+        messageHandler.addListener(MessageType.ResetBlockedAdsCount, FiltersService.resetBlockedAdsCount);
         contextMenuEvents.addListener(ContextMenuAction.UpdateAntibannerFilters, FiltersService.checkFiltersUpdate);
 
         settingsEvents.addListener(SettingOption.UseOptimizedFilters, FiltersService.onOptimizedFiltersSwitch);
     }
 
-    static async onFilterEnable(message: AddAndEnableFilterMessage) {
+    private static async onFilterEnable(message: AddAndEnableFilterMessage): Promise<void> {
         const { filterId } = message.data;
 
         await FiltersApi.loadAndEnableFilters([filterId]);
@@ -38,29 +46,29 @@ export class FiltersService {
         await Engine.update();
     }
 
-    static async onFilterDisable(message: DisableAntiBannerFilterMessage) {
+    private static async onFilterDisable(message: DisableAntiBannerFilterMessage): Promise<void> {
         const { filterId } = message.data;
 
-        filterStateStorage.disableFilters([filterId]);
+        FiltersApi.disableFilters([filterId]);
 
         await Engine.update();
     }
 
-    static async onGroupEnable(message) {
+    private static async onGroupEnable(message: EnableFiltersGroupMessage): Promise<void> {
         const { groupId } = message.data;
 
-        groupStateStorage.enableGroups([groupId]);
+        await Categories.enableGroup(groupId);
         await Engine.update();
     }
 
-    static async onGroupDisable(message) {
+    private static async onGroupDisable(message: DisableFiltersGroupMessage): Promise<void> {
         const { groupId } = message.data;
 
-        groupStateStorage.disableGroups([groupId]);
+        Categories.disableGroup(groupId);
         await Engine.update();
     }
 
-    static async checkFiltersUpdate() {
+    private static async checkFiltersUpdate(): Promise<FilterMetadata[]> {
         try {
             const updatedFilters = await FilterUpdateApi.updateEnabledFilters();
 
@@ -76,8 +84,12 @@ export class FiltersService {
         }
     }
 
-    static async onOptimizedFiltersSwitch() {
+    private static async onOptimizedFiltersSwitch(): Promise<void> {
         await FiltersApi.reloadEnabledFilters();
         await Engine.update();
+    }
+
+    private static async resetBlockedAdsCount(): Promise<void> {
+        await PageStatsApi.reset();
     }
 }

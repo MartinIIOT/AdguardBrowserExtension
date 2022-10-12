@@ -3,11 +3,10 @@ import { trustedDomainsStorage } from '../storages';
 export class DocumentBlockApi {
     private static TRUSTED_TTL_MS = 40 * 60 * 1000; // 40 min
 
-    public static async init() {
+    public static async init(): Promise<void> {
         try {
             const storageData = await trustedDomainsStorage.read();
             if (typeof storageData === 'string') {
-                // TODO: schema validation
                 trustedDomainsStorage.setCache(JSON.parse(storageData));
             } else {
                 await trustedDomainsStorage.setData([]);

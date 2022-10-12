@@ -32,29 +32,29 @@ export class NetworkSettings {
     }
 
     // URL for downloading AG filters
-    get filterRulesUrl() {
+    get filterRulesUrl(): string {
         return `${this.filtersUrl}/filters/{filter_id}.txt`;
     }
 
     // URL for downloading optimized AG filters
-    get optimizedFilterRulesUrl() {
+    get optimizedFilterRulesUrl(): string {
         return `${this.filtersUrl}/filters/{filter_id}_optimized.txt`;
     }
 
     // URL for checking filter updates
-    get filtersMetadataUrl() {
+    get filtersMetadataUrl(): string {
         const params = BrowserUtils.getExtensionParams();
         return `${this.filtersUrl}/filters.js?${params.join('&')}`;
     }
 
     // URL for downloading i18n localizations
-    get filtersI18nMetadataUrl() {
+    get filtersI18nMetadataUrl(): string {
         const params = BrowserUtils.getExtensionParams();
         return `${this.filtersUrl}/filters_i18n.json?${params.join('&')}`;
     }
 
     // URL for user complaints on missed ads or malware/phishing websites
-    get reportUrl() {
+    get reportUrl(): string {
         return `${this.backendUrl}/url-report.html`;
     }
 
@@ -64,8 +64,10 @@ export class NetworkSettings {
      *
      * Filter rules stats are covered in our privacy policy and on also here:
      * http://adguard.com/en/filter-rules-statistics.html
+     *
+     * @returns rule stats url
      */
-    get ruleStatsUrl() {
+    get ruleStatsUrl(): string {
         return `${this.backendUrl}/rulestats.html`;
     }
 }

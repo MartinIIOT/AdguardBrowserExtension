@@ -7,7 +7,7 @@ import { stealthConfigValidator } from './stealth';
 
 // Root configuration
 
-export const ProtocolVersion = '1.0';
+export const PROTOCOL_VERSION = '1.0';
 
 export const enum RootOption {
     ProtocolVersion = 'protocol-version',
@@ -18,7 +18,7 @@ export const enum RootOption {
 }
 
 export const configValidator = zod.object({
-    [RootOption.ProtocolVersion]: zod.literal(ProtocolVersion),
+    [RootOption.ProtocolVersion]: zod.literal(PROTOCOL_VERSION),
     [RootOption.GeneralSettings]: generalSettingsConfigValidator,
     [RootOption.ExtensionSpecificSettings]: extensionSpecificSettingsConfigValidator,
     [RootOption.Filters]: filtersConfigValidator,

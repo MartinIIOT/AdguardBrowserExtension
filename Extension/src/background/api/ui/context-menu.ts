@@ -8,7 +8,20 @@ export type AddMenuItemOptions = Menus.CreateCreatePropertiesType & {
     messageArgs?: { [key: string]: unknown },
 };
 
+/**
+ * Api for creating and updating browser context menu
+ */
 export class ContextMenuApi {
+    /**
+     * Update context menu depends on tab filtering state
+     *
+     * @param frameData - frame data from both tswebextension and app state
+     * @param frameData.applicationFilteringDisabled - is app filtering disabled globally
+     * @param frameData.urlFilteringDisabled - is app filtering disabled for current tab
+     * @param frameData.documentAllowlisted - is website allowlisted
+     * @param frameData.userAllowlisted - is current website allowlisted by user rule
+     * @param frameData.canAddRemoveRule - is user rules was applied on current website
+     */
     public static async updateMenu({
         applicationFilteringDisabled,
         urlFilteringDisabled,
@@ -54,6 +67,9 @@ export class ContextMenuApi {
         }
     }
 
+    /**
+     * Create menu items for context menu, displayed, when app filtering disabled globally
+     */
     private static addFilteringDisabledMenuItems(): void {
         ContextMenuApi.addMenuItem(ContextMenuAction.SiteFilteringDisabled);
         ContextMenuApi.addSeparator();
@@ -62,6 +78,9 @@ export class ContextMenuApi {
         ContextMenuApi.addMenuItem(ContextMenuAction.EnableProtection);
     }
 
+    /**
+     * Create menu items for context menu, displayed, when app filtering disabled for current tab
+     */
     private static addUrlFilteringDisabledContextMenuAction(): void {
         ContextMenuApi.addMenuItem(ContextMenuAction.SiteFilteringDisabled);
         ContextMenuApi.addSeparator();
@@ -70,6 +89,12 @@ export class ContextMenuApi {
         ContextMenuApi.addMenuItem(ContextMenuAction.UpdateAntibannerFilters);
     }
 
+    /**
+     * Create menu item for context menu
+     *
+     * @param action - context menu action key
+     * @param options - {@link browser.contextMenus.create} options
+     */
     private static addMenuItem(action: ContextMenuAction, options: AddMenuItemOptions = {}): void {
         const { messageArgs, ...rest } = options;
 
@@ -83,6 +108,9 @@ export class ContextMenuApi {
         });
     }
 
+    /**
+     * Create menu separator
+     */
     private static addSeparator(): void {
         browser.contextMenus.create({
             type: 'separator',

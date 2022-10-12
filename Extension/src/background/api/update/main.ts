@@ -24,14 +24,20 @@ export class UpdateApi {
     };
 
     /**
-     * Update app data based on run info
+     * Runs app updates depends on previous and current data scheme
+     *
+     * @param runInfo - info about extension start up
+     * @param runInfo.clientId - client id
+     * @param runInfo.currentAppVersion - current extension version
+     * @param runInfo.currentSchemaVersion - current data schema version
+     * @param runInfo.previousSchemaVersion - previous data schema version
      */
     public static async update({
         clientId,
         currentAppVersion,
         currentSchemaVersion,
         previousSchemaVersion,
-    }: RunInfo) {
+    }: RunInfo): Promise<void> {
         // check clientId existence
         if (clientId) {
             await storage.set(CLIENT_ID_KEY, clientId);
@@ -52,17 +58,30 @@ export class UpdateApi {
         }
     }
 
+    /**
+     * Create scheme migration key for mapping update strategy
+     *
+     * @param previousSchemaVersion - previous data schema version
+     * @param currentSchemaVersion - current data schema version
+     * @returns scheme migration key
+     */
     private static createSchemaMigrationKey(
         previousSchemaVersion: number,
         currentSchemaVersion: number,
-    ) {
+    ): string {
         return `${previousSchemaVersion}-${currentSchemaVersion}`;
     }
 
+    /**
+     * Run scheme migration
+     *
+     * @param previousSchemaVersion - previous data schema version
+     * @param currentSchemaVersion - current data schema version
+     */
     private static async runSchemaMigration(
         previousSchemaVersion: number,
         currentSchemaVersion: number,
-    ) {
+    ): Promise<void> {
         const schemaMigrationKey = UpdateApi.createSchemaMigrationKey(previousSchemaVersion, currentSchemaVersion);
         const schemaMigrationAction = UpdateApi.schemaMigrationMap[schemaMigrationKey];
 
@@ -86,7 +105,10 @@ export class UpdateApi {
         }
     }
 
-    private static async migrateFromV0toV1() {
+    /**
+     * Run data migration from scheme v0 to scheme v1
+     */
+    private static async migrateFromV0toV1(): Promise<void> {
         // In the v4.0.171 we have littered window.localStorage with proms used in the promo notifications module,
         // now we are clearing them
 
@@ -140,12 +162,15 @@ export class UpdateApi {
     }
 
     /**
-     * move data from settings to root storage
+     * Moves data from settings to root storage
+     *
+     * @param key - settings key
+     * @param currentSettings - current settings object
      */
     private static async moveStorageData(
         key: string,
         currentSettings: object,
-    ) {
+    ): Promise<void> {
         const data = currentSettings?.[key];
 
         if (data) {
@@ -154,7 +179,10 @@ export class UpdateApi {
         }
     }
 
-    private static async clearCache() {
+    /**
+     * Purge data, which don't need to save while app updating
+     */
+    private static async clearCache(): Promise<void> {
         await SafebrowsingApi.clearCache();
     }
 }

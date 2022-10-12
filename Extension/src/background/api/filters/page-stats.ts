@@ -19,7 +19,23 @@ import {
     metadataStorage,
     pageStatsStorage,
     PageStatsStorage,
+    PageStatsDataItem,
+    GroupMetadata,
 } from '../../storages';
+
+export type GetStatisticsDataResponse = {
+    today: PageStatsDataItem[],
+    lastWeek: PageStatsDataItem[],
+    lastMonth: PageStatsDataItem[],
+    lastYear: PageStatsDataItem[],
+    overall: PageStatsDataItem[],
+    blockedGroups: GetGroupsResponse,
+};
+
+export type GetGroupsResponse = (GroupMetadata | {
+    groupId: string;
+    groupName: string;
+})[];
 
 export class PageStatsApi {
     /**
@@ -103,9 +119,11 @@ export class PageStatsApi {
     }
 
     /**
-     * Returns statistics data object
+     * Get page stats and groups data from storages for popup statistics section
+     *
+     * @returns full statistics data record
      */
-    public static getStatisticsData() {
+    public static getStatisticsData(): GetStatisticsDataResponse {
         const stats = pageStatsStorage.getStatisticsData();
 
         return {
@@ -118,7 +136,12 @@ export class PageStatsApi {
         };
     }
 
-    private static getGroups() {
+    /**
+     * Get groups data from storage and add synthetic 'total' group for popup statistics section
+     *
+     * @returns groups data
+     */
+    private static getGroups(): GetGroupsResponse {
         const groups = metadataStorage.getGroups();
 
         return [{

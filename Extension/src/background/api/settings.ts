@@ -17,7 +17,7 @@ import {
     GeneralSettingsConfig,
     GeneralSettingsOption,
     RootOption,
-    ProtocolVersion,
+    PROTOCOL_VERSION,
     StealthConfig,
     StealthOption,
     UserFilterConfig,
@@ -116,7 +116,7 @@ export class SettingsApi {
         };
     }
 
-    public static async reset() {
+    public static async reset(): Promise<void> {
         await UserRulesApi.setUserRules([]);
 
         // Set settings store to defaults
@@ -130,7 +130,7 @@ export class SettingsApi {
         await CommonFilterApi.initDefaultFilters();
     }
 
-    public static async import(configText: string) {
+    public static async import(configText: string): Promise<boolean> {
         try {
             const json = JSON.parse(configText);
             const validConfig = configValidator.parse(json);
@@ -157,7 +157,7 @@ export class SettingsApi {
 
     public static async export(): Promise<string> {
         return JSON.stringify({
-            [RootOption.ProtocolVersion]: ProtocolVersion,
+            [RootOption.ProtocolVersion]: PROTOCOL_VERSION,
             [RootOption.GeneralSettings]: SettingsApi.exportGeneralSettings(),
             [RootOption.ExtensionSpecificSettings]: SettingsApi.exportExtensionSpecificSettings(),
             [RootOption.Filters]: await SettingsApi.exportFilters(),
@@ -218,7 +218,7 @@ export class SettingsApi {
         [ExtensionSpecificSettingsOption.ShowAppUpdatedInfo]: showAppUpdatedInfo,
         [ExtensionSpecificSettingsOption.HideRateAdguard]: hideRateAdguard,
         [ExtensionSpecificSettingsOption.UserRulesEditorWrap]: userRulesEditorWrap,
-    }: ExtensionSpecificSettingsConfig) {
+    }: ExtensionSpecificSettingsConfig): void {
         settingsStorage.set(SettingOption.UseOptimizedFilters, useOptimizedFilters);
         settingsStorage.set(SettingOption.DisableCollectHits, !collectHitsCount);
         settingsStorage.set(SettingOption.DisableShowContextMenu, !showContextMenu);
@@ -260,7 +260,7 @@ export class SettingsApi {
         [FiltersOption.CustomFilters]: customFilters,
         [FiltersOption.UserFilter]: userFilter,
         [FiltersOption.Allowlist]: allowlist,
-    }: FiltersConfig) {
+    }: FiltersConfig): Promise<void> {
         await SettingsApi.importUserFilter(userFilter);
         SettingsApi.importAllowlist(allowlist);
 
@@ -288,7 +288,7 @@ export class SettingsApi {
     private static async importUserFilter({
         [UserFilterOption.Enabled]: enabled,
         [UserFilterOption.Rules]: rules,
-    }: UserFilterConfig) {
+    }: UserFilterConfig): Promise<void> {
         if (typeof enabled === 'boolean') {
             settingsStorage.set(SettingOption.UserFilterEnabled, enabled);
         } else {
@@ -311,7 +311,7 @@ export class SettingsApi {
         [AllowlistOption.Inverted]: inverted,
         [AllowlistOption.Domains]: domains,
         [AllowlistOption.InvertedDomains]: invertedDomains,
-    }: AllowlistConfig) {
+    }: AllowlistConfig): void {
         if (typeof enabled === 'boolean') {
             settingsStorage.set(SettingOption.AllowlistEnabled, enabled);
         } else {
@@ -350,7 +350,7 @@ export class SettingsApi {
         [StealthOption.BlockFirstPartyCookiesTime]: blockFirstPartyCookiesTime,
         [StealthOption.BlockKnownTrackers]: blockKnownTrackers,
         [StealthOption.StripTrackingParams]: stripTrackingParam,
-    }: StealthConfig) {
+    }: StealthConfig): Promise<void> {
         /**
          * set "block webrtc" setting as soon as possible. AG-9980
          * don't set the actual value to avoid requesting permissions

@@ -34,7 +34,7 @@ export class CommonFilterApi {
      *
      * @returns common filter metadata
      */
-    public static getFilterMetadata(filterId: number): CommonFilterMetadata {
+    public static getFilterMetadata(filterId: number): CommonFilterMetadata | undefined {
         return metadataStorage.getFilter(filterId);
     }
 
@@ -159,7 +159,7 @@ export class CommonFilterApi {
      *
      * @returns list of language-specific filters ids
      */
-    private static getLangSuitableFilters(): number[] {
+    public static getLangSuitableFilters(): number[] {
         let filterIds: number[] = [];
 
         let localeFilterIds = metadataStorage.getFilterIdsForLanguage(browser.i18n.getUILanguage());

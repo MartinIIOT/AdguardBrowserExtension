@@ -71,7 +71,7 @@ export class Network {
      *
      * @param url - Subscription url
      */
-    public async downloadFilterRulesBySubscriptionUrl(url: string) {
+    public async downloadFilterRulesBySubscriptionUrl(url: string): Promise<string[]> {
         if (url in this.loadingSubscriptions) {
             return;
         }
@@ -100,7 +100,7 @@ export class Network {
     /**
      * Loads filter groups metadata
      */
-    public async getLocalFiltersMetadata() {
+    public async getLocalFiltersMetadata(): Promise<unknown> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/filters.json`);
 
         let response;
@@ -126,9 +126,8 @@ export class Network {
 
     /**
      * Loads filter groups metadata from local file
-     * @returns {Promise}
      */
-    public async getLocalFiltersI18nMetadata() {
+    public async getLocalFiltersI18nMetadata(): Promise<unknown> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/filters_i18n.json`);
 
         let response;
@@ -153,7 +152,7 @@ export class Network {
     /**
      * Loads script rules from local file
      */
-    public async getLocalScriptRules() {
+    public async getLocalScriptRules(): Promise<unknown> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/local_script_rules.json`);
 
         let response;
@@ -178,9 +177,8 @@ export class Network {
 
     /**
      * Downloads metadata from backend
-     * @return {Promise<void>}
      */
-    public async downloadMetadataFromBackend() {
+    public async downloadMetadataFromBackend(): Promise<unknown> {
         const response = await Network.executeRequestAsync(this.settings.filtersMetadataUrl, 'application/json');
         if (!response?.responseText) {
             throw new Error(`Empty response: ${response}`);
@@ -196,9 +194,8 @@ export class Network {
 
     /**
      * Downloads i18n metadata from backend
-     * @return {Promise<void>}
      */
-    public async downloadI18nMetadataFromBackend() {
+    public async downloadI18nMetadataFromBackend(): Promise<unknown> {
         const response = await Network.executeRequestAsync(
             this.settings.filtersI18nMetadataUrl,
             'application/json',
@@ -219,9 +216,9 @@ export class Network {
     /**
      * Checks specified host hashes with our safebrowsing service
      *
-     * @param hashes Host hashes
+     * @param hashes - Host hashes
      */
-    public async lookupSafebrowsing(hashes: string[]) {
+    public async lookupSafebrowsing(hashes: string[]): Promise<ExtensionXMLHttpRequest> {
         const url = `${this.settings.safebrowsingLookupUrl}?prefixes=${encodeURIComponent(hashes.join('/'))}`;
         const response = await Network.executeRequestAsync(url, 'application/json');
         return response;
@@ -230,11 +227,11 @@ export class Network {
     /**
      * Sends feedback from the user to our server
      *
-     * @param url           URL
-     * @param messageType   Message type
-     * @param comment       Message text
+     * @param url - URL
+     * @param messageType - Message type
+     * @param comment - Message text
      */
-    public sendUrlReport(url: string, messageType: string, comment: string) {
+    public sendUrlReport(url: string, messageType: string, comment: string): void {
         let params = `url=${encodeURIComponent(url)}`;
         params += `&messageType=${encodeURIComponent(messageType)}`;
         if (comment) {
@@ -257,7 +254,7 @@ export class Network {
      * @param stats             Stats
      * @param enabledFilters    List of enabled filters
      */
-    public sendHitStats(stats: string, enabledFilters: { filterId: number, version: string }[]) {
+    public sendHitStats(stats: string, enabledFilters: { filterId: number, version: string }[]): void {
         let params = `stats=${encodeURIComponent(stats)}`;
         params += `&v=${encodeURIComponent(browser.runtime.getManifest().version)}`;
 
@@ -279,7 +276,12 @@ export class Network {
         request.send(params);
     }
 
-    public configure(configuration: NetworkConfiguration) {
+    /**
+     * Configure network api
+     *
+     * @param configuration - network configuration
+     */
+    public configure(configuration: NetworkConfiguration): void {
         const { filtersMetadataUrl } = configuration;
         if (filtersMetadataUrl) {
             Object.defineProperty(this.settings, 'filtersMetadataUrl', {
@@ -319,8 +321,10 @@ export class Network {
     /**
      * URL for downloading AG filter
      *
-     * @param filterId Filter identifier
-     * @param useOptimizedFilters
+     * @param filterId - Filter identifier
+     * @param useOptimizedFilters - if true, download optimized filters
+     *
+     * @returns url for filter downloading
      */
     private getUrlForDownloadFilterRules(filterId: number, useOptimizedFilters: boolean): string {
         const url = useOptimizedFilters ? this.settings.optimizedFilterRulesUrl : this.settings.filterRulesUrl;
@@ -329,6 +333,10 @@ export class Network {
 
     /**
      * Appends request key to url
+     *
+     * @param url - url string
+     *
+     * @returns url with key query param
      */
     private addKeyParameter(url: string): string {
         return `${url}&key=${this.settings.apiKey}`;
@@ -336,6 +344,7 @@ export class Network {
 
     /**
      * Executes async request
+     *
      * @param url Url
      * @param contentType Content type
      */
@@ -348,7 +357,7 @@ export class Network {
                 request.setRequestHeader('Pragma', 'no-cache');
                 request.overrideMimeType(contentType);
                 request.mozBackgroundRequest = true;
-                request.onload = function () {
+                request.onload = function (): void {
                     resolve(request);
                 };
 
@@ -375,10 +384,12 @@ export class Network {
 
     /**
      * Safe json parsing
-     * @param text
-     * @private
+     *
+     * @param text - json string
+     *
+     * @returns parsed json
      */
-    private static parseJson(text: string) {
+    private static parseJson(text: string): unknown {
         try {
             return JSON.parse(text);
         } catch (ex) {
@@ -387,7 +398,7 @@ export class Network {
         }
     }
 
-    private static createError(message: string, url: string, response?: ExtensionXMLHttpRequest) {
+    private static createError(message: string, url: string, response?: ExtensionXMLHttpRequest): Error {
         let errorMessage = `
             error:                    ${message}
             requested url:            ${url}`;
