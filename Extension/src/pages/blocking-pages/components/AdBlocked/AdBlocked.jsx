@@ -11,8 +11,8 @@ import { messenger } from '../../../services/messenger';
 import '../../styles/index.pcss';
 
 export const ADGUARD_SITE_URL = Forward.get({
-    action: ForwardAction.ADGUARD_SITE,
-    from: ForwardFrom.ADBLOCKED,
+    action: ForwardAction.AdguardSite,
+    from: ForwardFrom.Adblocker,
 });
 
 export const AdBlocked = () => {
@@ -25,7 +25,7 @@ export const AdBlocked = () => {
 
     const handleProceed = useCallback((e) => {
         e.preventDefault();
-        messenger.sendMessage(MessageType.ADD_URL_TO_TRUSTED, { url });
+        messenger.sendMessage(MessageType.AddUrlToTrusted, { url });
     }, [url]);
 
     return (

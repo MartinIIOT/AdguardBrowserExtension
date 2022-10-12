@@ -1,42 +1,42 @@
 export const enum ForwardAction {
-    UNINSTALL_EXTENSION = 'adguard_uninstal_ext',
-    THANK_YOU = 'thank_you_page',
-    SITE_REPORT = 'site_report_page',
-    REPORT = 'report',
-    PRIVACY = 'privacy',
-    ACKNOWLEDGMENTS = 'acknowledgments',
-    GITHUB = 'github_options',
-    WEBSITE = 'adguard_site',
-    DISCUSS = 'discuss',
-    COMPARE = 'compare',
-    CHANGELOG = 'github_version_popup',
-    GLOBAL_PRIVACY_CONTROL = 'global_privacy_control',
-    DO_NOT_TRACK = 'do_not_track',
-    HOW_TO_CREATE_RULES = 'userfilter_description',
-    ADGUARD_SITE = 'adguard_site',
-    SELF_PROMOTION = 'self_promotion',
-    PROTECTION_WORKS = 'protection_works',
-    COLLECT_HITS_LEARN_MORE = 'filter_rules',
-    OPERA_STORE = 'opera_store',
-    FIREFOX_STORE = 'firefox_store',
-    CHROME_STORE = 'chrome_store',
-    EDGE_STORE = 'edge_store',
+    UninstallExtension = 'adguard_uninstal_ext',
+    ThankYou = 'thank_you_page',
+    SiteReport = 'site_report_page',
+    Report = 'report',
+    Privacy = 'privacy',
+    Acknowledgments = 'acknowledgments',
+    Github = 'github_options',
+    Website = 'adguard_site',
+    Discuss = 'discuss',
+    Compare = 'compare',
+    Changelog = 'github_version_popup',
+    GlobalPrivacyControl = 'global_privacy_control',
+    DoNotTrack = 'do_not_track',
+    HowToCreateRules = 'userfilter_description',
+    AdguardSite = 'adguard_site',
+    SelfPromotion = 'self_promotion',
+    ProtectionWorks = 'protection_works',
+    CollectHitsLearnMore = 'filter_rules',
+    OperaStore = 'opera_store',
+    FirefoxStore = 'firefox_store',
+    ChromeStore = 'chrome_store',
+    EdgeStore = 'edge_store',
     IOS = 'ios_about',
-    ANDROID = 'android_about',
+    Android = 'android_about',
 }
 
 export const enum ForwardFrom {
-    BACKGROUND = 'background',
-    OPTIONS = 'options_screen',
-    OPTIONS_FOOTER = 'options_screen_footer',
-    CONTEXT_MENU = 'context_menu',
-    POPUP = 'popup',
-    SAFEBROWSING = 'safebrowsing',
-    ADBLOCKED = 'adblocked',
+    Background = 'background',
+    Options = 'options_screen',
+    OptionsFooter = 'options_screen_footer',
+    ContextMenu = 'context_menu',
+    Popup = 'popup',
+    Safebrowsing = 'safebrowsing',
+    Adblocker = 'adblocked',
 }
 
 export const enum ForwardApp {
-    BROWSER_EXTENSION = 'browser_extension',
+    BrowserExtension = 'browser_extension',
 }
 
 export type ForwardParams = {
@@ -53,7 +53,7 @@ export class Forward {
     static url = 'https://link.adtidy.org/forward.html';
 
     static defaultParams = {
-        app: ForwardApp.BROWSER_EXTENSION,
+        app: ForwardApp.BrowserExtension,
     };
 
     static get(params: ForwardParams): string {

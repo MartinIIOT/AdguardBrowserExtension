@@ -12,13 +12,13 @@ export class SafebrowsingService {
         await SafebrowsingApi.initCache();
 
         settingsEvents.addListener(
-            SettingOption.DISABLE_SAFEBROWSING,
+            SettingOption.DisableSafebrowsing,
             SafebrowsingApi.clearCache,
         );
 
         RequestEvents.onHeadersReceived.addListener(SafebrowsingService.onHeaderReceived);
 
-        messageHandler.addListener(MessageType.OPEN_SAFEBROWSING_TRUSTED, SafebrowsingService.onAddTrustedDomain);
+        messageHandler.addListener(MessageType.OpenSafebrowsingTrusted, SafebrowsingService.onAddTrustedDomain);
     }
 
     private static onHeaderReceived({ context }: RequestData<WebRequest.OnHeadersReceivedDetailsType>) {

@@ -2,7 +2,7 @@ import MD5 from 'crypto-js/md5';
 
 import { BrowserUtils } from '../../../utils/browser-utils';
 import { log } from '../../../../common/log';
-import { ANTIBANNER_GROUPS_ID, CUSTOM_FILTERS_START_ID } from '../../../../common/constants';
+import { AntibannerGroupsId, CUSTOM_FILTERS_START_ID } from '../../../../common/constants';
 import {
     customFilterMetadataStorage,
     CustomFilterMetadata,
@@ -180,7 +180,7 @@ export class CustomFilterApi {
         const filterMetadata: CustomFilterMetadata = {
             filterId,
             displayNumber: 0,
-            groupId: ANTIBANNER_GROUPS_ID.CUSTOM_FILTERS_GROUP_ID,
+            groupId: AntibannerGroupsId.CustomFilterGroupId,
             name,
             description,
             homepage,

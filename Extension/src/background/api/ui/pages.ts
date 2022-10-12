@@ -31,13 +31,13 @@ export class PagesApi {
     public static filtersDownloadPageUrl = PagesApi.getExtensionPageUrl('filter-download.html');
 
     public static thankYouPageUrl = Forward.get({
-        action: ForwardAction.THANK_YOU,
-        from: ForwardFrom.BACKGROUND,
+        action: ForwardAction.ThankYou,
+        from: ForwardFrom.Background,
     });
 
     public static comparePageUrl = Forward.get({
-        action: ForwardAction.COMPARE,
-        from: ForwardFrom.OPTIONS,
+        action: ForwardAction.Compare,
+        from: ForwardFrom.Options,
     });
 
     public static extensionStoreUrl = PagesApi.getExtensionStoreUrl();
@@ -50,7 +50,7 @@ export class PagesApi {
     }
 
     static async openFullscreenUserRulesPage(): Promise<void> {
-        const theme = settingsStorage.get(SettingOption.APPEARANCE_THEME);
+        const theme = settingsStorage.get(SettingOption.AppearanceTheme);
         const url = PagesApi.getExtensionPageUrl(`fullscreen-user-rules.html?theme=${theme}`);
 
         await TabsApi.openWindow({
@@ -92,7 +92,7 @@ export class PagesApi {
         const filterIds = Engine.api.configuration?.filters || [];
 
         const params: ForwardParams = {
-            action: ForwardAction.REPORT,
+            action: ForwardAction.Report,
             from,
             product_type: 'Ext',
             product_version: encodeURIComponent(browser.runtime.getManifest().version),
@@ -133,7 +133,7 @@ export class PagesApi {
         await TabsApi.openTab({
             url: Forward.get({
                 from,
-                action: ForwardAction.SITE_REPORT,
+                action: ForwardAction.SiteReport,
                 domain: encodeURIComponent(punycodeDomain),
             }),
         });
@@ -170,19 +170,19 @@ export class PagesApi {
     }
 
     private static getExtensionStoreUrl() {
-        let action = ForwardAction.CHROME_STORE;
+        let action = ForwardAction.ChromeStore;
 
         if (UserAgent.isOpera) {
-            action = ForwardAction.OPERA_STORE;
+            action = ForwardAction.OperaStore;
         } else if (UserAgent.isFirefox) {
-            action = ForwardAction.FIREFOX_STORE;
+            action = ForwardAction.FirefoxStore;
         } else if (UserAgent.isEdge) {
-            action = ForwardAction.EDGE_STORE;
+            action = ForwardAction.EdgeStore;
         }
 
         return Forward.get({
             action,
-            from: ForwardFrom.OPTIONS,
+            from: ForwardFrom.Options,
         });
     }
 
@@ -204,12 +204,12 @@ export class PagesApi {
     }
 
     private static getBrowserSecurityParams(): { [key: string]: string } {
-        const isEnabled = !settingsStorage.get(SettingOption.DISABLE_SAFEBROWSING);
+        const isEnabled = !settingsStorage.get(SettingOption.DisableSafebrowsing);
         return { 'browsing_security.enabled': String(isEnabled) };
     }
 
     private static getStealthParams(filterIds: number[]): { [key: string]: string } {
-        const stealthEnabled = !settingsStorage.get(SettingOption.DISABLE_STEALTH_MODE);
+        const stealthEnabled = !settingsStorage.get(SettingOption.DisableStealthMode);
 
         if (!stealthEnabled) {
             return { 'stealth.enabled': 'false' };
@@ -218,33 +218,33 @@ export class PagesApi {
         const stealthOptions = [
             {
                 queryKey: 'stealth.ext_hide_referrer',
-                settingKey: SettingOption.HIDE_REFERRER,
+                settingKey: SettingOption.HideReferrer,
             },
             {
                 queryKey: 'stealth.hide_search_queries',
-                settingKey: SettingOption.HIDE_SEARCH_QUERIES,
+                settingKey: SettingOption.HideSearchQueries,
             },
             {
                 queryKey: 'stealth.DNT',
-                settingKey: SettingOption.SEND_DO_NOT_TRACK,
+                settingKey: SettingOption.SendDoNotTrack,
             },
             {
                 queryKey: 'stealth.x_client',
-                settingKey: SettingOption.BLOCK_CHROME_CLIENT_DATA,
+                settingKey: SettingOption.BlockChromeClientData,
             },
             {
                 queryKey: 'stealth.webrtc',
-                settingKey: SettingOption.BLOCK_WEBRTC,
+                settingKey: SettingOption.BlockWebRTC,
             },
             {
                 queryKey: 'stealth.third_party_cookies',
-                settingKey: SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES,
-                settingValueKey: SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME,
+                settingKey: SettingOption.SelfDestructThirdPartyCookies,
+                settingValueKey: SettingOption.SelfDestructThirdPartyCookiesTime,
             },
             {
                 queryKey: 'stealth.first_party_cookies',
-                settingKey: SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES,
-                settingValueKey: SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME,
+                settingKey: SettingOption.SelfDestructFirstPartyCookies,
+                settingValueKey: SettingOption.SelfDestructFirstPartyCookiesTime,
             },
         ];
 
@@ -270,7 +270,7 @@ export class PagesApi {
             stealthOptionsEntries.push([queryKey, option]);
         }
 
-        const isRemoveUrlParamsEnabled = filterIds.includes(AntiBannerFiltersId.URL_TRACKING_FILTER_ID);
+        const isRemoveUrlParamsEnabled = filterIds.includes(AntiBannerFiltersId.UrlTrackingFilterId);
 
         if (isRemoveUrlParamsEnabled) {
             stealthOptionsEntries.push(['stealth.strip_url', 'true']);

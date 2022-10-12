@@ -16,7 +16,7 @@ import { Popover } from '../ui/Popover';
 import { Icon } from '../ui/Icon';
 import { messenger } from '../../../services/messenger';
 import { MessageType } from '../../../../common/messages';
-import { NOTIFIER_TYPES } from '../../../../common/constants';
+import { NotifierType } from '../../../../common/constants';
 import { handleFileUpload } from '../../../helpers';
 import { log } from '../../../../common/log';
 import { ToggleWrapButton } from './ToggleWrapButton';
@@ -66,7 +66,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
 
             // initial export button state
             const { userRules } = await messenger.sendMessage(
-                MessageType.GET_USER_RULES_EDITOR_DATA,
+                MessageType.GetUserRulesEditorData,
             );
             if (userRules.length > 0) {
                 store.setUserRulesExportAvailableState(true);
@@ -83,7 +83,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
      */
     const handleUserFilterUpdated = useCallback(async () => {
         const { userRules } = await messenger.sendMessage(
-            MessageType.GET_USER_RULES_EDITOR_DATA,
+            MessageType.GetUserRulesEditorData,
         );
 
         if (!store.userRulesEditorContentChanged) {
@@ -110,7 +110,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
             // Subscribe to events of request filter update
             // to have actual user rules in the editor
             const events = [
-                NOTIFIER_TYPES.USER_FILTER_UPDATED,
+                NotifierType.userFilterUpdated,
             ];
 
             removeListenerCallback = await messenger.createEventListener(
@@ -119,7 +119,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                     const { type } = message;
 
                     switch (type) {
-                        case NOTIFIER_TYPES.USER_FILTER_UPDATED: {
+                        case NotifierType.userFilterUpdated: {
                             await handleUserFilterUpdated();
                             break;
                         }
@@ -279,7 +279,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
             await messenger.setEditorStorageContent(content);
         }
 
-        await messenger.sendMessage(MessageType.OPEN_FULLSCREEN_USER_RULES);
+        await messenger.sendMessage(MessageType.OpenFullscreenUserRules);
     };
 
     const closeEditorFullscreen = async () => {

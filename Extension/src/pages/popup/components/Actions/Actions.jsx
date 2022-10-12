@@ -30,7 +30,7 @@ export const Actions = observer(() => {
         if (!store.applicationAvailable) {
             return;
         }
-        messenger.openAbuseSite(store.url, ForwardFrom.POPUP);
+        messenger.openAbuseSite(store.url, ForwardFrom.Popup);
         window.close();
     };
 
@@ -38,7 +38,7 @@ export const Actions = observer(() => {
         if (!store.applicationAvailable) {
             return;
         }
-        messenger.checkSiteSecurity(store.url, ForwardFrom.POPUP);
+        messenger.checkSiteSecurity(store.url, ForwardFrom.Popup);
         window.close();
     };
 

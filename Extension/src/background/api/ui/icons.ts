@@ -26,7 +26,7 @@ export class IconsApi {
 
         let blocked: number;
 
-        if (!disabled && !settingsStorage.get(SettingOption.DISABLE_SHOW_PAGE_STATS)) {
+        if (!disabled && !settingsStorage.get(SettingOption.DisableShowPageStats)) {
             blocked = totalBlockedTab;
         } else {
             blocked = 0;

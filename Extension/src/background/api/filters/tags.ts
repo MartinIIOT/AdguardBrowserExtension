@@ -41,7 +41,7 @@ export class FilterTags {
     static getPurposeGroupedFilters() {
         const filters = metadataStorage
             .getFilters()
-            .filter(({ filterId }) => filterId !== AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID);
+            .filter(({ filterId }) => filterId !== AntiBannerFiltersId.SearchAndSelfPromoFilterId);
 
         const adsFilters = FilterTags.getFiltersByTagId(FilterTags.PURPOSE_ADS_TAG_ID, filters);
         const socialFilters = FilterTags.getFiltersByTagId(FilterTags.PURPOSE_SOCIAL_TAG_ID, filters);

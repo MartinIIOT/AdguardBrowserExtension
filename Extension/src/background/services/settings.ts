@@ -13,49 +13,49 @@ import { fullscreenUserRulesEditor } from './fullscreen-user-rules-editor';
 
 export class SettingsService {
     static init() {
-        messageHandler.addListener(MessageType.GET_OPTIONS_DATA, SettingsService.getOptionsData);
-        messageHandler.addListener(MessageType.RESET_SETTINGS, SettingsService.reset);
-        messageHandler.addListener(MessageType.CHANGE_USER_SETTING, SettingsService.changeUserSettings);
-        messageHandler.addListener(MessageType.APPLY_SETTINGS_JSON, SettingsService.import);
-        messageHandler.addListener(MessageType.LOAD_SETTINGS_JSON, SettingsService.export);
+        messageHandler.addListener(MessageType.GetOptionsData, SettingsService.getOptionsData);
+        messageHandler.addListener(MessageType.ResetSettings, SettingsService.reset);
+        messageHandler.addListener(MessageType.ChangeUserSettings, SettingsService.changeUserSettings);
+        messageHandler.addListener(MessageType.ApplySettingsJson, SettingsService.import);
+        messageHandler.addListener(MessageType.LoadSettingsJson, SettingsService.export);
 
-        settingsEvents.addListener(SettingOption.DISABLE_STEALTH_MODE, Engine.update);
-        settingsEvents.addListener(SettingOption.HIDE_REFERRER, Engine.update);
-        settingsEvents.addListener(SettingOption.HIDE_SEARCH_QUERIES, Engine.update);
-        settingsEvents.addListener(SettingOption.SEND_DO_NOT_TRACK, Engine.update);
+        settingsEvents.addListener(SettingOption.DisableStealthMode, Engine.update);
+        settingsEvents.addListener(SettingOption.HideReferrer, Engine.update);
+        settingsEvents.addListener(SettingOption.HideSearchQueries, Engine.update);
+        settingsEvents.addListener(SettingOption.SendDoNotTrack, Engine.update);
         settingsEvents.addListener(
-            SettingOption.BLOCK_CHROME_CLIENT_DATA,
+            SettingOption.BlockChromeClientData,
             Engine.update,
         );
-        settingsEvents.addListener(SettingOption.BLOCK_WEBRTC, Engine.update);
+        settingsEvents.addListener(SettingOption.BlockWebRTC, Engine.update);
         settingsEvents.addListener(
-            SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES,
-            Engine.update,
-        );
-        settingsEvents.addListener(
-            SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME,
+            SettingOption.SelfDestructThirdPartyCookies,
             Engine.update,
         );
         settingsEvents.addListener(
-            SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES,
+            SettingOption.SelfDestructThirdPartyCookiesTime,
             Engine.update,
         );
         settingsEvents.addListener(
-            SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME,
+            SettingOption.SelfDestructFirstPartyCookies,
             Engine.update,
         );
         settingsEvents.addListener(
-            SettingOption.DISABLE_FILTERING,
+            SettingOption.SelfDestructFirstPartyCookiesTime,
+            Engine.update,
+        );
+        settingsEvents.addListener(
+            SettingOption.DisableFiltering,
             SettingsService.onFilteringStateChange,
         );
 
         contextMenuEvents.addListener(
-            ContextMenuAction.ENABLE_PROTECTION,
+            ContextMenuAction.EnableProtection,
             SettingsService.enableFiltering,
         );
 
         contextMenuEvents.addListener(
-            ContextMenuAction.DISABLE_PROTECTION,
+            ContextMenuAction.DisableProtection,
             SettingsService.disableFiltering,
         );
     }
@@ -100,7 +100,7 @@ export class SettingsService {
 
         await Engine.update();
 
-        listeners.notifyListeners(listeners.SETTINGS_UPDATED, isImported);
+        listeners.notifyListeners(listeners.SettingsUpdated, isImported);
         return isImported;
     }
 
@@ -122,10 +122,10 @@ export class SettingsService {
     }
 
     static async enableFiltering() {
-        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, false);
+        await SettingsApi.setSetting(SettingOption.DisableFiltering, false);
     }
 
     static async disableFiltering() {
-        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, true);
+        await SettingsApi.setSetting(SettingOption.DisableFiltering, true);
     }
 }

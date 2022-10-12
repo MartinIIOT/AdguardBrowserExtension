@@ -26,28 +26,28 @@ export class ContextMenuApi {
                 ContextMenuApi.addUrlFilteringDisabledContextMenuAction();
             } else {
                 if (documentAllowlisted && !userAllowlisted) {
-                    ContextMenuApi.addMenuItem(ContextMenuAction.SITE_EXCEPTION);
+                    ContextMenuApi.addMenuItem(ContextMenuAction.SiteException);
                 } else if (canAddRemoveRule) {
                     if (documentAllowlisted) {
-                        ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_ON);
+                        ContextMenuApi.addMenuItem(ContextMenuAction.SiteFilteringOn);
                     } else {
-                        ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_OFF);
+                        ContextMenuApi.addMenuItem(ContextMenuAction.SiteFilteringOff);
                     }
                 }
                 ContextMenuApi.addSeparator();
 
                 if (!documentAllowlisted) {
-                    ContextMenuApi.addMenuItem(ContextMenuAction.BLOCK_SITE_ADS);
+                    ContextMenuApi.addMenuItem(ContextMenuAction.BlockSiteAds);
                 }
 
-                ContextMenuApi.addMenuItem(ContextMenuAction.SECURITY_REPORT);
-                ContextMenuApi.addMenuItem(ContextMenuAction.COMPLAINT_WEBSITE);
+                ContextMenuApi.addMenuItem(ContextMenuAction.SecurityReport);
+                ContextMenuApi.addMenuItem(ContextMenuAction.ComplaintWebsite);
                 ContextMenuApi.addSeparator();
-                ContextMenuApi.addMenuItem(ContextMenuAction.UPDATE_ANTIBANNER_FILTERS);
+                ContextMenuApi.addMenuItem(ContextMenuAction.UpdateAntibannerFilters);
                 ContextMenuApi.addSeparator();
-                ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_SETTINGS);
-                ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_LOG);
-                ContextMenuApi.addMenuItem(ContextMenuAction.DISABLE_PROTECTION);
+                ContextMenuApi.addMenuItem(ContextMenuAction.OpenSettings);
+                ContextMenuApi.addMenuItem(ContextMenuAction.OpenLog);
+                ContextMenuApi.addMenuItem(ContextMenuAction.DisableProtection);
             }
         } catch (e) {
             // do nothing
@@ -55,19 +55,19 @@ export class ContextMenuApi {
     }
 
     private static addFilteringDisabledMenuItems(): void {
-        ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_DISABLED);
+        ContextMenuApi.addMenuItem(ContextMenuAction.SiteFilteringDisabled);
         ContextMenuApi.addSeparator();
-        ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_LOG);
-        ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_SETTINGS);
-        ContextMenuApi.addMenuItem(ContextMenuAction.ENABLE_PROTECTION);
+        ContextMenuApi.addMenuItem(ContextMenuAction.OpenLog);
+        ContextMenuApi.addMenuItem(ContextMenuAction.OpenSettings);
+        ContextMenuApi.addMenuItem(ContextMenuAction.EnableProtection);
     }
 
     private static addUrlFilteringDisabledContextMenuAction(): void {
-        ContextMenuApi.addMenuItem(ContextMenuAction.SITE_FILTERING_DISABLED);
+        ContextMenuApi.addMenuItem(ContextMenuAction.SiteFilteringDisabled);
         ContextMenuApi.addSeparator();
-        ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_LOG);
-        ContextMenuApi.addMenuItem(ContextMenuAction.OPEN_SETTINGS);
-        ContextMenuApi.addMenuItem(ContextMenuAction.UPDATE_ANTIBANNER_FILTERS);
+        ContextMenuApi.addMenuItem(ContextMenuAction.OpenLog);
+        ContextMenuApi.addMenuItem(ContextMenuAction.OpenSettings);
+        ContextMenuApi.addMenuItem(ContextMenuAction.UpdateAntibannerFilters);
     }
 
     private static addMenuItem(action: ContextMenuAction, options: AddMenuItemOptions = {}): void {

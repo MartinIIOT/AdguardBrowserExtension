@@ -1,6 +1,7 @@
 import { Windows } from 'webextension-polyfill';
 import { ForwardFrom } from '../forward';
 import { SettingOption, Settings } from '../../background/schema';
+import { NotifierType } from '../constants';
 
 /**
  * Message types used for message passing between background page and
@@ -14,106 +15,117 @@ export type MessageCommonProps = {
 };
 
 export enum MessageType {
-  CREATE_EVENT_LISTENER = 'createEventListener',
-  REMOVE_LISTENER = 'removeListener',
-  OPEN_EXTENSION_STORE = 'openExtensionStore',
-  ADD_AND_ENABLE_FILTER = 'addAndEnableFilter',
-  APPLY_SETTINGS_JSON = 'applySettingsJson',
-  OPEN_FILTERING_LOG = 'openFilteringLog',
-  OPEN_FULLSCREEN_USER_RULES = 'openFullscreenUserRules',
-  RESET_BLOCKED_ADS_COUNT = 'resetBlockedAdsCount',
-  RESET_SETTINGS = 'resetSettings',
-  GET_USER_RULES = 'getUserRules',
-  SAVE_USER_RULES = 'saveUserRules',
-  GET_ALLOWLIST_DOMAINS = 'getAllowlistDomains',
-  SAVE_ALLOWLIST_DOMAINS = 'saveAllowlistDomains',
-  CHECK_ANTIBANNER_FILTERS_UPDATE = 'checkAntiBannerFiltersUpdate',
-  DISABLE_FILTERS_GROUP = 'disableFiltersGroup',
-  DISABLE_ANTIBANNER_FILTER = 'disableAntiBannerFilter',
-  LOAD_CUSTOM_FILTER_INFO = 'loadCustomFilterInfo',
-  SUBSCRIBE_TO_CUSTOM_FILTER = 'subscribeToCustomFilter',
-  REMOVE_ANTIBANNER_FILTER = 'removeAntiBannerFilter',
-  GET_TAB_INFO_FOR_POPUP = 'getTabInfoForPopup',
-  CHANGE_APPLICATION_FILTERING_DISABLED = 'changeApplicationFilteringDisabled',
-  OPEN_SETTINGS_TAB = 'openSettingsTab',
-  OPEN_ASSISTANT = 'openAssistant',
-  OPEN_ABUSE_TAB = 'openAbuseTab',
-  OPEN_SITE_REPORT_TAB = 'openSiteReportTab',
-  OPEN_COMPARE_PAGE = 'openComparePage',
-  RESET_CUSTOM_RULES_FOR_PAGE = 'resetCustomRulesForPage',
-  REMOVE_ALLOWLIST_DOMAIN = 'removeAllowlistDomainPopup',
-  ADD_ALLOWLIST_DOMAIN_POPUP = 'addAllowlistDomainPopup',
-  GET_STATISTICS_DATA = 'getStatisticsData',
-  ON_OPEN_FILTERING_LOG_PAGE = 'onOpenFilteringLogPage',
-  GET_FILTERING_LOG_DATA = 'getFilteringLogData',
-  INITIALIZE_FRAME_SCRIPT = 'initializeFrameScript',
-  ON_CLOSE_FILTERING_LOG_PAGE = 'onCloseFilteringLogPage',
-  GET_FILTERING_INFO_BY_TAB_ID = 'getFilteringInfoByTabId',
-  SYNCHRONIZE_OPEN_TABS = 'synchronizeOpenTabs',
-  CLEAR_EVENTS_BY_TAB_ID = 'clearEventsByTabId',
-  REFRESH_PAGE = 'refreshPage',
-  OPEN_TAB = 'openTab',
-  ADD_USER_RULE = 'addUserRule',
-  UN_ALLOWLIST_FRAME = 'unAllowlistFrame',
-  REMOVE_USER_RULE = 'removeUserRule',
-  GET_TAB_FRAME_INFO_BY_ID = 'getTabFrameInfoById',
-  ENABLE_FILTERS_GROUP = 'enableFiltersGroup',
-  NOTIFY_LISTENERS = 'notifyListeners',
-  ADD_LONG_LIVED_CONNECTION = 'addLongLivedConnection',
-  GET_OPTIONS_DATA = 'getOptionsData',
-  CHANGE_USER_SETTING = 'changeUserSetting',
-  CHECK_REQUEST_FILTER_READY = 'checkRequestFilterReady',
-  OPEN_THANKYOU_PAGE = 'openThankYouPage',
-  OPEN_SAFEBROWSING_TRUSTED = 'openSafebrowsingTrusted',
-  GET_SELECTORS_AND_SCRIPTS = 'getSelectorsAndScripts',
-  CHECK_PAGE_SCRIPT_WRAPPER_REQUEST = 'checkPageScriptWrapperRequest',
-  PROCESS_SHOULD_COLLAPSE = 'processShouldCollapse',
-  PROCESS_SHOULD_COLLAPSE_MANY = 'processShouldCollapseMany',
-  ADD_FILTERING_SUBSCRIPTION = 'addFilterSubscription',
-  SET_NOTIFICATION_VIEWED = 'setNotificationViewed',
-  SAVE_CSS_HITS_STATS = 'saveCssHitStats',
-  GET_COOKIE_RULES = 'getCookieRules',
-  SAVE_COOKIE_LOG_EVENT = 'saveCookieRuleEvent',
-  LOAD_SETTINGS_JSON = 'loadSettingsJson',
-  ADD_URL_TO_TRUSTED = 'addUrlToTrusted',
-  SET_PRESERVE_LOG_STATE = 'setPreserveLogState',
-  GET_USER_RULES_EDITOR_DATA = 'getUserRulesEditorData',
-  GET_EDITOR_STORAGE_CONTENT = 'getEditorStorageContent',
-  SET_EDITOR_STORAGE_CONTENT = 'setEditorStorageContent',
-  CONVERT_RULES_TEXT = 'convertRulesText',
-  SET_FILTERING_LOG_WINDOW_STATE = 'setFilteringLogWindowState',
-  APP_INITIALIZED = 'appInitialized',
-  UPDATE_TOTAL_BLOCKED = 'updateTotalBlocked',
+  CreateEventListener = 'createEventListener',
+  RemoveListener = 'removeListener',
+  OpenExtensionStore = 'openExtensionStore',
+  AddAndEnableFilter = 'addAndEnableFilter',
+  ApplySettingsJson = 'applySettingsJson',
+  OpenFilteringLog = 'openFilteringLog',
+  OpenFullscreenUserRules = 'openFullscreenUserRules',
+  ResetBlockedAdsCount = 'resetBlockedAdsCount',
+  ResetSettings = 'resetSettings',
+  GetUserRules = 'getUserRules',
+  SaveUserRules = 'saveUserRules',
+  GetAllowlistDomains = 'getAllowlistDomains',
+  SaveAllowlistDomains = 'saveAllowlistDomains',
+  CheckAntibannerFiltersUpdate = 'checkAntiBannerFiltersUpdate',
+  DisableFiltersGroup = 'disableFiltersGroup',
+  DisableAntibannerFilter = 'disableAntiBannerFilter',
+  LoadCustomFilterInfo = 'loadCustomFilterInfo',
+  SubscribeToCustomFilter = 'subscribeToCustomFilter',
+  RemoveAntibannerFilter = 'removeAntiBannerFilter',
+  GetTabInfoForPopup = 'getTabInfoForPopup',
+  ChangeApplicationFilteringDisabled = 'changeApplicationFilteringDisabled',
+  OpenSettingsTab = 'openSettingsTab',
+  OpenAssistant = 'openAssistant',
+  OpenAbuseTab = 'openAbuseTab',
+  OpenSiteReportTab = 'openSiteReportTab',
+  OpenComparePage = 'openComparePage',
+  ResetCustomRulesForPage = 'resetCustomRulesForPage',
+  RemoveAllowlistDomain = 'removeAllowlistDomainPopup',
+  AddAllowlistDomainPopup = 'addAllowlistDomainPopup',
+  GetStatisticsData = 'getStatisticsData',
+  OnOpenFilteringLogPage = 'onOpenFilteringLogPage',
+  GetFilteringLogData = 'getFilteringLogData',
+  InitializeFrameScript = 'initializeFrameScript',
+  OnCloseFilteringLogPage = 'onCloseFilteringLogPage',
+  GetFilteringInfoByTabId = 'getFilteringInfoByTabId',
+  SynchronizeOpenTabs = 'synchronizeOpenTabs',
+  ClearEventsByTabId = 'clearEventsByTabId',
+  RefreshPage = 'refreshPage',
+  OpenTab = 'openTab',
+  AddUserRule = 'addUserRule',
+  UnAllowlistFrame = 'unAllowlistFrame',
+  RemoveUserRule = 'removeUserRule',
+  GetTabFrameInfoById = 'getTabFrameInfoById',
+  EnableFiltersGroup = 'enableFiltersGroup',
+  NotifyListeners = 'notifyListeners',
+  AddLongLivedConnection = 'addLongLivedConnection',
+  GetOptionsData = 'getOptionsData',
+  ChangeUserSettings = 'changeUserSetting',
+  CheckRequestFilterReady = 'checkRequestFilterReady',
+  OpenThankyouPage = 'openThankYouPage',
+  OpenSafebrowsingTrusted = 'openSafebrowsingTrusted',
+  GetSelectorsAndScripts = 'getSelectorsAndScripts',
+  CheckPageScriptWrapperRequest = 'checkPageScriptWrapperRequest',
+  ProcessShouldCollapse = 'processShouldCollapse',
+  ProcessShouldCollapseMany = 'processShouldCollapseMany',
+  AddFilteringSubscription = 'addFilterSubscription',
+  SetNotificationViewed = 'setNotificationViewed',
+  SaveCssHitsStats = 'saveCssHitStats',
+  GetCookieRules = 'getCookieRules',
+  SaveCookieLogEvent = 'saveCookieRuleEvent',
+  LoadSettingsJson = 'loadSettingsJson',
+  AddUrlToTrusted = 'addUrlToTrusted',
+  SetPreserveLogState = 'setPreserveLogState',
+  GetUserRulesEditorData = 'getUserRulesEditorData',
+  GetEditorStorageContent = 'getEditorStorageContent',
+  SetEditorStorageContent = 'setEditorStorageContent',
+  ConvertRulesText = 'convertRulesText',
+  SetFilteringLogWindowState = 'setFilteringLogWindowState',
+  AppInitialized = 'appInitialized',
+  UpdateTotalBlocked = 'updateTotalBlocked',
 }
 
+export type CreateEventListenerMessage = {
+  type: MessageType.CreateEventListener,
+  data: {
+    events: NotifierType[]
+  }
+};
+
+export type RemoveListenerMessage = {
+  type: MessageType.RemoveListener,
+};
+
 export type GetTabInfoForPopupMessage = {
-  type: MessageType.GET_TAB_INFO_FOR_POPUP;
+  type: MessageType.GetTabInfoForPopup;
   data: {
     tabId: number;
   };
 };
 
 export type ChangeApplicationFilteringDisabledMessage = {
-  type: MessageType.CHANGE_APPLICATION_FILTERING_DISABLED;
+  type: MessageType.ChangeApplicationFilteringDisabled;
   data: {
     state: boolean;
   };
 };
 
 export type OpenSettingsTabMessage = {
-  type: MessageType.OPEN_SETTINGS_TAB;
+  type: MessageType.OpenSettingsTab;
 };
 
 export type OpenAssistantMessage = {
-  type: MessageType.OPEN_ASSISTANT;
+  type: MessageType.OpenAssistant;
 };
 
 export type OpenFilteringLogMessage = {
-  type: MessageType.OPEN_FILTERING_LOG;
+  type: MessageType.OpenFilteringLog;
 };
 
 export type OpenAbuseTabMessage = {
-  type: MessageType.OPEN_ABUSE_TAB;
+  type: MessageType.OpenAbuseTab;
   data: {
     url: string;
     from: ForwardFrom;
@@ -121,7 +133,7 @@ export type OpenAbuseTabMessage = {
 };
 
 export type OpenSiteReportTabMessage = {
-  type: MessageType.OPEN_SITE_REPORT_TAB;
+  type: MessageType.OpenSiteReportTab;
   data: {
     url: string;
     from: ForwardFrom;
@@ -129,11 +141,11 @@ export type OpenSiteReportTabMessage = {
 };
 
 export type GetOptionsDataMessage = {
-  type: MessageType.GET_OPTIONS_DATA;
+  type: MessageType.GetOptionsData;
 };
 
 export type ChangeUserSettingMessage<T extends SettingOption = SettingOption> = {
-  type: MessageType.CHANGE_USER_SETTING;
+  type: MessageType.ChangeUserSettings;
   data: {
     key: T,
     value: Settings[T]
@@ -141,18 +153,18 @@ export type ChangeUserSettingMessage<T extends SettingOption = SettingOption> = 
 };
 
 export type ResetSettingsMessage = {
-  type: MessageType.RESET_SETTINGS
+  type: MessageType.ResetSettings
 };
 
 export type AddAndEnableFilterMessage = {
-  type: MessageType.ADD_AND_ENABLE_FILTER
+  type: MessageType.AddAndEnableFilter
   data: {
     filterId: number
   }
 };
 
 export type DisableAntiBannerFilterMessage = {
-  type: MessageType.DISABLE_ANTIBANNER_FILTER
+  type: MessageType.DisableAntibannerFilter
   data: {
     filterId: number,
     remove: boolean
@@ -160,50 +172,50 @@ export type DisableAntiBannerFilterMessage = {
 };
 
 export type RemoveAntiBannerFilterMessage = {
-  type: MessageType.REMOVE_ANTIBANNER_FILTER
+  type: MessageType.RemoveAntibannerFilter
   data: {
     filterId: number
   }
 };
 
 export type SaveAllowlistDomainsMessage = {
-  type: MessageType.SAVE_ALLOWLIST_DOMAINS
+  type: MessageType.SaveAllowlistDomains
   data: {
     value: string,
   }
 };
 
 export type SaveUserRulesMessage = {
-  type: MessageType.SAVE_USER_RULES
+  type: MessageType.SaveUserRules
   data: {
     value: string,
   }
 };
 
 export type GetUserRulesMessage = {
-  type: MessageType.GET_USER_RULES
+  type: MessageType.GetUserRules
 };
 
 export type GetUserRulesEditorDataMessage = {
-  type: MessageType.GET_USER_RULES_EDITOR_DATA
+  type: MessageType.GetUserRulesEditorData
 };
 
 export type AddUserRuleMessage = {
-  type: MessageType.ADD_USER_RULE
+  type: MessageType.AddUserRule
   data: {
     ruleText: string,
   }
 };
 
 export type RemoveUserRuleMessage = {
-  type: MessageType.REMOVE_USER_RULE
+  type: MessageType.RemoveUserRule
   data: {
     ruleText: string,
   }
 };
 
 export type ResetCustomRulesForPageMessage = {
-  type: MessageType.RESET_CUSTOM_RULES_FOR_PAGE
+  type: MessageType.ResetCustomRulesForPage
   data: {
     url: string,
     tabId: number,
@@ -211,32 +223,32 @@ export type ResetCustomRulesForPageMessage = {
 };
 
 export type GetEditorStorageContentMessage = {
-  type: MessageType.GET_EDITOR_STORAGE_CONTENT
+  type: MessageType.GetEditorStorageContent
 };
 
 export type SetEditorStorageContentMessage = {
-  type: MessageType.SET_EDITOR_STORAGE_CONTENT
+  type: MessageType.SetEditorStorageContent
   data: {
     content: string,
   }
 };
 
 export type AddAllowlistDomainPopupMessage = {
-  type: MessageType.ADD_ALLOWLIST_DOMAIN_POPUP
+  type: MessageType.AddAllowlistDomainPopup
   data: {
     tabId: number,
   }
 };
 
 export type RemoveAllowlistDomainMessage = {
-  type: MessageType.REMOVE_ALLOWLIST_DOMAIN
+  type: MessageType.RemoveAllowlistDomain
   data: {
     tabId: number,
   }
 };
 
 export type LoadCustomFilterInfoMessage = {
-  type: MessageType.LOAD_CUSTOM_FILTER_INFO
+  type: MessageType.LoadCustomFilterInfo
   data: {
     url: string,
     title: string,
@@ -244,7 +256,7 @@ export type LoadCustomFilterInfoMessage = {
 };
 
 export type SubscribeToCustomFilterMessage = {
-  type: MessageType.SUBSCRIBE_TO_CUSTOM_FILTER
+  type: MessageType.SubscribeToCustomFilter
   data: {
     filter: {
       customUrl: string,
@@ -255,11 +267,11 @@ export type SubscribeToCustomFilterMessage = {
 };
 
 export type AppInitializedMessage = {
-  type: MessageType.APP_INITIALIZED
+  type: MessageType.AppInitialized
 };
 
 export type UpdateTotalBlockedMessage = {
-  type: MessageType.UPDATE_TOTAL_BLOCKED
+  type: MessageType.UpdateTotalBlocked
   data: {
     totalBlocked: number,
     totalBlockedTab: number,
@@ -267,27 +279,27 @@ export type UpdateTotalBlockedMessage = {
 };
 
 export type CheckRequestFilterReadyMessage = {
-  type: MessageType.CHECK_REQUEST_FILTER_READY
+  type: MessageType.CheckRequestFilterReady
 };
 
 export type GetFilteringLogDataMessage = {
-  type: MessageType.GET_FILTERING_LOG_DATA,
+  type: MessageType.GetFilteringLogData,
 };
 
 export type SynchronizeOpenTabsMessage = {
-  type: MessageType.SYNCHRONIZE_OPEN_TABS,
+  type: MessageType.SynchronizeOpenTabs,
 };
 
 export type OpenFilteringLogPageMessage = {
-  type: MessageType.ON_OPEN_FILTERING_LOG_PAGE
+  type: MessageType.OnOpenFilteringLogPage
 };
 
 export type CloseFilteringLogPageMessage = {
-  type: MessageType.ON_CLOSE_FILTERING_LOG_PAGE
+  type: MessageType.OnCloseFilteringLogPage
 };
 
 export type ClearEventsByTabIdMessage = {
-  type: MessageType.CLEAR_EVENTS_BY_TAB_ID
+  type: MessageType.ClearEventsByTabId
   data: {
     tabId: number,
     ignorePreserveLog: boolean,
@@ -295,28 +307,28 @@ export type ClearEventsByTabIdMessage = {
 };
 
 export type SetPreserveLogStateMessage = {
-  type: MessageType.SET_PRESERVE_LOG_STATE
+  type: MessageType.SetPreserveLogState
   data: {
     state: boolean,
   }
 };
 
 export type SetFilteringLogWindowStateMessage = {
-  type: MessageType.SET_FILTERING_LOG_WINDOW_STATE,
+  type: MessageType.SetFilteringLogWindowState,
   data: {
     windowState: Windows.CreateCreateDataType
   }
 };
 
 export type PageRefreshMessage = {
-  type: MessageType.REFRESH_PAGE,
+  type: MessageType.RefreshPage,
   data: {
     tabId: number,
   }
 };
 
 export type GetFilteringInfoByTabIdMessage = {
-  type: MessageType.GET_FILTERING_INFO_BY_TAB_ID,
+  type: MessageType.GetFilteringInfoByTabId,
   data: {
     tabId: number,
   }

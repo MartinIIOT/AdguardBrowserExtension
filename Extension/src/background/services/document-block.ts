@@ -9,7 +9,7 @@ export class DocumentBlockService {
     public static async init(): Promise<void> {
         await DocumentBlockApi.init();
 
-        messageHandler.addListener(MessageType.ADD_URL_TO_TRUSTED, DocumentBlockService.onAddUrlToTrusted);
+        messageHandler.addListener(MessageType.AddUrlToTrusted, DocumentBlockService.onAddUrlToTrusted);
     }
 
     private static async onAddUrlToTrusted({ data }): Promise<void> {

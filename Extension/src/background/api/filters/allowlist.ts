@@ -44,7 +44,7 @@ export class AllowlistApi {
      * @returns true, if inverted, else returns false
      */
     public static isInverted(): boolean {
-        return !settingsStorage.get(SettingOption.DEFAULT_ALLOWLIST_MODE);
+        return !settingsStorage.get(SettingOption.DefaultAllowlistMode);
     }
 
     /**
@@ -53,7 +53,7 @@ export class AllowlistApi {
      * @returns true, if enabled, else returns false
      */
     public static isEnabled(): boolean {
-        return settingsStorage.get(SettingOption.ALLOWLIST_ENABLED);
+        return settingsStorage.get(SettingOption.AllowlistEnabled);
     }
 
     /**
@@ -248,7 +248,7 @@ export class AllowlistApi {
 
         storage.setData(domains);
 
-        listeners.notifyListeners(listeners.UPDATE_ALLOWLIST_FILTER_RULES);
+        listeners.notifyListeners(listeners.UpdateAllowlistFilterRules);
     }
 
     /**

@@ -1,8 +1,13 @@
-import browser from 'webextension-polyfill';
+import browser, { Runtime } from 'webextension-polyfill';
 import { listeners } from '../notifier';
 import { messageHandler } from '../message-handler';
-import { MessageType } from '../../common/messages';
+import { CreateEventListenerMessage, MessageType } from '../../common/messages';
 
+export type CreateEventListenerResponse = {
+    listenerId: number,
+};
+
+// TODO: remove listener
 export class EventService {
     eventListeners = {};
 
@@ -10,18 +15,21 @@ export class EventService {
         this.createEventListener = this.createEventListener.bind(this);
     }
 
-    init() {
-        messageHandler.addListener(MessageType.CREATE_EVENT_LISTENER, this.createEventListener);
+    public init(): void {
+        messageHandler.addListener(MessageType.CreateEventListener, this.createEventListener);
     }
 
-    async createEventListener(message, sender) {
+    private async createEventListener(
+        message: CreateEventListenerMessage,
+        sender: Runtime.MessageSender,
+    ): Promise<CreateEventListenerResponse> {
         const { events } = message.data;
 
         const listenerId = listeners.addSpecifiedListener(events, (...args) => {
             const sender = this.eventListeners[listenerId];
             if (sender) {
                 browser.tabs.sendMessage(sender.tab.id, {
-                    type: MessageType.NOTIFY_LISTENERS,
+                    type: MessageType.NotifyListeners,
                     data: args,
                 });
             }

@@ -11,7 +11,7 @@ export type GroupState = {
 export type GroupStateStorageData = Record<number, GroupState>;
 
 export class GroupStateStorage extends StringStorage<
-    SettingOption.GROUPS_STATE,
+    SettingOption.GroupsState,
     GroupStateStorageData,
     'sync'
 > {
@@ -85,4 +85,4 @@ export class GroupStateStorage extends StringStorage<
     }
 }
 
-export const groupStateStorage = new GroupStateStorage(SettingOption.GROUPS_STATE, settingsStorage);
+export const groupStateStorage = new GroupStateStorage(SettingOption.GroupsState, settingsStorage);

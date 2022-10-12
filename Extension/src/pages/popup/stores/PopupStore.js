@@ -306,7 +306,7 @@ class PopupStore {
     @action
     closePromoNotification = async () => {
         this.promoNotification = null;
-        await messenger.sendMessage(MessageType.SET_NOTIFICATION_VIEWED, { withDelay: false });
+        await messenger.sendMessage(MessageType.SetNotificationViewed, { withDelay: false });
     };
 
     @action
@@ -316,8 +316,8 @@ class PopupStore {
         runInAction(() => {
             this.promoNotification = null;
         });
-        await messenger.sendMessage(MessageType.SET_NOTIFICATION_VIEWED, { withDelay: false });
-        await messenger.sendMessage(MessageType.OPEN_TAB, { url });
+        await messenger.sendMessage(MessageType.SetNotificationViewed, { withDelay: false });
+        await messenger.sendMessage(MessageType.OpenTab, { url });
     };
 
     @action
@@ -340,7 +340,7 @@ class PopupStore {
             return null;
         }
 
-        return this.settings.values[this.settings.names.APPEARANCE_THEME];
+        return this.settings.values[this.settings.names.AppearanceTheme];
     }
 }
 

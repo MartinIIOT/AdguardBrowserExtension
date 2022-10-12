@@ -2,16 +2,16 @@ import zod from 'zod';
 
 // User filter configuration
 
-export const enum UserFilterOptions {
-    RULES = 'rules',
-    DISABLED_RULES = 'disabled-rules',
-    ENABLED = 'enabled',
+export const enum UserFilterOption {
+    Rules = 'rules',
+    DisabledRules = 'disabled-rules',
+    Enabled = 'enabled',
 }
 
 export const userFilterValidator = zod.object({
-    [UserFilterOptions.RULES]: zod.string(),
-    [UserFilterOptions.DISABLED_RULES]: zod.string(),
-    [UserFilterOptions.ENABLED]: zod.boolean().optional(),
+    [UserFilterOption.Rules]: zod.string(),
+    [UserFilterOption.DisabledRules]: zod.string(),
+    [UserFilterOption.Enabled]: zod.boolean().optional(),
 });
 
 export type UserFilterConfig = zod.infer<typeof userFilterValidator>;

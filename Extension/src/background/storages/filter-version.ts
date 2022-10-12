@@ -13,7 +13,7 @@ export type FilterVersionData = {
 export type FilterVersionStorageData = Record<number, FilterVersionData>;
 
 export class FilterVersionStorage extends StringStorage<
-    SettingOption.FILTERS_VERSION,
+    SettingOption.FiltersVersion,
     FilterVersionStorageData,
     'sync'
 > {
@@ -75,4 +75,4 @@ export class FilterVersionStorage extends StringStorage<
     }
 }
 
-export const filterVersionStorage = new FilterVersionStorage(SettingOption.FILTERS_VERSION, settingsStorage);
+export const filterVersionStorage = new FilterVersionStorage(SettingOption.FiltersVersion, settingsStorage);

@@ -252,14 +252,14 @@ export const contentUtils = (function () {
                     element.addEventListener('click', () => {
                         if (element.classList.contains('disable-notifications')) {
                             // disable update notifications
-                            messenger.sendMessage(MessageType.CHANGE_USER_SETTING, {
-                                key: SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION,
+                            messenger.sendMessage(MessageType.ChangeUserSettings, {
+                                key: SettingOption.DisableShowAppUpdatedNotification,
                                 value: true,
                             });
                         }
                         if (showPromoNotification
                             && element.classList.contains('set-notification-viewed')) {
-                            messenger.sendMessage(MessageType.SET_NOTIFICATION_VIEWED, {
+                            messenger.sendMessage(MessageType.SetNotificationViewed, {
                                 withDelay: false,
                             });
                         }

@@ -13,7 +13,7 @@ export type FilterState = {
 export type FilterStateStorageData = Record<number, FilterState>;
 
 export class FilterStateStorage extends StringStorage<
-    SettingOption.FILTERS_STATE,
+    SettingOption.FiltersState,
     FilterStateStorageData,
     'sync'
 > {
@@ -21,8 +21,8 @@ export class FilterStateStorage extends StringStorage<
      * This filters have own complex state management
      */
     private static unsupportedFiltersIds = [
-        AntiBannerFiltersId.ALLOWLIST_FILTER_ID,
-        AntiBannerFiltersId.USER_FILTER_ID,
+        AntiBannerFiltersId.AllowlistFilterId,
+        AntiBannerFiltersId.UserFilterId,
     ];
 
     private static defaultState = {
@@ -110,4 +110,4 @@ export class FilterStateStorage extends StringStorage<
     }
 }
 
-export const filterStateStorage = new FilterStateStorage(SettingOption.FILTERS_STATE, settingsStorage);
+export const filterStateStorage = new FilterStateStorage(SettingOption.FiltersState, settingsStorage);

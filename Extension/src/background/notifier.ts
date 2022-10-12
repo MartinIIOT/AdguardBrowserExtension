@@ -16,7 +16,7 @@
  */
 
 import { log } from '../common/log';
-import { NOTIFIER_TYPES } from '../common/constants';
+import { NotifierType } from '../common/constants';
 
 type Listener = (...args: unknown[]) => unknown;
 
@@ -32,10 +32,10 @@ class Notifier {
     /**
      * Make accessible only constants without functions. They will be passed to content-page
      */
-    events = NOTIFIER_TYPES;
+    events = NotifierType;
 
     constructor() {
-        Object.entries(NOTIFIER_TYPES).forEach(([key, value]) => {
+        Object.entries(NotifierType).forEach(([key, value]) => {
             this[key] = value;
             this.eventNotifierEventsMap[value] = key;
         });
@@ -119,4 +119,4 @@ class Notifier {
     }
 }
 
-export const listeners = new Notifier() as Notifier & typeof NOTIFIER_TYPES;
+export const listeners = new Notifier() as Notifier & typeof NotifierType;

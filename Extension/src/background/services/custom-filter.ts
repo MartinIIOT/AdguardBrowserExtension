@@ -20,12 +20,12 @@ export class CustomFilterService {
      * Init handlers
      */
     static async init() {
-        messageHandler.addListener(MessageType.LOAD_CUSTOM_FILTER_INFO, CustomFilterService.onCustomFilterInfoLoad);
+        messageHandler.addListener(MessageType.LoadCustomFilterInfo, CustomFilterService.onCustomFilterInfoLoad);
         messageHandler.addListener(
-            MessageType.SUBSCRIBE_TO_CUSTOM_FILTER,
+            MessageType.SubscribeToCustomFilter,
             CustomFilterService.onCustomFilterSubscription,
         );
-        messageHandler.addListener(MessageType.REMOVE_ANTIBANNER_FILTER, CustomFilterService.onCustomFilterRemove);
+        messageHandler.addListener(MessageType.RemoveAntibannerFilter, CustomFilterService.onCustomFilterRemove);
 
         browser.webNavigation.onCommitted.addListener(CustomFilterService.injectSubscriptionScript);
     }

@@ -49,8 +49,8 @@ import { CLIENT_ID_KEY } from '../common/constants';
  */
 export class App {
     static uninstallUrl = Forward.get({
-        action: ForwardAction.UNINSTALL_EXTENSION,
-        from: ForwardFrom.BACKGROUND,
+        action: ForwardAction.UninstallExtension,
+        from: ForwardFrom.Background,
     });
 
     /**
@@ -174,7 +174,7 @@ export class App {
         // First install additional scenario
         if (isInstall) {
             // Adds engine status listener for filters-download page
-            messageHandler.addListener(MessageType.CHECK_REQUEST_FILTER_READY, App.onCheckRequestFilterReady);
+            messageHandler.addListener(MessageType.CheckRequestFilterReady, App.onCheckRequestFilterReady);
 
             // Opens filters-download page
             await PagesApi.openFiltersDownloadPage();
@@ -185,7 +185,7 @@ export class App {
 
         // Update additional scenario
         if (isUpdate) {
-            if (!settingsStorage.get(SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION)) {
+            if (!settingsStorage.get(SettingOption.DisableShowAppUpdatedNotification)) {
                 toasts.showApplicationUpdatedPopup(currentAppVersion, previousAppVersion);
             }
         }
@@ -195,7 +195,7 @@ export class App {
 
         appStorage.set('isInit', true);
 
-        await sendMessage<MessageType.APP_INITIALIZED>({ type: MessageType.APP_INITIALIZED });
+        await sendMessage<MessageType.AppInitialized>({ type: MessageType.AppInitialized });
     }
 
     /**
@@ -209,10 +209,10 @@ export class App {
         /**
          * If engine is ready, user will be redirected to thankyou page.
          *
-         * CHECK_REQUEST_FILTER_READY listener is not needed anymore
+         * CheckRequestFilterReady listener is not needed anymore
          */
         if (ready) {
-            messageHandler.removeListener(MessageType.CHECK_REQUEST_FILTER_READY);
+            messageHandler.removeListener(MessageType.CheckRequestFilterReady);
         }
 
         return ready;

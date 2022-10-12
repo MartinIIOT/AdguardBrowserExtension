@@ -1,5 +1,5 @@
 import { listeners } from '../notifier';
-import { NOTIFIER_TYPES } from '../../common/constants';
+import { NotifierType } from '../../common/constants';
 
 /**
  * Module used to keep track of userrules editor opened in the fullscreen mode
@@ -21,7 +21,7 @@ class FullscreenUserRulesEditor {
     }
 
     onPagesCountChanged() {
-        listeners.notifyListeners(NOTIFIER_TYPES.FULLSCREEN_USER_RULES_EDITOR_UPDATED, this.isOpen());
+        listeners.notifyListeners(NotifierType.FullscreenUserRulesEditorUpdated, this.isOpen());
     }
 
     isOpen() {

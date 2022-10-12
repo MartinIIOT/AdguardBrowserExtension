@@ -1,66 +1,66 @@
 import { ForwardAction, ForwardFrom, Forward } from '../../common/forward';
 
 export const PRIVACY_URL = Forward.get({
-    action: ForwardAction.PRIVACY,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.Privacy,
+    from: ForwardFrom.Options,
 });
 
 export const ACKNOWLEDGMENTS_URL = Forward.get({
-    action: ForwardAction.ACKNOWLEDGMENTS,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.Acknowledgments,
+    from: ForwardFrom.Options,
 });
 
 export const GITHUB_URL = Forward.get({
-    action: ForwardAction.GITHUB,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.Github,
+    from: ForwardFrom.Options,
 });
 
 export const WEBSITE_URL = Forward.get({
-    action: ForwardAction.WEBSITE,
-    from: ForwardFrom.OPTIONS_FOOTER,
+    action: ForwardAction.Website,
+    from: ForwardFrom.OptionsFooter,
 });
 
 export const DISCUSS_URL = Forward.get({
-    action: ForwardAction.DISCUSS,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.Discuss,
+    from: ForwardFrom.Options,
 });
 
 export const COMPARE_URL = Forward.get({
-    action: ForwardAction.COMPARE,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.Compare,
+    from: ForwardFrom.Options,
 });
 
 export const CHANGELOG_URL = Forward.get({
-    action: ForwardAction.CHANGELOG,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.Changelog,
+    from: ForwardFrom.Options,
 });
 
 export const GLOBAL_PRIVACY_CONTROL_URL = Forward.get({
-    action: ForwardAction.GLOBAL_PRIVACY_CONTROL,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.GlobalPrivacyControl,
+    from: ForwardFrom.Options,
 });
 
 export const DO_NOT_TRACK_URL = Forward.get({
-    action: ForwardAction.DO_NOT_TRACK,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.DoNotTrack,
+    from: ForwardFrom.Options,
 });
 
 export const HOW_TO_CREATE_RULES_URL = Forward.get({
-    action: ForwardAction.HOW_TO_CREATE_RULES,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.HowToCreateRules,
+    from: ForwardFrom.Options,
 });
 
 export const ACCEPTABLE_ADS_LEARN_MORE_URL = Forward.get({
-    action: ForwardAction.SELF_PROMOTION,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.SelfPromotion,
+    from: ForwardFrom.Options,
 });
 
 export const SAFEBROWSING_LEARN_MORE_URL = Forward.get({
-    action: ForwardAction.PROTECTION_WORKS,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.ProtectionWorks,
+    from: ForwardFrom.Options,
 });
 
 export const COLLECT_HITS_LEARN_MORE_URL = Forward.get({
-    action: ForwardAction.COLLECT_HITS_LEARN_MORE,
-    from: ForwardFrom.OPTIONS,
+    action: ForwardAction.CollectHitsLearnMore,
+    from: ForwardFrom.Options,
 });

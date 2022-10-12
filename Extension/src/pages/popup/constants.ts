@@ -2,17 +2,17 @@ import { Forward, ForwardAction, ForwardFrom } from '../../common/forward';
 
 export const IOS_URL = Forward.get({
     action: ForwardAction.IOS,
-    from: ForwardFrom.POPUP,
+    from: ForwardFrom.Popup,
 });
 
 export const ANDROID_URL = Forward.get({
-    action: ForwardAction.ANDROID,
-    from: ForwardFrom.POPUP,
+    action: ForwardAction.Android,
+    from: ForwardFrom.Popup,
 });
 
 export const COMPARE_URL = Forward.get({
-    action: ForwardAction.COMPARE,
-    from: ForwardFrom.POPUP,
+    action: ForwardAction.Compare,
+    from: ForwardFrom.Popup,
 });
 
 export const VIEW_STATES = {

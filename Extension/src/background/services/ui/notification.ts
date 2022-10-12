@@ -9,7 +9,7 @@ export class NotificationService {
     public static init(): void {
         notificationApi.init();
 
-        messageHandler.addListener(MessageType.SET_NOTIFICATION_VIEWED, NotificationService.setNotificationViewed);
+        messageHandler.addListener(MessageType.SetNotificationViewed, NotificationService.setNotificationViewed);
     }
 
     private static async setNotificationViewed({ data }): Promise<void> {

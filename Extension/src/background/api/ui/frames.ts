@@ -61,7 +61,7 @@ export class FramesApi {
         const totalBlocked = PageStatsApi.getTotalBlocked();
 
         const totalBlockedTab = blockedRequestCount || 0;
-        const applicationFilteringDisabled = SettingsApi.getSetting(SettingOption.DISABLE_FILTERING);
+        const applicationFilteringDisabled = SettingsApi.getSetting(SettingOption.DisableFiltering);
 
         if (applicationAvailable) {
             documentAllowlisted = !!mainFrameRule && mainFrameRule.isAllowlist();
@@ -70,8 +70,8 @@ export class FramesApi {
 
                 const filterId = rule.getFilterListId();
 
-                userAllowlisted = filterId === AntiBannerFiltersId.USER_FILTER_ID
-                       || filterId === AntiBannerFiltersId.ALLOWLIST_FILTER_ID;
+                userAllowlisted = filterId === AntiBannerFiltersId.UserFilterId
+                       || filterId === AntiBannerFiltersId.AllowlistFilterId;
 
                 frameRule = {
                     filterId,

@@ -3,18 +3,18 @@ import zod from 'zod';
 // Custom filters configuration
 
 export const enum CustomFilterOption {
-    CUSTOM_URL = 'customUrl',
-    TITLE = 'title',
-    TRUSTED = 'trusted',
-    ENABLED = 'enabled',
+    CustomUrl = 'customUrl',
+    Title = 'title',
+    Trusted = 'trusted',
+    Enabled = 'enabled',
 }
 
 export const customFiltersConfigValidator = zod.array(
     zod.object({
-        [CustomFilterOption.CUSTOM_URL]: zod.string(),
-        [CustomFilterOption.TITLE]: zod.string().optional(),
-        [CustomFilterOption.TRUSTED]: zod.boolean().optional(),
-        [CustomFilterOption.ENABLED]: zod.boolean().optional(),
+        [CustomFilterOption.CustomUrl]: zod.string(),
+        [CustomFilterOption.Title]: zod.string().optional(),
+        [CustomFilterOption.Trusted]: zod.boolean().optional(),
+        [CustomFilterOption.Enabled]: zod.boolean().optional(),
     }),
 );
 

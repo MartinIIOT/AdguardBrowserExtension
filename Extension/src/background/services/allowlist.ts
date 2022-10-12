@@ -21,28 +21,28 @@ export class AllowlistService {
      * Initialize handlers
      */
     public static async init() {
-        messageHandler.addListener(MessageType.GET_ALLOWLIST_DOMAINS, AllowlistService.onGetAllowlistDomains);
-        messageHandler.addListener(MessageType.SAVE_ALLOWLIST_DOMAINS, AllowlistService.handleDomainsSave);
-        messageHandler.addListener(MessageType.ADD_ALLOWLIST_DOMAIN_POPUP, AllowlistService.onAddAllowlistDomain);
-        messageHandler.addListener(MessageType.REMOVE_ALLOWLIST_DOMAIN, AllowlistService.onRemoveAllowlistDomain);
+        messageHandler.addListener(MessageType.GetAllowlistDomains, AllowlistService.onGetAllowlistDomains);
+        messageHandler.addListener(MessageType.SaveAllowlistDomains, AllowlistService.handleDomainsSave);
+        messageHandler.addListener(MessageType.AddAllowlistDomainPopup, AllowlistService.onAddAllowlistDomain);
+        messageHandler.addListener(MessageType.RemoveAllowlistDomain, AllowlistService.onRemoveAllowlistDomain);
 
         settingsEvents.addListener(
-            SettingOption.ALLOWLIST_ENABLED,
+            SettingOption.AllowlistEnabled,
             AllowlistService.onEnableStateChange,
         );
 
         settingsEvents.addListener(
-            SettingOption.DEFAULT_ALLOWLIST_MODE,
+            SettingOption.DefaultAllowlistMode,
             AllowlistService.onAllowlistModeChange,
         );
 
         contextMenuEvents.addListener(
-            ContextMenuAction.SITE_FILTERING_ON,
+            ContextMenuAction.SiteFilteringOn,
             AllowlistService.enableSiteFilteringFromContextMenu,
         );
 
         contextMenuEvents.addListener(
-            ContextMenuAction.SITE_FILTERING_OFF,
+            ContextMenuAction.SiteFilteringOff,
             AllowlistService.disableSiteFilteringFromContextMenu,
         );
     }

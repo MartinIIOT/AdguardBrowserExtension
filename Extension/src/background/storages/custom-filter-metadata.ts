@@ -22,7 +22,7 @@ export type CustomFilterMetadata = {
  * Storage for custom filters metadata
  */
 export class CustomFilterMetadataStorage extends StringStorage<
-    SettingOption.CUSTOM_FILTERS,
+    SettingOption.CustomFilters,
     CustomFilterMetadata[],
     'sync'
 > {
@@ -61,6 +61,6 @@ export class CustomFilterMetadataStorage extends StringStorage<
 }
 
 export const customFilterMetadataStorage = new CustomFilterMetadataStorage(
-    SettingOption.CUSTOM_FILTERS,
+    SettingOption.CustomFilters,
     settingsStorage,
 );

@@ -4,7 +4,7 @@ import { BrowserUtils } from '../../utils/browser-utils';
 import { log } from '../../../common/log';
 import { UserAgent } from '../../../common/user-agent';
 import { SettingOption } from '../../schema';
-import { AntiBannerFiltersId, ANTIBANNER_GROUPS_ID } from '../../../common/constants';
+import { AntiBannerFiltersId, AntibannerGroupsId } from '../../../common/constants';
 import {
     CommonFilterMetadata,
     metadataStorage,
@@ -56,8 +56,8 @@ export class CommonFilterApi {
      */
     public static isCommonFilter(filterId: number): boolean {
         return !CustomFilterApi.isCustomFilter(filterId)
-        && filterId !== AntiBannerFiltersId.USER_FILTER_ID
-        && filterId !== AntiBannerFiltersId.ALLOWLIST_FILTER_ID;
+        && filterId !== AntiBannerFiltersId.UserFilterId
+        && filterId !== AntiBannerFiltersId.AllowlistFilterId;
     }
 
     /**
@@ -99,7 +99,7 @@ export class CommonFilterApi {
      * @param remote - is filter rules loaded from backend
      */
     public static async loadFilterRulesFromBackend(filterId: number, remote: boolean): Promise<void> {
-        const isOptimized = settingsStorage.get(SettingOption.USE_OPTIMIZED_FILTERS);
+        const isOptimized = settingsStorage.get(SettingOption.UseOptimizedFilters);
 
         const rules = await network.downloadFilterRules(filterId, remote, isOptimized) as string[];
 
@@ -133,18 +133,18 @@ export class CommonFilterApi {
     public static async initDefaultFilters(): Promise<void> {
         groupStateStorage.enableGroups([
             1,
-            ANTIBANNER_GROUPS_ID.LANGUAGE_FILTERS_GROUP_ID,
-            ANTIBANNER_GROUPS_ID.OTHER_FILTERS_GROUP_ID,
-            ANTIBANNER_GROUPS_ID.CUSTOM_FILTERS_GROUP_ID,
+            AntibannerGroupsId.LanguageFiltersGroupId,
+            AntibannerGroupsId.OtherFiltersGroupId,
+            AntibannerGroupsId.CustomFilterGroupId,
         ]);
 
         const filterIds = [
-            AntiBannerFiltersId.ENGLISH_FILTER_ID,
-            AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
+            AntiBannerFiltersId.EnglishFilterId,
+            AntiBannerFiltersId.SearchAndSelfPromoFilterId,
         ];
 
         if (UserAgent.isAndroid) {
-            filterIds.push(AntiBannerFiltersId.MOBILE_ADS_FILTER_ID);
+            filterIds.push(AntiBannerFiltersId.MobileAdsFilterId);
         }
 
         filterIds.push(...CommonFilterApi.getLangSuitableFilters());

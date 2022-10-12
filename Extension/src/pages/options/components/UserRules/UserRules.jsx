@@ -16,7 +16,7 @@ const UserRules = observer(() => {
     const { settingsStore, uiStore } = useContext(rootStore);
 
     const handleGoToEditorClick = async () => {
-        await messenger.sendMessage(MessageType.OPEN_FULLSCREEN_USER_RULES);
+        await messenger.sendMessage(MessageType.OpenFullscreenUserRules);
     };
 
     return (

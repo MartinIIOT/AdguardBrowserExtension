@@ -110,12 +110,12 @@ export class UpdateApi {
         }
 
         // delete metadata from settings (new one will be loaded while filter initialization)
-        if (currentSettings?.[SettingOption.I18N_METADATA]) {
-            delete currentSettings[SettingOption.I18N_METADATA];
+        if (currentSettings?.[SettingOption.I18nMetadata]) {
+            delete currentSettings[SettingOption.I18nMetadata];
         }
 
-        if (currentSettings?.[SettingOption.METADATA]) {
-            delete currentSettings[SettingOption.METADATA];
+        if (currentSettings?.[SettingOption.Metadata]) {
+            delete currentSettings[SettingOption.Metadata];
         }
 
         // mode notification data from settings to root storage

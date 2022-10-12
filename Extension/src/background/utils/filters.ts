@@ -8,11 +8,11 @@ export const filters = (() => {
         ids: AntiBannerFiltersId,
 
         isUserFilterRule(rule) {
-            return rule.getFilterListId() === AntiBannerFiltersId.USER_FILTER_ID;
+            return rule.getFilterListId() === AntiBannerFiltersId.UserFilterId;
         },
 
         isAllowlistFilterRule(rule) {
-            return rule.getFilterListId() === AntiBannerFiltersId.ALLOWLIST_FILTER_ID;
+            return rule.getFilterListId() === AntiBannerFiltersId.AllowlistFilterId;
         },
     };
 

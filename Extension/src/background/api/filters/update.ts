@@ -37,7 +37,7 @@ export class FilterUpdateApi {
      * by matching update period via filters version check and expires timestamps
      */
     public static async autoUpdateFilters(): Promise<void> {
-        const updatePeriod = settingsStorage.get(SettingOption.FILTERS_UPDATE_PERIOD);
+        const updatePeriod = settingsStorage.get(SettingOption.FiltersUpdatePeriod);
 
         // auto update disabled
         if (updatePeriod === 0) {

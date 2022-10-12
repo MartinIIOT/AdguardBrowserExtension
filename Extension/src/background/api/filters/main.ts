@@ -1,6 +1,6 @@
 import { log } from '../../../common/log';
 import {
-    ANTIBANNER_GROUPS_ID,
+    AntibannerGroupsId,
     CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER,
 } from '../../../common/constants';
 import { translator } from '../../../common/translators/translator';
@@ -278,7 +278,7 @@ export class FiltersApi {
         );
 
         localizedMetadata.groups.push({
-            groupId: ANTIBANNER_GROUPS_ID.CUSTOM_FILTERS_GROUP_ID,
+            groupId: AntibannerGroupsId.CustomFilterGroupId,
             displayNumber: CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER,
             groupName: translator.getMessage('options_antibanner_custom_group'),
         });

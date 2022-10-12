@@ -26,8 +26,8 @@ export class UiApi {
 
     private static async broadcastTotalBlockedMessage({ totalBlocked, totalBlockedTab }: FrameData): Promise<void> {
         try {
-            sendMessage<MessageType.UPDATE_TOTAL_BLOCKED>({
-                type: MessageType.UPDATE_TOTAL_BLOCKED,
+            sendMessage<MessageType.UpdateTotalBlocked>({
+                type: MessageType.UpdateTotalBlocked,
                 data: {
                     totalBlocked,
                     totalBlockedTab,

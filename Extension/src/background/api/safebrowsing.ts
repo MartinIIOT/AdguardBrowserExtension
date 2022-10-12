@@ -63,7 +63,7 @@ export class SafebrowsingApi {
      * @param referrerUrl Referrer URL
      */
     public static async checkSafebrowsingFilter(requestUrl: string, referrerUrl: string) {
-        const safebrowsingDisabled = settingsStorage.get(SettingOption.DISABLE_SAFEBROWSING);
+        const safebrowsingDisabled = settingsStorage.get(SettingOption.DisableSafebrowsing);
 
         if (safebrowsingDisabled) {
             return;

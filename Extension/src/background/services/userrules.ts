@@ -29,19 +29,19 @@ export class UserRulesService {
     public static async init(): Promise<void> {
         await UserRulesApi.init();
 
-        messageHandler.addListener(MessageType.GET_USER_RULES, UserRulesService.getUserRules);
-        messageHandler.addListener(MessageType.GET_USER_RULES_EDITOR_DATA, UserRulesService.getUserRulesEditorData);
-        messageHandler.addListener(MessageType.SAVE_USER_RULES, UserRulesService.handleUserRulesSave);
-        messageHandler.addListener(MessageType.ADD_USER_RULE, UserRulesService.handleUserRuleAdd);
-        messageHandler.addListener(MessageType.REMOVE_USER_RULE, UserRulesService.handleUserRuleRemove);
-        messageHandler.addListener(MessageType.GET_EDITOR_STORAGE_CONTENT, UserRulesService.getEditorStorageContent);
-        messageHandler.addListener(MessageType.SET_EDITOR_STORAGE_CONTENT, UserRulesService.setEditorStorageContent);
-        messageHandler.addListener(MessageType.RESET_CUSTOM_RULES_FOR_PAGE, UserRulesService.resetCustomRulesForPage);
+        messageHandler.addListener(MessageType.GetUserRules, UserRulesService.getUserRules);
+        messageHandler.addListener(MessageType.GetUserRulesEditorData, UserRulesService.getUserRulesEditorData);
+        messageHandler.addListener(MessageType.SaveUserRules, UserRulesService.handleUserRulesSave);
+        messageHandler.addListener(MessageType.AddUserRule, UserRulesService.handleUserRuleAdd);
+        messageHandler.addListener(MessageType.RemoveUserRule, UserRulesService.handleUserRuleRemove);
+        messageHandler.addListener(MessageType.GetEditorStorageContent, UserRulesService.getEditorStorageContent);
+        messageHandler.addListener(MessageType.SetEditorStorageContent, UserRulesService.setEditorStorageContent);
+        messageHandler.addListener(MessageType.ResetCustomRulesForPage, UserRulesService.resetCustomRulesForPage);
 
         Engine.api.onAssistantCreateRule.subscribe(UserRulesService.addUserRule);
 
         settingsEvents.addListener(
-            SettingOption.USER_FILTER_ENABLED,
+            SettingOption.UserFilterEnabled,
             UserRulesService.handleEnableStateChange,
         );
     }

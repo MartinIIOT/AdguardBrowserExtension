@@ -50,19 +50,19 @@ export type GetFilteringLogDataResponse = {
 
 export class FilteringLogService {
     public static init(): void {
-        messageHandler.addListener(MessageType.GET_FILTERING_LOG_DATA, FilteringLogService.onGetFilteringLogData);
-        messageHandler.addListener(MessageType.SYNCHRONIZE_OPEN_TABS, FilteringLogService.onSyncOpenTabs);
+        messageHandler.addListener(MessageType.GetFilteringLogData, FilteringLogService.onGetFilteringLogData);
+        messageHandler.addListener(MessageType.SynchronizeOpenTabs, FilteringLogService.onSyncOpenTabs);
         messageHandler.addListener(
-            MessageType.GET_FILTERING_INFO_BY_TAB_ID,
+            MessageType.GetFilteringInfoByTabId,
             FilteringLogService.onGetFilteringLogInfoById,
         );
-        messageHandler.addListener(MessageType.ON_OPEN_FILTERING_LOG_PAGE, filteringLogApi.onOpenFilteringLogPage);
-        messageHandler.addListener(MessageType.ON_CLOSE_FILTERING_LOG_PAGE, filteringLogApi.onCloseFilteringLogPage);
-        messageHandler.addListener(MessageType.CLEAR_EVENTS_BY_TAB_ID, FilteringLogService.onClearEventsByTabId);
-        messageHandler.addListener(MessageType.REFRESH_PAGE, FilteringLogService.onRefreshPage);
-        messageHandler.addListener(MessageType.SET_PRESERVE_LOG_STATE, FilteringLogService.onSetPreserveLogState);
+        messageHandler.addListener(MessageType.OnOpenFilteringLogPage, filteringLogApi.onOpenFilteringLogPage);
+        messageHandler.addListener(MessageType.OnCloseFilteringLogPage, filteringLogApi.onCloseFilteringLogPage);
+        messageHandler.addListener(MessageType.ClearEventsByTabId, FilteringLogService.onClearEventsByTabId);
+        messageHandler.addListener(MessageType.RefreshPage, FilteringLogService.onRefreshPage);
+        messageHandler.addListener(MessageType.SetPreserveLogState, FilteringLogService.onSetPreserveLogState);
         messageHandler.addListener(
-            MessageType.SET_FILTERING_LOG_WINDOW_STATE,
+            MessageType.SetFilteringLogWindowState,
             FilteringLogService.onSetFilteringLogWindowState,
         );
 

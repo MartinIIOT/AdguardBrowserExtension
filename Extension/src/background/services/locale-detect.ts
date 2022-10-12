@@ -132,8 +132,8 @@ export class LocaleDetect {
      * Detects language for the specified tab
      */
     private async detectTabLanguage(tab: Tabs.Tab) {
-        const isDetectDisabled = settingsStorage.get(SettingOption.DISABLE_DETECT_FILTERS);
-        const isFilteringDisabled = settingsStorage.get(SettingOption.DISABLE_FILTERING);
+        const isDetectDisabled = settingsStorage.get(SettingOption.DisableDetectFilters);
+        const isFilteringDisabled = settingsStorage.get(SettingOption.DisableFiltering);
 
         if (isDetectDisabled
             || isFilteringDisabled

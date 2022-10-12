@@ -16,9 +16,9 @@ import { FramesApi } from '../../api/ui/frames';
 
 export class PopupService {
     static init(): void {
-        messageHandler.addListener(MessageType.GET_TAB_INFO_FOR_POPUP, PopupService.getTabInfoForPopup);
+        messageHandler.addListener(MessageType.GetTabInfoForPopup, PopupService.getTabInfoForPopup);
         messageHandler.addListener(
-            MessageType.CHANGE_APPLICATION_FILTERING_DISABLED,
+            MessageType.ChangeApplicationFilteringDisabled,
             PopupService.onChangeFilteringDisable,
         );
     }
@@ -36,11 +36,11 @@ export class PopupService {
                 options: {
                     showStatsSupported: true,
                     isFirefoxBrowser: UserAgent.isFirefox,
-                    showInfoAboutFullVersion: !settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
+                    showInfoAboutFullVersion: !settingsStorage.get(SettingOption.DisableShowAdguardPromoInfo),
                     isMacOs: UserAgent.isMacOs,
                     isEdgeBrowser: UserAgent.isEdge || UserAgent.isEdgeChromium,
                     notification: await notificationApi.getCurrentNotification(),
-                    isDisableShowAdguardPromoInfo: settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO),
+                    isDisableShowAdguardPromoInfo: settingsStorage.get(SettingOption.DisableShowAdguardPromoInfo),
                     hasCustomRulesToReset: await UserRulesApi.hasRulesForUrl(tabContext.info.url),
                 },
             };
@@ -50,6 +50,6 @@ export class PopupService {
     private static async onChangeFilteringDisable({ data }): Promise<void> {
         const { state: disabled } = data;
 
-        await SettingsApi.setSetting(SettingOption.DISABLE_FILTERING, disabled);
+        await SettingsApi.setSetting(SettingOption.DisableFiltering, disabled);
     }
 }

@@ -42,7 +42,7 @@ const Allowlist = observer(() => {
 
     const { settings } = settingsStore;
 
-    const { DEFAULT_ALLOWLIST_MODE } = settings.names;
+    const { DefaultAllowlistMode } = settings.names;
 
     const importClickHandler = (e) => {
         e.preventDefault();
@@ -94,7 +94,7 @@ const Allowlist = observer(() => {
         await settingsStore.updateSetting(id, data);
     };
 
-    const { ALLOWLIST_ENABLED } = settings.names;
+    const { AllowlistEnabled } = settings.names;
 
     let shouldResetSize = false;
     if (settingsStore.allowlistSizeReset) {
@@ -106,9 +106,9 @@ const Allowlist = observer(() => {
         <>
             <SettingsSection
                 title={reactTranslator.getMessage('options_allowlist')}
-                id={ALLOWLIST_ENABLED}
+                id={AllowlistEnabled}
                 mode="smallContainer"
-                description={settings.values[DEFAULT_ALLOWLIST_MODE]
+                description={settings.values[DefaultAllowlistMode]
                     ? reactTranslator.getMessage('options_allowlist_desc')
                     : (
                         <div>
@@ -128,9 +128,9 @@ const Allowlist = observer(() => {
                     )}
                 inlineControl={(
                     <Setting
-                        id={ALLOWLIST_ENABLED}
+                        id={AllowlistEnabled}
                         type={SETTINGS_TYPES.CHECKBOX}
-                        value={settings.values[ALLOWLIST_ENABLED]}
+                        value={settings.values[AllowlistEnabled]}
                         handler={allowlistChangeHandler}
                     />
                 )}

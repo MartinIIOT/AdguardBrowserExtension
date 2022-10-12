@@ -26,10 +26,10 @@ export class ConnectionHandler {
 
         port.onMessage.addListener((message) => {
             const { type, data } = message;
-            if (type === MessageType.ADD_LONG_LIVED_CONNECTION) {
+            if (type === MessageType.AddLongLivedConnection) {
                 const { events } = data;
                 listenerId = listeners.addSpecifiedListener(events, async (...data) => {
-                    const type = MessageType.NOTIFY_LISTENERS;
+                    const type = MessageType.NotifyListeners;
                     try {
                         port.postMessage({ type, data });
                     } catch (e) {

@@ -33,17 +33,17 @@ export const ExportTypes = {
 const exportMetadata = {
     [ExportTypes.USER_FILTER]: {
         name: 'user_rules',
-        messageType: MessageType.GET_USER_RULES,
+        messageType: MessageType.GetUserRules,
         ext: 'txt',
     },
     [ExportTypes.ALLOW_LIST]: {
         name: 'allowlist',
-        messageType: MessageType.GET_ALLOWLIST_DOMAINS,
+        messageType: MessageType.GetAllowlistDomains,
         ext: 'txt',
     },
     [ExportTypes.SETTINGS]: {
         name: 'settings',
-        messageType: MessageType.LOAD_SETTINGS_JSON,
+        messageType: MessageType.LoadSettingsJson,
         ext: 'json',
     },
 };

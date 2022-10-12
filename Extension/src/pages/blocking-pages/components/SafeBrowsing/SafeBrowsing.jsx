@@ -11,8 +11,8 @@ import { messenger } from '../../../services/messenger';
 import '../../styles/index.pcss';
 
 const ADGUARD_SITE_URL = Forward.get({
-    action: ForwardAction.ADGUARD_SITE,
-    from: ForwardFrom.SAFEBROWSING,
+    action: ForwardAction.AdguardSite,
+    from: ForwardFrom.Safebrowsing,
 });
 
 export const SafeBrowsing = () => {
@@ -32,12 +32,12 @@ export const SafeBrowsing = () => {
 
     const handleProceed = useCallback((e) => {
         e.preventDefault();
-        messenger.sendMessage(MessageType.OPEN_SAFEBROWSING_TRUSTED, { url });
+        messenger.sendMessage(MessageType.OpenSafebrowsingTrusted, { url });
     }, [url]);
 
     const reportUrl = Forward.get({
-        action: ForwardAction.SITE_REPORT,
-        from: ForwardFrom.SAFEBROWSING,
+        action: ForwardAction.SiteReport,
+        from: ForwardFrom.Safebrowsing,
         domain: host,
     });
 

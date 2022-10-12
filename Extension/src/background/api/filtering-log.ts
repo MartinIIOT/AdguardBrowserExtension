@@ -156,7 +156,7 @@ export class FilteringLogApi {
 
         this.tabsInfoMap[id] = tabInfo;
 
-        listeners.notifyListeners(listeners.TAB_ADDED, tabInfo);
+        listeners.notifyListeners(listeners.TabAdded, tabInfo);
     }
 
     /**
@@ -184,7 +184,7 @@ export class FilteringLogApi {
 
         // this.tabsInfoMap[id] = tabInfo;
 
-        listeners.notifyListeners(listeners.TAB_UPDATE, tabInfo);
+        listeners.notifyListeners(listeners.TabUpdate, tabInfo);
     }
 
     /**
@@ -201,7 +201,7 @@ export class FilteringLogApi {
         const tabInfo = this.tabsInfoMap[id];
 
         if (tabInfo) {
-            listeners.notifyListeners(listeners.TAB_CLOSE, tabInfo);
+            listeners.notifyListeners(listeners.TabClose, tabInfo);
         }
         delete this.tabsInfoMap[id];
     }
@@ -268,7 +268,7 @@ export class FilteringLogApi {
 
         if (tabInfo && !preserveLog) {
             tabInfo.filteringEvents = [];
-            listeners.notifyListeners(listeners.TAB_RESET, tabInfo);
+            listeners.notifyListeners(listeners.TabReset, tabInfo);
         }
     }
 
@@ -285,7 +285,7 @@ export class FilteringLogApi {
             tabInfo.filteringEvents.splice(1, 1);
         }
 
-        listeners.notifyListeners(listeners.LOG_EVENT_ADDED, tabInfo, data);
+        listeners.notifyListeners(listeners.LogEventAdded, tabInfo, data);
     }
 
     public updateEventData(tabId: number, eventId: string, data: unknown): void {
@@ -301,7 +301,7 @@ export class FilteringLogApi {
         if (event) {
             event = Object.assign(event, data);
 
-            listeners.notifyListeners(listeners.LOG_EVENT_ADDED, tabInfo, event);
+            listeners.notifyListeners(listeners.LogEventAdded, tabInfo, event);
         }
     }
 
@@ -344,7 +344,7 @@ export class FilteringLogApi {
             data.documentLevelRule = true;
         }
 
-        if (rule.getFilterListId() === AntiBannerFiltersId.STEALTH_MODE_FILTER_ID) {
+        if (rule.getFilterListId() === AntiBannerFiltersId.StealthModeFilterId) {
             data.isStealthModeRule = true;
         }
 
@@ -353,7 +353,7 @@ export class FilteringLogApi {
         data.modifierValue = rule.getAdvancedModifierValue();
         data.cookieRule = rule.isOptionEnabled(NetworkRuleOption.Cookie);
 
-        if (filterId === AntiBannerFiltersId.USER_FILTER_ID) {
+        if (filterId === AntiBannerFiltersId.UserFilterId) {
             const originalRule = UserRulesApi.getSourceRule(rule.getText());
             if (originalRule) {
                 data.ruleText = originalRule;
@@ -384,7 +384,7 @@ export class FilteringLogApi {
             data.scriptRule = true;
         }
 
-        if (filterId === AntiBannerFiltersId.USER_FILTER_ID) {
+        if (filterId === AntiBannerFiltersId.UserFilterId) {
             const originalRule = UserRulesApi.getSourceRule(rule.getText());
             if (originalRule) {
                 data.ruleText = originalRule;

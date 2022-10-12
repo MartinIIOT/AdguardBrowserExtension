@@ -8,20 +8,20 @@ import {
 
 import {
     AllowlistConfig,
-    AllowlistOptions,
+    AllowlistOption,
     configValidator,
     ExtensionSpecificSettingsConfig,
-    ExtensionSpecificSettingsOptions,
+    ExtensionSpecificSettingsOption,
     FiltersConfig,
-    FiltersOptions,
+    FiltersOption,
     GeneralSettingsConfig,
-    GeneralSettingsOptions,
-    Options,
-    PROTOCOL_VERSION,
+    GeneralSettingsOption,
+    RootOption,
+    ProtocolVersion,
     StealthConfig,
-    StealthOptions,
+    StealthOption,
     UserFilterConfig,
-    UserFilterOptions,
+    UserFilterOption,
     SettingOption,
     Settings,
     settingsValidator,
@@ -69,7 +69,7 @@ export class SettingsApi {
         await settingsEvents.publishEvent(key, value);
 
         // legacy event mediator for frontend
-        listeners.notifyListeners(listeners.SETTING_UPDATED, {
+        listeners.notifyListeners(listeners.SettingUpdated, {
             propertyName: key,
             propertyValue: value,
         });
@@ -93,24 +93,24 @@ export class SettingsApi {
     public static getTsWebExtConfiguration(): SettingsConfig {
         return {
             documentBlockingPageUrl: browser.runtime.getURL(DOCUMENT_BLOCK_PAGE_PATH),
-            collectStats: !settingsStorage.get(SettingOption.DISABLE_COLLECT_HITS),
-            allowlistInverted: !settingsStorage.get(SettingOption.DEFAULT_ALLOWLIST_MODE),
-            allowlistEnabled: settingsStorage.get(SettingOption.ALLOWLIST_ENABLED),
-            stealthModeEnabled: !settingsStorage.get(SettingOption.DISABLE_STEALTH_MODE),
-            filteringEnabled: !settingsStorage.get(SettingOption.DISABLE_FILTERING),
+            collectStats: !settingsStorage.get(SettingOption.DisableCollectHits),
+            allowlistInverted: !settingsStorage.get(SettingOption.DefaultAllowlistMode),
+            allowlistEnabled: settingsStorage.get(SettingOption.AllowlistEnabled),
+            stealthModeEnabled: !settingsStorage.get(SettingOption.DisableStealthMode),
+            filteringEnabled: !settingsStorage.get(SettingOption.DisableFiltering),
             stealth: {
-                blockChromeClientData: settingsStorage.get(SettingOption.BLOCK_CHROME_CLIENT_DATA),
-                hideReferrer: settingsStorage.get(SettingOption.HIDE_REFERRER),
-                hideSearchQueries: settingsStorage.get(SettingOption.HIDE_SEARCH_QUERIES),
-                sendDoNotTrack: settingsStorage.get(SettingOption.SEND_DO_NOT_TRACK),
-                blockWebRTC: settingsStorage.get(SettingOption.BLOCK_WEBRTC),
-                selfDestructThirdPartyCookies: settingsStorage.get(SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES),
+                blockChromeClientData: settingsStorage.get(SettingOption.BlockChromeClientData),
+                hideReferrer: settingsStorage.get(SettingOption.HideReferrer),
+                hideSearchQueries: settingsStorage.get(SettingOption.HideSearchQueries),
+                sendDoNotTrack: settingsStorage.get(SettingOption.SendDoNotTrack),
+                blockWebRTC: settingsStorage.get(SettingOption.BlockWebRTC),
+                selfDestructThirdPartyCookies: settingsStorage.get(SettingOption.SelfDestructThirdPartyCookies),
                 selfDestructThirdPartyCookiesTime: (
-                    settingsStorage.get(SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME)
+                    settingsStorage.get(SettingOption.SelfDestructThirdPartyCookiesTime)
                 ),
-                selfDestructFirstPartyCookies: settingsStorage.get(SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES),
+                selfDestructFirstPartyCookies: settingsStorage.get(SettingOption.SelfDestructFirstPartyCookies),
                 selfDestructFirstPartyCookiesTime: (
-                    settingsStorage.get(SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME)
+                    settingsStorage.get(SettingOption.SelfDestructFirstPartyCookiesTime)
                 ),
             },
         };
@@ -138,15 +138,15 @@ export class SettingsApi {
             await SettingsApi.reset();
 
             SettingsApi.importExtensionSpecificSettings(
-                validConfig[Options.EXTENSION_SPECIFIC_SETTINGS],
+                validConfig[RootOption.ExtensionSpecificSettings],
             );
 
-            if (validConfig[Options.STEALTH]) {
-                await SettingsApi.importStealth(validConfig[Options.STEALTH]);
+            if (validConfig[RootOption.Stealth]) {
+                await SettingsApi.importStealth(validConfig[RootOption.Stealth]);
             }
 
-            await SettingsApi.importGeneralSettings(validConfig[Options.GENERAL_SETTINGS]);
-            await SettingsApi.importFilters(validConfig[Options.FILTERS]);
+            await SettingsApi.importGeneralSettings(validConfig[RootOption.GeneralSettings]);
+            await SettingsApi.importFilters(validConfig[RootOption.Filters]);
 
             return true;
         } catch (e) {
@@ -157,109 +157,109 @@ export class SettingsApi {
 
     public static async export(): Promise<string> {
         return JSON.stringify({
-            [Options.PROTOCOL_VERSION]: PROTOCOL_VERSION,
-            [Options.GENERAL_SETTINGS]: SettingsApi.exportGeneralSettings(),
-            [Options.EXTENSION_SPECIFIC_SETTINGS]: SettingsApi.exportExtensionSpecificSettings(),
-            [Options.FILTERS]: await SettingsApi.exportFilters(),
-            [Options.STEALTH]: SettingsApi.exportStealth(),
+            [RootOption.ProtocolVersion]: ProtocolVersion,
+            [RootOption.GeneralSettings]: SettingsApi.exportGeneralSettings(),
+            [RootOption.ExtensionSpecificSettings]: SettingsApi.exportExtensionSpecificSettings(),
+            [RootOption.Filters]: await SettingsApi.exportFilters(),
+            [RootOption.Stealth]: SettingsApi.exportStealth(),
         });
     }
 
     private static async importGeneralSettings({
-        [GeneralSettingsOptions.ALLOW_ACCEPTABLE_ADS]: allowAcceptableAds,
-        [GeneralSettingsOptions.SHOW_BLOCKED_ADS_COUNT]: showBlockedAdsCount,
-        [GeneralSettingsOptions.AUTODETECT_FILTERS]: autodetectFilters,
-        [GeneralSettingsOptions.SAFEBROWSING_ENABLED]: safebrowsingEnabled,
-        [GeneralSettingsOptions.FILTERS_UPDATE_PERIOD]: filtersUpdatePeriod,
-        [GeneralSettingsOptions.APPEARANCE_THEME]: appearanceTheme,
+        [GeneralSettingsOption.AllowAcceptableAds]: allowAcceptableAds,
+        [GeneralSettingsOption.ShowBlockedAdsCount]: showBlockedAdsCount,
+        [GeneralSettingsOption.AutodetectFilters]: autodetectFilters,
+        [GeneralSettingsOption.SafebrowsingEnabled]: safebrowsingEnabled,
+        [GeneralSettingsOption.FiltersUpdatePeriod]: filtersUpdatePeriod,
+        [GeneralSettingsOption.AppearanceTheme]: appearanceTheme,
     }: GeneralSettingsConfig): Promise<void> {
-        // TODO: ALLOW_ACCEPTABLE_ADS
+        // TODO: AllowAcceptableAds
 
-        settingsStorage.set(SettingOption.DISABLE_SHOW_PAGE_STATS, !showBlockedAdsCount);
-        settingsStorage.set(SettingOption.DISABLE_DETECT_FILTERS, !autodetectFilters);
-        settingsStorage.set(SettingOption.DISABLE_SAFEBROWSING, !safebrowsingEnabled);
-        settingsStorage.set(SettingOption.FILTERS_UPDATE_PERIOD, filtersUpdatePeriod);
+        settingsStorage.set(SettingOption.DisableShowPageStats, !showBlockedAdsCount);
+        settingsStorage.set(SettingOption.DisableDetectFilters, !autodetectFilters);
+        settingsStorage.set(SettingOption.DisableSafebrowsing, !safebrowsingEnabled);
+        settingsStorage.set(SettingOption.FiltersUpdatePeriod, filtersUpdatePeriod);
 
         if (appearanceTheme) {
-            settingsStorage.set(SettingOption.APPEARANCE_THEME, appearanceTheme as AppearanceTheme);
+            settingsStorage.set(SettingOption.AppearanceTheme, appearanceTheme as AppearanceTheme);
         }
 
         if (allowAcceptableAds) {
             await CommonFilterApi.loadFilterRulesFromBackend(
-                AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
+                AntiBannerFiltersId.SearchAndSelfPromoFilterId,
                 false,
             );
-            filterStateStorage.enableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
+            filterStateStorage.enableFilters([AntiBannerFiltersId.SearchAndSelfPromoFilterId]);
         } else {
-            filterStateStorage.disableFilters([AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID]);
+            filterStateStorage.disableFilters([AntiBannerFiltersId.SearchAndSelfPromoFilterId]);
         }
     }
 
     private static exportGeneralSettings(): GeneralSettingsConfig {
         return {
-            [GeneralSettingsOptions.ALLOW_ACCEPTABLE_ADS]: (
-                !!filterStateStorage.get(AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID)?.enabled
+            [GeneralSettingsOption.AllowAcceptableAds]: (
+                !!filterStateStorage.get(AntiBannerFiltersId.SearchAndSelfPromoFilterId)?.enabled
             ),
-            [GeneralSettingsOptions.SHOW_BLOCKED_ADS_COUNT]: (
-                !settingsStorage.get(SettingOption.DISABLE_SHOW_PAGE_STATS)
+            [GeneralSettingsOption.ShowBlockedAdsCount]: (
+                !settingsStorage.get(SettingOption.DisableShowPageStats)
             ),
-            [GeneralSettingsOptions.AUTODETECT_FILTERS]: !settingsStorage.get(SettingOption.DISABLE_DETECT_FILTERS),
-            [GeneralSettingsOptions.SAFEBROWSING_ENABLED]: !settingsStorage.get(SettingOption.DISABLE_SAFEBROWSING),
-            [GeneralSettingsOptions.FILTERS_UPDATE_PERIOD]: settingsStorage.get(SettingOption.FILTERS_UPDATE_PERIOD),
-            [GeneralSettingsOptions.APPEARANCE_THEME]: settingsStorage.get(SettingOption.APPEARANCE_THEME),
+            [GeneralSettingsOption.AutodetectFilters]: !settingsStorage.get(SettingOption.DisableDetectFilters),
+            [GeneralSettingsOption.SafebrowsingEnabled]: !settingsStorage.get(SettingOption.DisableSafebrowsing),
+            [GeneralSettingsOption.FiltersUpdatePeriod]: settingsStorage.get(SettingOption.FiltersUpdatePeriod),
+            [GeneralSettingsOption.AppearanceTheme]: settingsStorage.get(SettingOption.AppearanceTheme),
         };
     }
 
     private static importExtensionSpecificSettings({
-        [ExtensionSpecificSettingsOptions.USE_OPTIMIZED_FILTERS]: useOptimizedFilters,
-        [ExtensionSpecificSettingsOptions.COLLECT_HITS_COUNT]: collectHitsCount,
-        [ExtensionSpecificSettingsOptions.SHOW_CONTEXT_MENU]: showContextMenu,
-        [ExtensionSpecificSettingsOptions.SHOW_INFO_ABOUT_ADGUARD]: showInfoAboutAdguard,
-        [ExtensionSpecificSettingsOptions.SHOW_APP_UPDATED_INFO]: showAppUpdatedInfo,
-        [ExtensionSpecificSettingsOptions.HIDE_RATE_ADGUARD]: hideRateAdguard,
-        [ExtensionSpecificSettingsOptions.USER_RULES_EDITOR_WRAP]: userRulesEditorWrap,
+        [ExtensionSpecificSettingsOption.UseOptimizedFilters]: useOptimizedFilters,
+        [ExtensionSpecificSettingsOption.CollectHitsCount]: collectHitsCount,
+        [ExtensionSpecificSettingsOption.ShowContextMenu]: showContextMenu,
+        [ExtensionSpecificSettingsOption.ShowInfoAboutAdguard]: showInfoAboutAdguard,
+        [ExtensionSpecificSettingsOption.ShowAppUpdatedInfo]: showAppUpdatedInfo,
+        [ExtensionSpecificSettingsOption.HideRateAdguard]: hideRateAdguard,
+        [ExtensionSpecificSettingsOption.UserRulesEditorWrap]: userRulesEditorWrap,
     }: ExtensionSpecificSettingsConfig) {
-        settingsStorage.set(SettingOption.USE_OPTIMIZED_FILTERS, useOptimizedFilters);
-        settingsStorage.set(SettingOption.DISABLE_COLLECT_HITS, !collectHitsCount);
-        settingsStorage.set(SettingOption.DISABLE_SHOW_CONTEXT_MENU, !showContextMenu);
-        settingsStorage.set(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO, !showInfoAboutAdguard);
-        settingsStorage.set(SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION, !showAppUpdatedInfo);
-        settingsStorage.set(SettingOption.HIDE_RATE_BLOCK, hideRateAdguard);
-        settingsStorage.set(SettingOption.USER_RULES_EDITOR_WRAP, userRulesEditorWrap);
+        settingsStorage.set(SettingOption.UseOptimizedFilters, useOptimizedFilters);
+        settingsStorage.set(SettingOption.DisableCollectHits, !collectHitsCount);
+        settingsStorage.set(SettingOption.DisableShowContextMenu, !showContextMenu);
+        settingsStorage.set(SettingOption.DisableShowAdguardPromoInfo, !showInfoAboutAdguard);
+        settingsStorage.set(SettingOption.DisableShowAppUpdatedNotification, !showAppUpdatedInfo);
+        settingsStorage.set(SettingOption.HideRateBlock, hideRateAdguard);
+        settingsStorage.set(SettingOption.UserRulesEditorWrap, userRulesEditorWrap);
     }
 
     private static exportExtensionSpecificSettings(): ExtensionSpecificSettingsConfig {
         return {
-            [ExtensionSpecificSettingsOptions.USE_OPTIMIZED_FILTERS]: (
-                settingsStorage.get(SettingOption.USE_OPTIMIZED_FILTERS)
+            [ExtensionSpecificSettingsOption.UseOptimizedFilters]: (
+                settingsStorage.get(SettingOption.UseOptimizedFilters)
             ),
-            [ExtensionSpecificSettingsOptions.COLLECT_HITS_COUNT]: (
-                !settingsStorage.get(SettingOption.DISABLE_COLLECT_HITS)
+            [ExtensionSpecificSettingsOption.CollectHitsCount]: (
+                !settingsStorage.get(SettingOption.DisableCollectHits)
             ),
-            [ExtensionSpecificSettingsOptions.SHOW_CONTEXT_MENU]: (
-                !settingsStorage.get(SettingOption.DISABLE_SHOW_CONTEXT_MENU)
+            [ExtensionSpecificSettingsOption.ShowContextMenu]: (
+                !settingsStorage.get(SettingOption.DisableShowContextMenu)
             ),
-            [ExtensionSpecificSettingsOptions.SHOW_INFO_ABOUT_ADGUARD]: (
-                !settingsStorage.get(SettingOption.DISABLE_SHOW_ADGUARD_PROMO_INFO)
+            [ExtensionSpecificSettingsOption.ShowInfoAboutAdguard]: (
+                !settingsStorage.get(SettingOption.DisableShowAdguardPromoInfo)
             ),
-            [ExtensionSpecificSettingsOptions.SHOW_APP_UPDATED_INFO]: (
-                !settingsStorage.get(SettingOption.DISABLE_SHOW_APP_UPDATED_NOTIFICATION)
+            [ExtensionSpecificSettingsOption.ShowAppUpdatedInfo]: (
+                !settingsStorage.get(SettingOption.DisableShowAppUpdatedNotification)
             ),
-            [ExtensionSpecificSettingsOptions.HIDE_RATE_ADGUARD]: (
-                settingsStorage.get(SettingOption.HIDE_RATE_BLOCK)
+            [ExtensionSpecificSettingsOption.HideRateAdguard]: (
+                settingsStorage.get(SettingOption.HideRateBlock)
             ),
-            [ExtensionSpecificSettingsOptions.USER_RULES_EDITOR_WRAP]: (
-                settingsStorage.get(SettingOption.USER_RULES_EDITOR_WRAP)
+            [ExtensionSpecificSettingsOption.UserRulesEditorWrap]: (
+                settingsStorage.get(SettingOption.UserRulesEditorWrap)
             ),
         };
     }
 
     private static async importFilters({
-        [FiltersOptions.ENABLED_FILTERS]: enabledFilters,
-        [FiltersOptions.ENABLED_GROUPS]: enabledGroups,
-        [FiltersOptions.CUSTOM_FILTERS]: customFilters,
-        [FiltersOptions.USER_FILTER]: userFilter,
-        [FiltersOptions.ALLOWLIST]: allowlist,
+        [FiltersOption.EnabledFilters]: enabledFilters,
+        [FiltersOption.EnabledGroups]: enabledGroups,
+        [FiltersOption.CustomFilters]: customFilters,
+        [FiltersOption.UserFilter]: userFilter,
+        [FiltersOption.Allowlist]: allowlist,
     }: FiltersConfig) {
         await SettingsApi.importUserFilter(userFilter);
         SettingsApi.importAllowlist(allowlist);
@@ -277,22 +277,22 @@ export class SettingsApi {
 
     private static async exportFilters(): Promise<FiltersConfig> {
         return {
-            [FiltersOptions.ENABLED_FILTERS]: filterStateStorage.getEnabledFilters(),
-            [FiltersOptions.ENABLED_GROUPS]: groupStateStorage.getEnabledGroups(),
-            [FiltersOptions.CUSTOM_FILTERS]: CustomFilterApi.getFiltersData(),
-            [FiltersOptions.USER_FILTER]: await SettingsApi.exportUserFilter(),
-            [FiltersOptions.ALLOWLIST]: SettingsApi.exportAllowlist(),
+            [FiltersOption.EnabledFilters]: filterStateStorage.getEnabledFilters(),
+            [FiltersOption.EnabledGroups]: groupStateStorage.getEnabledGroups(),
+            [FiltersOption.CustomFilters]: CustomFilterApi.getFiltersData(),
+            [FiltersOption.UserFilter]: await SettingsApi.exportUserFilter(),
+            [FiltersOption.Allowlist]: SettingsApi.exportAllowlist(),
         };
     }
 
     private static async importUserFilter({
-        [UserFilterOptions.ENABLED]: enabled,
-        [UserFilterOptions.RULES]: rules,
+        [UserFilterOption.Enabled]: enabled,
+        [UserFilterOption.Rules]: rules,
     }: UserFilterConfig) {
         if (typeof enabled === 'boolean') {
-            settingsStorage.set(SettingOption.USER_FILTER_ENABLED, enabled);
+            settingsStorage.set(SettingOption.UserFilterEnabled, enabled);
         } else {
-            settingsStorage.set(SettingOption.USER_FILTER_ENABLED, true);
+            settingsStorage.set(SettingOption.UserFilterEnabled, true);
         }
 
         await UserRulesApi.setUserRules(rules.split('\n'));
@@ -300,28 +300,28 @@ export class SettingsApi {
 
     private static async exportUserFilter(): Promise<UserFilterConfig> {
         return {
-            [UserFilterOptions.ENABLED]: settingsStorage.get(SettingOption.USER_FILTER_ENABLED),
-            [UserFilterOptions.RULES]: (await UserRulesApi.getUserRules()).join('/n'),
-            [UserFilterOptions.DISABLED_RULES]: '',
+            [UserFilterOption.Enabled]: settingsStorage.get(SettingOption.UserFilterEnabled),
+            [UserFilterOption.Rules]: (await UserRulesApi.getUserRules()).join('/n'),
+            [UserFilterOption.DisabledRules]: '',
         };
     }
 
     private static importAllowlist({
-        [AllowlistOptions.ENABLED]: enabled,
-        [AllowlistOptions.INVERTED]: inverted,
-        [AllowlistOptions.DOMAINS]: domains,
-        [AllowlistOptions.INVERTED_DOMAINS]: invertedDomains,
+        [AllowlistOption.Enabled]: enabled,
+        [AllowlistOption.Inverted]: inverted,
+        [AllowlistOption.Domains]: domains,
+        [AllowlistOption.InvertedDomains]: invertedDomains,
     }: AllowlistConfig) {
         if (typeof enabled === 'boolean') {
-            settingsStorage.set(SettingOption.ALLOWLIST_ENABLED, enabled);
+            settingsStorage.set(SettingOption.AllowlistEnabled, enabled);
         } else {
-            settingsStorage.set(SettingOption.ALLOWLIST_ENABLED, true);
+            settingsStorage.set(SettingOption.AllowlistEnabled, true);
         }
 
         if (typeof inverted === 'boolean') {
-            settingsStorage.set(SettingOption.DEFAULT_ALLOWLIST_MODE, !inverted);
+            settingsStorage.set(SettingOption.DefaultAllowlistMode, !inverted);
         } else {
-            settingsStorage.set(SettingOption.DEFAULT_ALLOWLIST_MODE, true);
+            settingsStorage.set(SettingOption.DefaultAllowlistMode, true);
         }
 
         AllowlistApi.setAllowlistDomains(domains);
@@ -330,90 +330,90 @@ export class SettingsApi {
 
     private static exportAllowlist(): AllowlistConfig {
         return {
-            [AllowlistOptions.ENABLED]: settingsStorage.get(SettingOption.ALLOWLIST_ENABLED),
-            [AllowlistOptions.INVERTED]: !settingsStorage.get(SettingOption.DEFAULT_ALLOWLIST_MODE),
-            [AllowlistOptions.DOMAINS]: AllowlistApi.getAllowlistDomains(),
-            [AllowlistOptions.INVERTED_DOMAINS]: AllowlistApi.getInvertedAllowlistDomains(),
+            [AllowlistOption.Enabled]: settingsStorage.get(SettingOption.AllowlistEnabled),
+            [AllowlistOption.Inverted]: !settingsStorage.get(SettingOption.DefaultAllowlistMode),
+            [AllowlistOption.Domains]: AllowlistApi.getAllowlistDomains(),
+            [AllowlistOption.InvertedDomains]: AllowlistApi.getInvertedAllowlistDomains(),
         };
     }
 
     private static async importStealth({
-        [StealthOptions.DISABLE_STEALTH_MODE]: disableStealthMode,
-        [StealthOptions.HIDE_REFERRER]: hideReferrer,
-        [StealthOptions.HIDE_SEARCH_QUERIES]: hideSearchQueries,
-        [StealthOptions.SEND_DO_NOT_TRACK]: sendDoNotTrack,
-        [StealthOptions.BLOCK_WEBRTC]: blockWebRTC,
-        [StealthOptions.REMOVE_X_CLIENT_DATA]: removeXClientData,
-        [StealthOptions.BLOCK_THIRD_PARTY_COOKIES]: blockThirdPartyCookies,
-        [StealthOptions.BLOCK_THIRD_PARTY_COOKIES_TIME]: blockThirdPartyCookiesTime,
-        [StealthOptions.BLOCK_FIRST_PARTY_COOKIES]: blockFirstPartyCookies,
-        [StealthOptions.BLOCK_FIRST_PARTY_COOKIES_TIME]: blockFirstPartyCookiesTime,
-        [StealthOptions.BLOCK_KNOWN_TRACKERS]: blockKnownTrackers,
-        [StealthOptions.STRIP_TRACKING_PARAMS]: stripTrackingParam,
+        [StealthOption.DisableStealthMode]: disableStealthMode,
+        [StealthOption.HideReferrer]: hideReferrer,
+        [StealthOption.HideSearchQueries]: hideSearchQueries,
+        [StealthOption.SendDoNotTrack]: sendDoNotTrack,
+        [StealthOption.BlockWebRTC]: blockWebRTC,
+        [StealthOption.RemoveXClientData]: removeXClientData,
+        [StealthOption.BlockThirdPartyCookies]: blockThirdPartyCookies,
+        [StealthOption.BlockThirdPartyCookiesTime]: blockThirdPartyCookiesTime,
+        [StealthOption.BlockFirstPartyCookies]: blockFirstPartyCookies,
+        [StealthOption.BlockFirstPartyCookiesTime]: blockFirstPartyCookiesTime,
+        [StealthOption.BlockKnownTrackers]: blockKnownTrackers,
+        [StealthOption.StripTrackingParams]: stripTrackingParam,
     }: StealthConfig) {
         /**
          * set "block webrtc" setting as soon as possible. AG-9980
          * don't set the actual value to avoid requesting permissions
          */
-        if (settingsStorage.get(SettingOption.BLOCK_WEBRTC) !== blockWebRTC) {
-            settingsStorage.set(SettingOption.BLOCK_WEBRTC, blockWebRTC);
+        if (settingsStorage.get(SettingOption.BlockWebRTC) !== blockWebRTC) {
+            settingsStorage.set(SettingOption.BlockWebRTC, blockWebRTC);
         }
 
-        settingsStorage.set(SettingOption.DISABLE_STEALTH_MODE, disableStealthMode);
-        settingsStorage.set(SettingOption.HIDE_REFERRER, hideReferrer);
-        settingsStorage.set(SettingOption.HIDE_SEARCH_QUERIES, hideSearchQueries);
-        settingsStorage.set(SettingOption.SEND_DO_NOT_TRACK, sendDoNotTrack);
-        settingsStorage.set(SettingOption.BLOCK_CHROME_CLIENT_DATA, removeXClientData);
-        settingsStorage.set(SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES, blockThirdPartyCookies);
+        settingsStorage.set(SettingOption.DisableStealthMode, disableStealthMode);
+        settingsStorage.set(SettingOption.HideReferrer, hideReferrer);
+        settingsStorage.set(SettingOption.HideSearchQueries, hideSearchQueries);
+        settingsStorage.set(SettingOption.SendDoNotTrack, sendDoNotTrack);
+        settingsStorage.set(SettingOption.BlockChromeClientData, removeXClientData);
+        settingsStorage.set(SettingOption.SelfDestructThirdPartyCookies, blockThirdPartyCookies);
 
         if (blockThirdPartyCookiesTime) {
-            settingsStorage.set(SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME, blockThirdPartyCookiesTime);
+            settingsStorage.set(SettingOption.SelfDestructThirdPartyCookiesTime, blockThirdPartyCookiesTime);
         }
 
-        settingsStorage.set(SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES, blockFirstPartyCookies);
+        settingsStorage.set(SettingOption.SelfDestructFirstPartyCookies, blockFirstPartyCookies);
 
         if (blockFirstPartyCookiesTime) {
-            settingsStorage.set(SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME, blockFirstPartyCookiesTime);
+            settingsStorage.set(SettingOption.SelfDestructFirstPartyCookiesTime, blockFirstPartyCookiesTime);
         }
 
         if (stripTrackingParam) {
-            await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
+            await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.UrlTrackingFilterId]);
         } else {
-            filterStateStorage.disableFilters([AntiBannerFiltersId.URL_TRACKING_FILTER_ID]);
+            filterStateStorage.disableFilters([AntiBannerFiltersId.UrlTrackingFilterId]);
         }
 
         if (blockKnownTrackers) {
-            await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.TRACKING_FILTER_ID]);
+            await FiltersApi.loadAndEnableFilters([AntiBannerFiltersId.TrackingFilterId]);
         } else {
-            filterStateStorage.disableFilters([AntiBannerFiltersId.TRACKING_FILTER_ID]);
+            filterStateStorage.disableFilters([AntiBannerFiltersId.TrackingFilterId]);
         }
     }
 
     private static exportStealth(): StealthConfig {
         return {
-            [StealthOptions.DISABLE_STEALTH_MODE]: settingsStorage.get(SettingOption.DISABLE_STEALTH_MODE),
-            [StealthOptions.HIDE_REFERRER]: settingsStorage.get(SettingOption.HIDE_REFERRER),
-            [StealthOptions.HIDE_SEARCH_QUERIES]: settingsStorage.get(SettingOption.HIDE_SEARCH_QUERIES),
-            [StealthOptions.SEND_DO_NOT_TRACK]: settingsStorage.get(SettingOption.SEND_DO_NOT_TRACK),
-            [StealthOptions.BLOCK_WEBRTC]: settingsStorage.get(SettingOption.BLOCK_WEBRTC),
-            [StealthOptions.REMOVE_X_CLIENT_DATA]: settingsStorage.get(SettingOption.BLOCK_CHROME_CLIENT_DATA),
-            [StealthOptions.BLOCK_THIRD_PARTY_COOKIES]: (
-                settingsStorage.get(SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES)
+            [StealthOption.DisableStealthMode]: settingsStorage.get(SettingOption.DisableStealthMode),
+            [StealthOption.HideReferrer]: settingsStorage.get(SettingOption.HideReferrer),
+            [StealthOption.HideSearchQueries]: settingsStorage.get(SettingOption.HideSearchQueries),
+            [StealthOption.SendDoNotTrack]: settingsStorage.get(SettingOption.SendDoNotTrack),
+            [StealthOption.BlockWebRTC]: settingsStorage.get(SettingOption.BlockWebRTC),
+            [StealthOption.RemoveXClientData]: settingsStorage.get(SettingOption.BlockChromeClientData),
+            [StealthOption.BlockThirdPartyCookies]: (
+                settingsStorage.get(SettingOption.SelfDestructThirdPartyCookies)
             ),
-            [StealthOptions.BLOCK_THIRD_PARTY_COOKIES_TIME]: (
-                settingsStorage.get(SettingOption.SELF_DESTRUCT_THIRD_PARTY_COOKIES_TIME)
+            [StealthOption.BlockThirdPartyCookiesTime]: (
+                settingsStorage.get(SettingOption.SelfDestructThirdPartyCookiesTime)
             ),
-            [StealthOptions.BLOCK_FIRST_PARTY_COOKIES]: (
-                settingsStorage.get(SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES)
+            [StealthOption.BlockFirstPartyCookies]: (
+                settingsStorage.get(SettingOption.SelfDestructFirstPartyCookies)
             ),
-            [StealthOptions.BLOCK_FIRST_PARTY_COOKIES_TIME]: (
-                settingsStorage.get(SettingOption.SELF_DESTRUCT_FIRST_PARTY_COOKIES_TIME)
+            [StealthOption.BlockFirstPartyCookiesTime]: (
+                settingsStorage.get(SettingOption.SelfDestructFirstPartyCookiesTime)
             ),
-            [StealthOptions.BLOCK_KNOWN_TRACKERS]: (
-                !!filterStateStorage.get(AntiBannerFiltersId.TRACKING_FILTER_ID)?.enabled
+            [StealthOption.BlockKnownTrackers]: (
+                !!filterStateStorage.get(AntiBannerFiltersId.TrackingFilterId)?.enabled
             ),
-            [StealthOptions.STRIP_TRACKING_PARAMS]: (
-                !!filterStateStorage.get(AntiBannerFiltersId.URL_TRACKING_FILTER_ID)?.enabled
+            [StealthOption.StripTrackingParams]: (
+                !!filterStateStorage.get(AntiBannerFiltersId.UrlTrackingFilterId)?.enabled
             ),
         };
     }

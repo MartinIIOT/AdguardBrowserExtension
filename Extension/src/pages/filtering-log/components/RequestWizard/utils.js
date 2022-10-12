@@ -1,4 +1,4 @@
-import { AntiBannerFiltersId, RequestTypes } from '../../../../common/constants';
+import { AntiBannerFiltersId, RequestType } from '../../../../common/constants';
 import { strings } from '../../../../common/strings';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 
@@ -61,11 +61,11 @@ export const UrlUtils = {
  * @returns {String}
  */
 export const getFilterName = (filterId, filtersMetadata) => {
-    if (filterId === AntiBannerFiltersId.USER_FILTER_ID) {
+    if (filterId === AntiBannerFiltersId.UserFilterId) {
         return reactTranslator.getMessage('options_userfilter');
     }
 
-    if (filterId === AntiBannerFiltersId.ALLOWLIST_FILTER_ID) {
+    if (filterId === AntiBannerFiltersId.AllowlistFilterId) {
         return reactTranslator.getMessage('options_allowlist');
     }
 
@@ -93,12 +93,12 @@ export const getRequestEventType = (event) => {
 
     if (requestRule?.cookieRule
         || requestRule?.isModifyingCookieRule) {
-        requestEventType = RequestTypes.COOKIE;
+        requestEventType = RequestType.Cookie;
     } else if (cspReportBlocked) {
         // By default csp requests in firefox have other request type,
         // but if event cspReportBlocked is true
         // we consider such request to have "CSP report" type
-        requestEventType = RequestTypes.CSP_REPORT;
+        requestEventType = RequestType.CspReport;
     } else if (removeHeader) {
         return 'REMOVEHEADER';
     } else if (removeParam) {

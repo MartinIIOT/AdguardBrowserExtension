@@ -18,7 +18,7 @@ class FullscreenUserRulesStore {
 
     @action
     async getFullscreenUserRulesData() {
-        const { settings } = await messenger.sendMessage(MessageType.GET_USER_RULES_EDITOR_DATA);
+        const { settings } = await messenger.sendMessage(MessageType.GetUserRulesEditorData);
         runInAction(() => {
             this.settings = settings;
         });
@@ -30,7 +30,7 @@ class FullscreenUserRulesStore {
             return null;
         }
 
-        return this.settings.values[this.settings.names.APPEARANCE_THEME];
+        return this.settings.values[this.settings.names.AppearanceTheme];
     }
 }
 

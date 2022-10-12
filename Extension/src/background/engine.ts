@@ -29,7 +29,7 @@ export class Engine {
 
         const rulesCount = Engine.api.getRulesCount();
         log.info(`tswebextension is started. Rules count: ${rulesCount}`);
-        listeners.notifyListeners(listeners.REQUEST_FILTER_UPDATED, {
+        listeners.notifyListeners(listeners.RequestFilterUpdated, {
             rulesCount,
         });
     }
@@ -42,7 +42,7 @@ export class Engine {
 
         const rulesCount = Engine.api.getRulesCount();
         log.info(`tswebextension configuration is updated. Rules count: ${rulesCount}`);
-        listeners.notifyListeners(listeners.REQUEST_FILTER_UPDATED, {
+        listeners.notifyListeners(listeners.RequestFilterUpdated, {
             rulesCount,
         });
     }

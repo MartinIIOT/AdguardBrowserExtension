@@ -19,15 +19,15 @@ import { listeners } from '../notifier';
 export class FiltersService {
     static async init() {
         // TODO: debounce message events
-        messageHandler.addListener(MessageType.ADD_AND_ENABLE_FILTER, FiltersService.onFilterEnable);
-        messageHandler.addListener(MessageType.DISABLE_ANTIBANNER_FILTER, FiltersService.onFilterDisable);
-        messageHandler.addListener(MessageType.ENABLE_FILTERS_GROUP, FiltersService.onGroupEnable);
-        messageHandler.addListener(MessageType.DISABLE_FILTERS_GROUP, FiltersService.onGroupDisable);
+        messageHandler.addListener(MessageType.AddAndEnableFilter, FiltersService.onFilterEnable);
+        messageHandler.addListener(MessageType.DisableAntibannerFilter, FiltersService.onFilterDisable);
+        messageHandler.addListener(MessageType.EnableFiltersGroup, FiltersService.onGroupEnable);
+        messageHandler.addListener(MessageType.DisableFiltersGroup, FiltersService.onGroupDisable);
 
-        messageHandler.addListener(MessageType.CHECK_ANTIBANNER_FILTERS_UPDATE, FiltersService.checkFiltersUpdate);
-        contextMenuEvents.addListener(ContextMenuAction.UPDATE_ANTIBANNER_FILTERS, FiltersService.checkFiltersUpdate);
+        messageHandler.addListener(MessageType.CheckAntibannerFiltersUpdate, FiltersService.checkFiltersUpdate);
+        contextMenuEvents.addListener(ContextMenuAction.UpdateAntibannerFilters, FiltersService.checkFiltersUpdate);
 
-        settingsEvents.addListener(SettingOption.USE_OPTIMIZED_FILTERS, FiltersService.onOptimizedFiltersSwitch);
+        settingsEvents.addListener(SettingOption.UseOptimizedFilters, FiltersService.onOptimizedFiltersSwitch);
     }
 
     static async onFilterEnable(message: AddAndEnableFilterMessage) {
@@ -67,12 +67,12 @@ export class FiltersService {
             await Engine.update();
 
             toasts.showFiltersUpdatedAlertMessage(true, updatedFilters);
-            listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY, updatedFilters);
+            listeners.notifyListeners(listeners.FiltersUpdateCheckReady, updatedFilters);
 
             return updatedFilters;
         } catch (e) {
             toasts.showFiltersUpdatedAlertMessage(false);
-            listeners.notifyListeners(listeners.FILTERS_UPDATE_CHECK_READY);
+            listeners.notifyListeners(listeners.FiltersUpdateCheckReady);
         }
     }
 

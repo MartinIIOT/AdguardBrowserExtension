@@ -44,7 +44,7 @@ export class FilterDownload {
 
     private static async checkRequestFilterReady(): Promise<void> {
         try {
-            const ready = await messenger.sendMessage(MessageType.CHECK_REQUEST_FILTER_READY);
+            const ready = await messenger.sendMessage(MessageType.CheckRequestFilterReady);
 
             if (ready) {
                 FilterDownload.onEngineLoaded();
@@ -62,7 +62,7 @@ export class FilterDownload {
         FilterDownload.nanobar.go(100);
         setTimeout(() => {
             if (window) {
-                messenger.sendMessage(MessageType.OPEN_THANKYOU_PAGE);
+                messenger.sendMessage(MessageType.OpenThankyouPage);
             }
         }, FilterDownload.openThankyouPageTimeoutMs);
     }

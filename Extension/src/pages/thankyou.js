@@ -34,8 +34,8 @@ const PageController = (response) => {
 
     const safebrowsingEnabledChange = (e) => {
         const checkbox = e.currentTarget;
-        messenger.sendMessage(MessageType.CHANGE_USER_SETTING, {
-            key: userSettings.names.DISABLE_SAFEBROWSING,
+        messenger.sendMessage(MessageType.ChangeUserSettings, {
+            key: userSettings.names.DisableSafebrowsing,
             value: !checkbox.checked,
         });
     };
@@ -43,12 +43,12 @@ const PageController = (response) => {
     const trackingFilterEnabledChange = (e) => {
         const checkbox = e.currentTarget;
         if (checkbox.checked) {
-            messenger.sendMessage(MessageType.ADD_AND_ENABLE_FILTER, {
-                filterId: AntiBannerFiltersId.TRACKING_FILTER_ID,
+            messenger.sendMessage(MessageType.AddAndEnableFilter, {
+                filterId: AntiBannerFiltersId.TrackingFilterId,
             });
         } else {
-            messenger.sendMessage(MessageType.DISABLE_ANTIBANNER_FILTER, {
-                filterId: AntiBannerFiltersId.TRACKING_FILTER_ID,
+            messenger.sendMessage(MessageType.DisableAntibannerFilter, {
+                filterId: AntiBannerFiltersId.TrackingFilterId,
                 remove: true,
             });
         }
@@ -57,12 +57,12 @@ const PageController = (response) => {
     const socialFilterEnabledChange = (e) => {
         const checkbox = e.currentTarget;
         if (checkbox.checked) {
-            messenger.sendMessage(MessageType.ADD_AND_ENABLE_FILTER, {
-                filterId: AntiBannerFiltersId.SOCIAL_FILTER_ID,
+            messenger.sendMessage(MessageType.AddAndEnableFilter, {
+                filterId: AntiBannerFiltersId.SocialFilterId,
             });
         } else {
-            messenger.sendMessage(MessageType.DISABLE_ANTIBANNER_FILTER, {
-                filterId: AntiBannerFiltersId.SOCIAL_FILTER_ID,
+            messenger.sendMessage(MessageType.DisableAntibannerFilter, {
+                filterId: AntiBannerFiltersId.SocialFilterId,
                 remove: true,
             });
         }
@@ -70,8 +70,8 @@ const PageController = (response) => {
 
     const sendStatsCheckboxChange = (e) => {
         const checkbox = e.currentTarget;
-        messenger.sendMessage(MessageType.CHANGE_USER_SETTING, {
-            key: userSettings.names.DISABLE_COLLECT_HITS,
+        messenger.sendMessage(MessageType.ChangeUserSettings, {
+            key: userSettings.names.DisableCollectHits,
             value: !checkbox.checked,
         });
     };
@@ -79,12 +79,12 @@ const PageController = (response) => {
     const allowAcceptableAdsChange = (e) => {
         const checkbox = e.currentTarget;
         if (checkbox.checked) {
-            messenger.sendMessage(MessageType.ADD_AND_ENABLE_FILTER, {
-                filterId: AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
+            messenger.sendMessage(MessageType.AddAndEnableFilter, {
+                filterId: AntiBannerFiltersId.SearchAndSelfPromoFilterId,
             });
         } else {
-            messenger.sendMessage(MessageType.DISABLE_ANTIBANNER_FILTER, {
-                filterId: AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID,
+            messenger.sendMessage(MessageType.DisableAntibannerFilter, {
+                filterId: AntiBannerFiltersId.SearchAndSelfPromoFilterId,
                 remove: true,
             });
         }
@@ -111,7 +111,7 @@ const PageController = (response) => {
         openExtensionStoreBtns.forEach((openExtensionStoreBtn) => {
             openExtensionStoreBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                messenger.sendMessage(MessageType.OPEN_EXTENSION_STORE);
+                messenger.sendMessage(MessageType.OpenExtensionStore);
             });
         });
 
@@ -119,7 +119,7 @@ const PageController = (response) => {
         openSettingsBtns.forEach((openSettingsBtn) => {
             openSettingsBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                messenger.sendMessage(MessageType.OPEN_SETTINGS_TAB);
+                messenger.sendMessage(MessageType.OpenSettingsTab);
             });
         });
     };
@@ -141,12 +141,12 @@ const PageController = (response) => {
     };
 
     const render = () => {
-        const safebrowsingEnabled = !userSettings.values[userSettings.names.DISABLE_SAFEBROWSING];
-        const collectHitsCount = !userSettings.values[userSettings.names.DISABLE_COLLECT_HITS];
-        const trackingFilterEnabled = AntiBannerFiltersId.TRACKING_FILTER_ID in enabledFilters;
-        const socialFilterEnabled = AntiBannerFiltersId.SOCIAL_FILTER_ID in enabledFilters;
+        const safebrowsingEnabled = !userSettings.values[userSettings.names.DisableSafebrowsing];
+        const collectHitsCount = !userSettings.values[userSettings.names.DisableCollectHits];
+        const trackingFilterEnabled = AntiBannerFiltersId.TrackingFilterId in enabledFilters;
+        const socialFilterEnabled = AntiBannerFiltersId.SocialFilterId in enabledFilters;
         // eslint-disable-next-line max-len
-        const allowAcceptableAdsEnabled = AntiBannerFiltersId.SEARCH_AND_SELF_PROMO_FILTER_ID in enabledFilters;
+        const allowAcceptableAdsEnabled = AntiBannerFiltersId.SearchAndSelfPromoFilterId in enabledFilters;
 
         renderSafebrowsingSection(safebrowsingEnabled, collectHitsCount);
         updateCheckbox(trackingFilterEnabledCheckbox, trackingFilterEnabled);
@@ -181,7 +181,7 @@ const init = async () => {
 
     clearTimeout(timeoutId);
 
-    const response = await messenger.sendMessage(MessageType.INITIALIZE_FRAME_SCRIPT);
+    const response = await messenger.sendMessage(MessageType.InitializeFrameScript);
     const controller = PageController(response);
 
     if (document.readyState === 'loading') {

@@ -35,33 +35,33 @@ export class UiService {
     public static async init(): Promise<void> {
         await toasts.init();
 
-        messageHandler.addListener(MessageType.OPEN_TAB, TabsApi.openTab);
+        messageHandler.addListener(MessageType.OpenTab, TabsApi.openTab);
 
-        messageHandler.addListener(MessageType.OPEN_SETTINGS_TAB, PagesApi.openSettingsPage);
-        contextMenuEvents.addListener(ContextMenuAction.OPEN_SETTINGS, PagesApi.openSettingsPage);
+        messageHandler.addListener(MessageType.OpenSettingsTab, PagesApi.openSettingsPage);
+        contextMenuEvents.addListener(ContextMenuAction.OpenSettings, PagesApi.openSettingsPage);
 
-        messageHandler.addListener(MessageType.OPEN_FILTERING_LOG, PagesApi.openFilteringLogPage);
-        contextMenuEvents.addListener(ContextMenuAction.OPEN_LOG, PagesApi.openFilteringLogPage);
+        messageHandler.addListener(MessageType.OpenFilteringLog, PagesApi.openFilteringLogPage);
+        contextMenuEvents.addListener(ContextMenuAction.OpenLog, PagesApi.openFilteringLogPage);
 
-        messageHandler.addListener(MessageType.OPEN_ABUSE_TAB, UiService.openAbusePage);
-        contextMenuEvents.addListener(ContextMenuAction.COMPLAINT_WEBSITE, UiService.openAbusePageFromPContextMenu);
+        messageHandler.addListener(MessageType.OpenAbuseTab, UiService.openAbusePage);
+        contextMenuEvents.addListener(ContextMenuAction.ComplaintWebsite, UiService.openAbusePageFromPContextMenu);
 
-        messageHandler.addListener(MessageType.OPEN_SITE_REPORT_TAB, UiService.openSiteReportPage);
-        contextMenuEvents.addListener(ContextMenuAction.SECURITY_REPORT, UiService.openSiteReportPageFromContextMenu);
+        messageHandler.addListener(MessageType.OpenSiteReportTab, UiService.openSiteReportPage);
+        contextMenuEvents.addListener(ContextMenuAction.SecurityReport, UiService.openSiteReportPageFromContextMenu);
 
-        messageHandler.addListener(MessageType.OPEN_THANKYOU_PAGE, PagesApi.openThankYouPage);
-        messageHandler.addListener(MessageType.OPEN_EXTENSION_STORE, PagesApi.openExtensionStorePage);
-        messageHandler.addListener(MessageType.OPEN_COMPARE_PAGE, PagesApi.openComparePage);
-        messageHandler.addListener(MessageType.OPEN_FULLSCREEN_USER_RULES, PagesApi.openFullscreenUserRulesPage);
+        messageHandler.addListener(MessageType.OpenThankyouPage, PagesApi.openThankYouPage);
+        messageHandler.addListener(MessageType.OpenExtensionStore, PagesApi.openExtensionStorePage);
+        messageHandler.addListener(MessageType.OpenComparePage, PagesApi.openComparePage);
+        messageHandler.addListener(MessageType.OpenFullscreenUserRules, PagesApi.openFullscreenUserRulesPage);
         messageHandler.addListener(
-            MessageType.ADD_FILTERING_SUBSCRIPTION,
+            MessageType.AddFilteringSubscription,
             PagesApi.openSettingsPageWithCustomFilterModal,
         );
 
-        messageHandler.addListener(MessageType.OPEN_ASSISTANT, AssistantApi.openAssistant);
-        contextMenuEvents.addListener(ContextMenuAction.BLOCK_SITE_ADS, AssistantApi.openAssistant);
+        messageHandler.addListener(MessageType.OpenAssistant, AssistantApi.openAssistant);
+        contextMenuEvents.addListener(ContextMenuAction.BlockSiteAds, AssistantApi.openAssistant);
 
-        messageHandler.addListener(MessageType.INITIALIZE_FRAME_SCRIPT, UiService.initializeFrameScriptRequest);
+        messageHandler.addListener(MessageType.InitializeFrameScript, UiService.initializeFrameScriptRequest);
 
         tsWebExtTabApi.onUpdate.subscribe(UiApi.update);
         tsWebExtTabApi.onActivated.subscribe(UiApi.update);
@@ -79,7 +79,7 @@ export class UiService {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.url) {
-            await PagesApi.openAbusePage(activeTab.url, ForwardFrom.CONTEXT_MENU);
+            await PagesApi.openAbusePage(activeTab.url, ForwardFrom.ContextMenu);
         } else {
             log.warn('Can`t open abuse page for active tab');
         }
@@ -95,7 +95,7 @@ export class UiService {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.url) {
-            await PagesApi.openSiteReportPage(activeTab.url, ForwardFrom.CONTEXT_MENU);
+            await PagesApi.openSiteReportPage(activeTab.url, ForwardFrom.ContextMenu);
         } else {
             log.warn('Can`t open site report page for active tab');
         }
@@ -129,7 +129,7 @@ export class UiService {
             },
             constants: {
                 AntiBannerFiltersId,
-                EventNotifierTypes: listeners.events,
+                EventNotifierType: listeners.events,
             },
         };
     }

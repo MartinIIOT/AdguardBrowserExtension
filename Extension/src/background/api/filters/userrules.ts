@@ -20,10 +20,10 @@ export class UserRulesApi {
      * If it's undefined, sets empty user rules list
      */
     public static async init(): Promise<void> {
-        const userRules = await FiltersStorage.get(AntiBannerFiltersId.USER_FILTER_ID);
+        const userRules = await FiltersStorage.get(AntiBannerFiltersId.UserFilterId);
 
         if (!userRules) {
-            await FiltersStorage.set(AntiBannerFiltersId.USER_FILTER_ID, []);
+            await FiltersStorage.set(AntiBannerFiltersId.UserFilterId, []);
         }
     }
 
@@ -33,7 +33,7 @@ export class UserRulesApi {
      * @returns true, if user list is enabled, else returns false
      */
     public static isEnabled(): boolean {
-        return settingsStorage.get(SettingOption.USER_FILTER_ENABLED);
+        return settingsStorage.get(SettingOption.UserFilterEnabled);
     }
 
     /**
@@ -55,7 +55,7 @@ export class UserRulesApi {
      * Get rules from user list
      */
     public static async getUserRules(): Promise<string[]> {
-        return FiltersStorage.get(AntiBannerFiltersId.USER_FILTER_ID);
+        return FiltersStorage.get(AntiBannerFiltersId.UserFilterId);
     }
 
     /**
@@ -99,9 +99,9 @@ export class UserRulesApi {
      * @param rules - list of rule strings
      */
     public static async setUserRules(rules: string[]): Promise<void> {
-        await FiltersStorage.set(AntiBannerFiltersId.USER_FILTER_ID, rules);
+        await FiltersStorage.set(AntiBannerFiltersId.UserFilterId, rules);
 
-        listeners.notifyListeners(listeners.USER_FILTER_UPDATED);
+        listeners.notifyListeners(listeners.userFilterUpdated);
     }
 
     /**

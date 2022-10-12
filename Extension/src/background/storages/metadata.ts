@@ -47,7 +47,7 @@ export type Metadata = {
     tags: TagMetadata[]
 };
 
-export class MetadataStorage extends StringStorage<SettingOption.METADATA, Metadata, 'sync'> {
+export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metadata, 'sync'> {
     public getFilters() {
         return this.data.filters;
     }
@@ -191,4 +191,4 @@ export class MetadataStorage extends StringStorage<SettingOption.METADATA, Metad
     }
 }
 
-export const metadataStorage = new MetadataStorage(SettingOption.METADATA, settingsStorage);
+export const metadataStorage = new MetadataStorage(SettingOption.Metadata, settingsStorage);

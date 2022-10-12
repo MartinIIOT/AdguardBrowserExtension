@@ -8,7 +8,7 @@ import { log } from '../../../../common/log';
 import { rootStore } from '../../stores/RootStore';
 import { RequestModal } from '../RequestWizard/RequestModal';
 import { Icons } from '../../../common/components/ui/Icons';
-import { FILTERING_LOG, NOTIFIER_TYPES } from '../../../../common/constants';
+import { FILTERING_LOG, NotifierType } from '../../../../common/constants';
 import { useAppearanceTheme } from '../../../common/hooks/useAppearanceTheme';
 import { FilteringEvents } from '../FilteringEvents';
 
@@ -64,11 +64,11 @@ const FilteringLog = observer(() => {
 
         (async () => {
             const events = [
-                NOTIFIER_TYPES.TAB_ADDED,
-                NOTIFIER_TYPES.TAB_UPDATE,
-                NOTIFIER_TYPES.TAB_CLOSE,
-                NOTIFIER_TYPES.TAB_RESET,
-                NOTIFIER_TYPES.SETTING_UPDATED,
+                NotifierType.TabAdded,
+                NotifierType.TabUpdate,
+                NotifierType.TabClose,
+                NotifierType.TabReset,
+                NotifierType.SettingUpdated,
             ];
 
             removeListenerCallback = messenger.createLongLivedConnection(
@@ -78,24 +78,24 @@ const FilteringLog = observer(() => {
                     const { type, data } = message;
 
                     switch (type) {
-                        case NOTIFIER_TYPES.TAB_ADDED:
-                        case NOTIFIER_TYPES.TAB_UPDATE: {
+                        case NotifierType.TabAdded:
+                        case NotifierType.TabUpdate: {
                             const [tabInfo] = data;
                             logStore.onTabUpdate(tabInfo);
                             break;
                         }
-                        case NOTIFIER_TYPES.TAB_CLOSE: {
+                        case NotifierType.TabClose: {
                             const [tabInfo] = data;
                             await logStore.onTabClose(tabInfo);
                             break;
                         }
-                        case NOTIFIER_TYPES.TAB_RESET: {
+                        case NotifierType.TabReset: {
                             const [tabInfo] = data;
                             logStore.onTabReset(tabInfo);
                             wizardStore.closeModal();
                             break;
                         }
-                        case NOTIFIER_TYPES.SETTING_UPDATED: {
+                        case NotifierType.SettingUpdated: {
                             const [{ propertyName, propertyValue }] = data;
                             logStore.onSettingUpdated(propertyName, propertyValue);
                             break;
