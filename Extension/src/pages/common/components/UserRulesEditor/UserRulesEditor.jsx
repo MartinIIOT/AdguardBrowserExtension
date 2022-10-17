@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 import { observer } from 'mobx-react';
 import { Range } from 'ace-builds';
+import debounce from 'lodash/debounce';
 import { SimpleRegex } from '@adguard/tsurlfilter/dist/es/simple-regex';
 
 import { userRulesEditorStore } from './UserRulesEditorStore';
@@ -13,10 +14,12 @@ import { Editor } from '../Editor';
 import { UserRulesSavingButton } from './UserRulesSavingButton';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { Popover } from '../ui/Popover';
+import { Checkbox } from '../ui/Checkbox';
 import { Icon } from '../ui/Icon';
 import { messenger } from '../../../services/messenger';
 import { MessageType } from '../../../../common/messages';
 import { NotifierType } from '../../../../common/constants';
+import { HANDLER_DELAY_MS } from '../../constants';
 import { handleFileUpload } from '../../../helpers';
 import { log } from '../../../../common/log';
 import { ToggleWrapButton } from './ToggleWrapButton';
@@ -39,9 +42,36 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
     }
 
     useEffect(() => {
+        let removeListenerCallback = () => {};
+
         (async () => {
             await store.requestSettingsData();
+
+            const events = [
+                NotifierType.SettingUpdated,
+            ];
+            removeListenerCallback = await messenger.createEventListener(
+                events,
+                async (message) => {
+                    const { type } = message;
+
+                    switch (type) {
+                        case NotifierType.SettingUpdated: {
+                            await store.requestSettingsData();
+                            break;
+                        }
+                        default: {
+                            log.debug('Undefined message type:', type);
+                            break;
+                        }
+                    }
+                },
+            );
         })();
+
+        return () => {
+            removeListenerCallback();
+        };
     }, [store]);
 
     // Get initial storage content and set to the editor
@@ -104,7 +134,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
 
     // Append listeners
     useEffect(() => {
-        let removeListenerCallback = () => {};
+        let removeListenerCallback = () => { };
 
         (async () => {
             // Subscribe to events of request filter update
@@ -292,6 +322,10 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
         window.close();
     };
 
+    const handleUserRulesToggle = debounce((e) => {
+        store.updateSetting(e.id, e.data);
+    }, HANDLER_DELAY_MS);
+
     const fullscreenTooltipText = fullscreen
         ? reactTranslator.getMessage('options_editor_close_fullscreen_button_tooltip')
         : reactTranslator.getMessage('options_editor_open_fullscreen_button_tooltip');
@@ -308,6 +342,24 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
             />
             <div className="actions actions--divided">
                 <div className="actions__group">
+                    {
+                        fullscreen && (
+                            <label
+                                className="actions__label"
+                                htmlFor="user-filter-enabled"
+                            >
+                                <div className="actions__title">
+                                    {reactTranslator.getMessage('fullscreen_user_rules_title')}
+                                </div>
+                                <Checkbox
+                                    id="user-filter-enabled"
+                                    handler={handleUserRulesToggle}
+                                    value={store.userFilterEnabled}
+                                    className="checkbox__label--actions"
+                                />
+                            </label>
+                        )
+                    }
                     <UserRulesSavingButton onClick={saveClickHandler} />
                     <input
                         type="file"
