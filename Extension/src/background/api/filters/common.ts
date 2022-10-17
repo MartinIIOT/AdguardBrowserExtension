@@ -105,10 +105,12 @@ export class CommonFilterApi {
 
         await FiltersStorage.set(filterId, rules);
 
+        const currentFilterState = filterStateStorage.get(filterId);
+
         filterStateStorage.set(filterId, {
             installed: true,
             loaded: true,
-            enabled: false,
+            enabled: !!currentFilterState?.enabled,
         });
 
         const {

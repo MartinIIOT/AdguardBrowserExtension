@@ -25,8 +25,6 @@ export class FilterUpdateApi {
 
         const updatedFilters = await FilterUpdateApi.updateFilters(enabledFilters);
 
-        filterStateStorage.enableFilters(enabledFilters);
-
         filterVersionStorage.refreshLastCheckTime(enabledFilters);
 
         return updatedFilters;
