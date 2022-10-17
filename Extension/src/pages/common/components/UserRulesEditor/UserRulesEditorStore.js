@@ -104,7 +104,7 @@ class UserRulesEditorStore {
 
     @computed
     get userFilterEnabledSettingId() {
-        return this.settings.names.USER_FILTER_ENABLED;
+        return this.settings.names.UserFilterEnabled;
     }
 
     @computed
