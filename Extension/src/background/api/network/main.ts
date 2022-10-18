@@ -277,48 +277,6 @@ export class Network {
     }
 
     /**
-     * Configure network api
-     *
-     * @param configuration - network configuration
-     */
-    public configure(configuration: NetworkConfiguration): void {
-        const { filtersMetadataUrl } = configuration;
-        if (filtersMetadataUrl) {
-            Object.defineProperty(this.settings, 'filtersMetadataUrl', {
-                get() {
-                    return filtersMetadataUrl;
-                },
-            });
-        }
-
-        const { filterRulesUrl } = configuration;
-        if (filterRulesUrl) {
-            Object.defineProperty(this.settings, 'filterRulesUrl', {
-                get() {
-                    return filterRulesUrl;
-                },
-            });
-        }
-        const { localFiltersFolder } = configuration;
-        if (localFiltersFolder) {
-            Object.defineProperty(this.settings, 'localFiltersFolder', {
-                get() {
-                    return localFiltersFolder;
-                },
-            });
-        }
-
-        const { localFilterIds } = configuration;
-        if (localFilterIds) {
-            Object.defineProperty(this.settings, 'localFilterIds', {
-                get() {
-                    return localFilterIds;
-                },
-            });
-        }
-    }
-
-    /**
      * URL for downloading AG filter
      *
      * @param filterId - Filter identifier
