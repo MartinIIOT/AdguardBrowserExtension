@@ -1,31 +1,39 @@
-import { FilteringLogEvent, MESSAGE_HANDLER_NAME } from '@adguard/tswebextension';
+/* eslint-disable no-console */
+import { FilteringEventType, FilteringLogEvent, MESSAGE_HANDLER_NAME } from '@adguard/tswebextension';
 import { AdguardApi, AdguardApiConfiguration } from './src';
 
 (async (): Promise<void> => {
-    const adguardApi = new AdguardApi(
-        'adguard',
-        'https://filters.adtidy.org/extension/chromium/filters.json',
-        'https://filters.adtidy.org/extension/chromium/filters/{filter_id}.txt',
-    );
+    const adguardApi = new AdguardApi({
+        resourcesPath: 'adguard',
+        filterRulesUrl: 'https://filters.adtidy.org/extension/chromium/filters/{filter_id}.txt',
+        filtersMetadataUrl: 'https://filters.adtidy.org/extension/chromium/filters.json',
+    });
 
-    // console log request process events
+    // console log request data on basic rule apply
     const onFilteringLogEvent = (event: FilteringLogEvent) => {
-        console.log(event);
+        if (event.type === FilteringEventType.APPLY_BASIC_RULE) {
+            console.log(event.data);
+        }
     };
 
-    adguardApi.tswebextension.onFilteringLogEvent.subscribe(onFilteringLogEvent);
+    // console log current rules count, loaded in engine
+    const logTotalCount = (): void => {
+        console.log('Total rules count:', adguardApi.tswebextension.getRulesCount());
+    };
+
+    adguardApi.onFilteringLogEvent.subscribe(onFilteringLogEvent);
 
     const config: AdguardApiConfiguration = {
         filters: [2],
         allowlist: ['www.avira.com'],
-        trustedDomains: [],
+        trustedDomains: [], // hide?
         userrules: ['example.org##h1'],
         verbose: false,
         settings: {
             filteringEnabled: true,
             stealthModeEnabled: true,
-            collectStats: true,
-            allowlistInverted: false,
+            collectStats: true, // hide?
+            allowlistInverted: false, // public?
             allowlistEnabled: true,
             stealth: {
                 blockChromeClientData: false,
@@ -44,24 +52,27 @@ import { AdguardApi, AdguardApiConfiguration } from './src';
     await adguardApi.start(config);
 
     console.log('Finished Adguard API initialization.');
+    logTotalCount();
 
     config.allowlist.push('www.google.com');
 
     await adguardApi.configure(config);
 
     console.log('Finished Adguard API re-configuration');
+    logTotalCount();
 
     // update config on assistant rule apply
-    adguardApi.tswebextension.onAssistantCreateRule.subscribe(async (rule) => {
+    adguardApi.onAssistantCreateRule.subscribe(async (rule) => {
         console.log(`Rule ${rule} was created by Adguard Assistant`);
         config.userrules.push(rule);
         await adguardApi.configure(config);
         console.log('Finished Adguard API re-configuration');
+        logTotalCount();
     });
 
     const tsWebExtensionMessageHandler = adguardApi.tswebextension.getMessageHandler();
 
-    // add message assistant message listener
+    // add assistant message listener
     chrome.runtime.onMessage.addListener((message, sender) => {
         if (message.handlerName === MESSAGE_HANDLER_NAME) {
             return tsWebExtensionMessageHandler(message, sender);
@@ -71,7 +82,7 @@ import { AdguardApi, AdguardApiConfiguration } from './src';
             case 'OPEN_ASSISTANT': {
                 chrome.tabs.query({ active: true }, (res) => {
                     if (res.length > 0 && res[0].id) {
-                        adguardApi.tswebextension.openAssistant(res[0].id);
+                        adguardApi.openAssistant(res[0].id);
                     }
                 });
                 break;
@@ -84,7 +95,7 @@ import { AdguardApi, AdguardApiConfiguration } from './src';
     // Disable Adguard in 1 minute
     setTimeout(async () => {
         adguardApi.tswebextension.onFilteringLogEvent.unsubscribe(onFilteringLogEvent);
-        await adguardApi.tswebextension.stop();
+        await adguardApi.stop();
         console.log('Adguard API has been disabled.');
     }, 60 * 1000);
 })();

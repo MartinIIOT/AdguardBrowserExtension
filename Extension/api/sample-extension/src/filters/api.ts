@@ -9,14 +9,6 @@ import { CommonFilterMetadata } from '../../../../src/background/storages/metada
 import { FilterRulesApi } from './rules';
 
 export class FiltersApi {
-    // update checking initialization delay
-    private static initDelay = 1000 * 60 * 5; // 5 min
-
-    // update checking period
-    private static checkPeriodMs = 1000 * 60 * 30; // 30 min
-
-    private updateTimerId: number;
-
     private metadataApi: MetadataApi;
 
     private versionsApi: VersionsApi;
@@ -38,10 +30,6 @@ export class FiltersApi {
     public async init(): Promise<void> {
         await this.metadataApi.init();
         await this.versionsApi.init();
-
-        setTimeout(async () => {
-            await this.scheduleUpdate();
-        }, FiltersApi.initDelay);
     }
 
     public async getFilters(filterIds: number[]): Promise<{
@@ -72,22 +60,10 @@ export class FiltersApi {
         };
     }
 
-    public async scheduleUpdate(): Promise<void> {
-        if (this.updateTimerId) {
-            window.clearTimeout(this.updateTimerId);
-        }
-
-        await this.updateFilters();
-
-        this.updateTimerId = window.setTimeout(async () => {
-            await this.scheduleUpdate();
-        }, FiltersApi.checkPeriodMs);
-    }
-
     /**
      * Update filters
      */
-    private async updateFilters(): Promise<void> {
+    public async updateFilters(): Promise<void> {
         log.info('Check filters updates...');
         /**
          * Reload filters metadata from backend for correct

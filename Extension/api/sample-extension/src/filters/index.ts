@@ -1,1 +1,2 @@
-export { FiltersApi } from './main';
+export { FiltersApi } from './api';
+export { FiltersService } from './service';
