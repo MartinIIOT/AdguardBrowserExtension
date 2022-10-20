@@ -5,6 +5,7 @@ import { NetworkSettings } from './settings';
 import { UserAgent } from '../../../common/user-agent';
 import { log } from '../../../common/log';
 import { strings } from '../../../common/strings';
+import { Metadata } from '../../storages';
 
 export type NetworkConfiguration = {
     filtersMetadataUrl?: string,
@@ -79,7 +80,8 @@ export class Network {
         this.loadingSubscriptions[url] = true;
 
         try {
-            let lines = await FiltersDownloader.download(url, this.filterCompilerConditionsConstants);
+            // TODO: runtime validation
+            let lines = await FiltersDownloader.download(url, this.filterCompilerConditionsConstants) as string[];
             lines = FiltersDownloader.resolveConditions(lines, this.filterCompilerConditionsConstants);
 
             delete this.loadingSubscriptions[url];
@@ -205,7 +207,8 @@ export class Network {
             throw new Error(`Empty response: ${response}`);
         }
 
-        const metadata = Network.parseJson(response.responseText);
+        // TODO: runtime validation
+        const metadata = Network.parseJson(response.responseText) as Metadata;
         if (!metadata) {
             throw new Error(`Invalid response: ${response}`);
         }

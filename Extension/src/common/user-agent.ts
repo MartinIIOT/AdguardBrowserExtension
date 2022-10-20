@@ -1,41 +1,46 @@
 /**
  * helper class for user agent data
- *
- * Use bowser UA string parser because User Agent Client Hints API is not supported by FF
- * https://developer.mozilla.org/en-US/docs/Web/API/User-Agent_Client_Hints_API#browser_compatibility
  */
 export class UserAgent {
-    static browserDataMap = {
-        'Chrome': {
+    static browserDataMap: Record<
+        string,
+        {
+            uaStringName: string;
+            brand?: string;
+        }
+    > = {
+        Chrome: {
             brand: 'Google Chrome',
             uaStringName: 'Chrome',
         },
-        'Firefox': {
-            brand: undefined,
+        Firefox: {
             uaStringName: 'Firefox',
         },
-        'Safari': {
-            brand: undefined,
+        Safari: {
             uaStringName: 'Safari',
         },
-        'Opera': {
+        Opera: {
             brand: 'Opera',
             uaStringName: 'OPR',
         },
-        'YaBrowser': {
+        YaBrowser: {
             brand: 'Yandex',
             uaStringName: 'YaBrowser',
         },
-        'Edge': {
-            brand: undefined,
+        Edge: {
             uaStringName: 'edge',
         },
-        'EdgeChromium': {
+        EdgeChromium: {
             brand: 'Microsoft Edge',
             uaStringName: 'edg',
         },
     };
 
+    /**
+     * Gets current browser name
+     *
+     * @returns user agent browser name
+     */
     static getBrowserName(): string | null {
         const brandsData = navigator?.userAgentData?.brands;
 
@@ -58,6 +63,9 @@ export class UserAgent {
 
     /**
      * Check if current browser is as given
+     *
+     * @param browserName - Browser Name
+     * @returns true, if current browser has specified name
      */
     static isTargetBrowser(browserName: string): boolean {
         const brand = UserAgent.browserDataMap[browserName]?.brand;
@@ -82,6 +90,9 @@ export class UserAgent {
 
     /**
      * Check if current platform is as given
+     *
+     * @param platformName - Platform name
+     * @returns true, if current browser has specified name
      */
     static isTargetPlatform(platformName: string): boolean {
         const platformString = navigator?.userAgentData?.platform;
@@ -93,11 +104,12 @@ export class UserAgent {
 
     /**
      * Get browser version by name
-     * @param {string} browserName
-     * @returns {number|null}
+     *
+     * @param browserName - Browser Name
+     * @returns browser version number or null
      */
     static getBrowserVersion(browserName: string): number | null {
-        let brand: string;
+        let brand: string | undefined;
         let uaStringMask: RegExp | undefined;
 
         if (browserName === 'Chrome') {
@@ -150,9 +162,10 @@ export class UserAgent {
 
     static isAndroid = UserAgent.isTargetPlatform('ANDROID');
 
-    static isSupportedBrowser = (UserAgent.isChrome && UserAgent.chromeVersion >= 79)
-        || (UserAgent.isFirefox && UserAgent.firefoxVersion >= 78)
-        || (UserAgent.isOpera && UserAgent.operaVersion >= 66);
+    static isSupportedBrowser =
+        (UserAgent.isChrome && Number(UserAgent.chromeVersion) >= 79)
+        || (UserAgent.isFirefox && Number(UserAgent.firefoxVersion) >= 78)
+        || (UserAgent.isOpera && Number(UserAgent.operaVersion) >= 66);
 
     static browserName = UserAgent.getBrowserName();
 }

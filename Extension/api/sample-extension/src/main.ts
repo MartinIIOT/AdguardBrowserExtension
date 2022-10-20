@@ -16,6 +16,8 @@ export type AdguardApiOptions = {
     filtersMetadataUrl: string,
     filterRulesUrl: string,
 };
+
+// TODO: api same to old
 export class AdguardApi implements AdguardApi {
     public tswebextension: TsWebExtension;
 
@@ -28,6 +30,7 @@ export class AdguardApi implements AdguardApi {
      */
     public onAssistantCreateRule: typeof this.tswebextension.onAssistantCreateRule;
 
+    // TODO: adapter
     /**
      * {@link TsWebExtension} {@link EventChannel} for filtering log events.
      *

@@ -14,7 +14,7 @@ export class Version {
         }
     }
 
-    public compare(version: Version) {
+    public compare(version: Version): number {
         for (let i = 0; i < 4; i += 1) {
             if (this.data[i] > version.data[i]) {
                 return 1;
@@ -25,7 +25,7 @@ export class Version {
         return 0;
     }
 
-    private static parseVersionPart(part: string) {
+    private static parseVersionPart(part: string): number {
         if (Number.isNaN(part)) {
             return 0;
         }

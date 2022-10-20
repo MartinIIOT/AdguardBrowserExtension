@@ -1,70 +1,38 @@
 import browser from 'webextension-polyfill';
 
-import { SettingOption } from '../schema';
-import { StringStorage } from '../utils/string-storage';
-import { i18n } from '../utils/i18n';
-import { settingsStorage } from './settings';
 import {
+    SettingOption,
+    Metadata,
+    TagMetadata,
+    RegularFilterMetadata,
+    GroupMetadata,
     FiltersI18n,
     GroupsI18n,
     I18nMetadata,
     TagsI18n,
-} from './i18n-metadata';
-
-export type CommonFilterMetadata = {
-    description: string,
-    displayNumber: number,
-    expires: number,
-    filterId: number,
-    groupId: number,
-    homepage: string,
-    languages: string[],
-    name: string,
-    subscriptionUrl: string,
-    tags: number[],
-    timeAdded: string,
-    timeUpdated: string,
-    trustLevel: string,
-    version: string,
-};
-
-export type TagMetadata = {
-    description: string
-    keyword: string
-    name: string
-    tagId: number
-};
-
-export type GroupMetadata = {
-    displayNumber: number
-    groupId: number
-    groupName: string
-};
-
-export type Metadata = {
-    filters: CommonFilterMetadata[],
-    groups: GroupMetadata[],
-    tags: TagMetadata[]
-};
+} from '../schema';
+import { StringStorage } from '../utils/string-storage';
+import { i18n } from '../utils/i18n';
+import { settingsStorage } from './settings';
 
 export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metadata, 'sync'> {
-    public getFilters() {
+    public getFilters(): RegularFilterMetadata[] {
         return this.data.filters;
     }
 
-    public getFilter(filterId: number) {
+    public getFilter(filterId: number): RegularFilterMetadata {
         return this.data.filters.find(el => el.filterId === filterId);
     }
 
-    public getGroups() {
+    public getGroups(): GroupMetadata[] {
         return this.data.groups;
     }
 
-    public getGroup(groupId: number) {
+    public getGroup(groupId: number): GroupMetadata {
         return this.data.groups.find(el => el.groupId === groupId);
     }
 
-    public getGroupByFilterId(filterId: number) {
+    public getGroupByFilterId(filterId: number): GroupMetadata | undefined {
         const filter = this.getFilter(filterId);
 
         if (!filter) {
@@ -74,11 +42,11 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
         return this.getGroup(filter.groupId);
     }
 
-    public getTags() {
+    public getTags(): TagMetadata[] {
         return this.data.tags;
     }
 
-    public getTag(tagId: number) {
+    public getTag(tagId: number): TagMetadata {
         return this.data.tags.find(el => el.tagId === tagId);
     }
 
@@ -157,9 +125,9 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
      * Localize filter
      */
     private static applyFilterLocalization(
-        filter: CommonFilterMetadata,
+        filter: RegularFilterMetadata,
         filtersI18n: FiltersI18n,
-    ) {
+    ): void {
         const { filterId } = filter;
         const localizations = filtersI18n[filterId];
         if (localizations) {
@@ -178,7 +146,7 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
     private static applyGroupLocalization(
         group: GroupMetadata,
         groupsI18n: GroupsI18n,
-    ) {
+    ): void {
         const { groupId } = group;
         const localizations = groupsI18n[groupId];
         if (localizations) {
