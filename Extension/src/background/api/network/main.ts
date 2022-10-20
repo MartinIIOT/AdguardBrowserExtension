@@ -3,9 +3,10 @@ import FiltersDownloader from '@adguard/filters-downloader';
 
 import { NetworkSettings } from './settings';
 import { UserAgent } from '../../../common/user-agent';
-import { log } from '../../../common/log';
 import { strings } from '../../../common/strings';
-import { Metadata } from '../../storages';
+import {
+    I18nMetadata, i18nMetadataValidator, Metadata, metadataValidator,
+} from '../../schema';
 
 export type NetworkConfiguration = {
     filtersMetadataUrl?: string,
@@ -101,8 +102,12 @@ export class Network {
 
     /**
      * Loads filter groups metadata
+     *
+     * @throws Error if metadata is invalid
+     *
+     * @returns @see {@link Metadata}
      */
-    public async getLocalFiltersMetadata(): Promise<unknown> {
+    public async getLocalFiltersMetadata(): Promise<Metadata> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/filters.json`);
 
         let response;
@@ -118,18 +123,24 @@ export class Network {
             throw Network.createError('empty response', url, response);
         }
 
-        const metadata = Network.parseJson(response.responseText);
-        if (!metadata) {
-            throw Network.createError('invalid response', url, response);
+        try {
+            const metadata = JSON.parse(response.responseText);
+            return metadataValidator.parse(metadata);
+        } catch (e) {
+            // FIXME: Return regular error
+            // FIXME: Zod error doesn't display
+            throw Network.createError('invalid response', url, response, e);
         }
-
-        return metadata;
     }
 
     /**
      * Loads filter groups metadata from local file
+     *
+     * @throws Error if metadata is invalid
+     *
+     * @returns @see {@link I18nMetadata}
      */
-    public async getLocalFiltersI18nMetadata(): Promise<unknown> {
+    public async getLocalFiltersI18nMetadata(): Promise<I18nMetadata> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/filters_i18n.json`);
 
         let response;
@@ -144,17 +155,24 @@ export class Network {
             throw Network.createError('empty response', url, response);
         }
 
-        const metadata = Network.parseJson(response.responseText);
-        if (!metadata) {
-            throw Network.createError('invalid response', url, response);
+        try {
+            const metadata = JSON.parse(response.responseText);
+            return i18nMetadataValidator.parse(metadata);
+        } catch (e) {
+            // FIXME: Return regular error
+            // FIXME: Zod error doesn't display
+            throw Network.createError('invalid response', url, response, e);
         }
-        return metadata;
     }
 
     /**
      * Loads script rules from local file
+     *
+     * @throws Error if metadata is invalid
+     *
+     * @returns Array of string script rules
      */
-    public async getLocalScriptRules(): Promise<unknown> {
+    public async getLocalScriptRules(): Promise<string[]> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/local_script_rules.json`);
 
         let response;
@@ -169,35 +187,40 @@ export class Network {
             throw Network.createError('empty response', url, response);
         }
 
-        const metadata = Network.parseJson(response.responseText);
-        if (!metadata) {
-            throw Network.createError('invalid response', url, response);
+        try {
+            return JSON.parse(response.responseText);
+        } catch (e) {
+            throw Network.createError('invalid response', url, response, e);
         }
-
-        return metadata;
     }
 
     /**
      * Downloads metadata from backend
+     *
+     * @throws Error if metadata is invalid
      */
     public async downloadMetadataFromBackend(): Promise<unknown> {
-        const response = await Network.executeRequestAsync(this.settings.filtersMetadataUrl, 'application/json');
+        const url = this.settings.filtersMetadataUrl;
+        const response = await Network.executeRequestAsync(url, 'application/json');
         if (!response?.responseText) {
             throw new Error(`Empty response: ${response}`);
         }
 
-        const metadata = Network.parseJson(response.responseText);
-        if (!metadata) {
-            throw new Error(`Invalid response: ${response}`);
+        try {
+            return JSON.parse(response.responseText);
+        } catch (e) {
+            throw Network.createError('invalid response', url, response, e);
         }
-
-        return metadata;
     }
 
     /**
-     * Downloads i18n metadata from backend
+     * Downloads i18n metadata from backend and returns it
+     *
+     * @throws Error if metadata is invalid
+     *
+     * @returns @see {@link I18nMetadata}
      */
-    public async downloadI18nMetadataFromBackend(): Promise<unknown> {
+    public async downloadI18nMetadataFromBackend(): Promise<I18nMetadata> {
         const response = await Network.executeRequestAsync(
             this.settings.filtersI18nMetadataUrl,
             'application/json',
@@ -207,13 +230,12 @@ export class Network {
             throw new Error(`Empty response: ${response}`);
         }
 
-        // TODO: runtime validation
-        const metadata = Network.parseJson(response.responseText) as Metadata;
-        if (!metadata) {
-            throw new Error(`Invalid response: ${response}`);
+        try {
+            const metadata = JSON.parse(response.responseText);
+            return i18nMetadataValidator.parse(metadata);
+        } catch (e) {
+            throw new Error(`Invalid response: ${response}`, { cause: e });
         }
-
-        return metadata;
     }
 
     /**
@@ -343,23 +365,12 @@ export class Network {
         });
     }
 
-    /**
-     * Safe json parsing
-     *
-     * @param text - json string
-     *
-     * @returns parsed json
-     */
-    private static parseJson(text: string): unknown {
-        try {
-            return JSON.parse(text);
-        } catch (ex) {
-            log.error('Error parse json {0}', ex);
-            return null;
-        }
-    }
-
-    private static createError(message: string, url: string, response?: ExtensionXMLHttpRequest): Error {
+    private static createError(
+        message: string,
+        url: string,
+        response?: ExtensionXMLHttpRequest,
+        originError?: Error,
+    ): Error {
         let errorMessage = `
             error:                    ${message}
             requested url:            ${url}`;
@@ -371,7 +382,7 @@ export class Network {
             request status text:      ${response.statusText}`;
         }
 
-        return new Error(errorMessage);
+        return new Error(errorMessage, { cause: originError });
     }
 }
 

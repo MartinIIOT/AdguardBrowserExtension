@@ -11,15 +11,14 @@ import {
     groupStateStorage,
     i18nMetadataStorage,
     metadataStorage,
-    CommonFilterMetadata,
     MetadataStorage,
     filterVersionStorage,
     FilterStateStorage,
-    Metadata,
     GroupStateStorage,
     FilterVersionStorage,
     FiltersStorage,
 } from '../../storages';
+import { Metadata, RegularFilterMetadata } from '../../schema';
 
 import { network } from '../network';
 import { UserRulesApi } from './userrules';
@@ -28,7 +27,7 @@ import { CommonFilterApi } from './common';
 import { CustomFilterApi } from './custom';
 import { PageStatsApi } from './page-stats';
 
-export type FilterMetadata = CommonFilterMetadata | CustomFilterMetadata;
+export type FilterMetadata = RegularFilterMetadata | CustomFilterMetadata;
 
 /**
  * API for managing filters data.

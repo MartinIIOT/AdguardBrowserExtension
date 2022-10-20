@@ -1,8 +1,10 @@
-import zod, { z } from 'zod';
+import zod from 'zod';
 
-export const regularFilterI18nMetadataValidator = zod.object({
-    description: zod.string(),
-    name: zod.string(),
-});
+export const regularFilterI18nMetadataValidator = zod.record(
+    zod.string(), zod.object({
+        description: zod.string(),
+        name: zod.string(),
+    }),
+);
 
-export type RegularFilterI18nMetadata = z.infer<typeof regularFilterI18nMetadataValidator>;
+export type RegularFilterI18nMetadata = zod.infer<typeof regularFilterI18nMetadataValidator>;
