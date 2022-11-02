@@ -1,12 +1,28 @@
+/**
+ * @file
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 import browser from 'webextension-polyfill';
 
 import { BrowserUtils } from '../../utils/browser-utils';
 import { log } from '../../../common/log';
 import { UserAgent } from '../../../common/user-agent';
-import { SettingOption } from '../../schema';
+import { SettingOption, RegularFilterMetadata } from '../../schema';
 import { AntiBannerFiltersId, AntibannerGroupsId } from '../../../common/constants';
 import {
-    CommonFilterMetadata,
     metadataStorage,
     filterStateStorage,
     groupStateStorage,
@@ -34,7 +50,7 @@ export class CommonFilterApi {
      *
      * @returns common filter metadata
      */
-    public static getFilterMetadata(filterId: number): CommonFilterMetadata | undefined {
+    public static getFilterMetadata(filterId: number): RegularFilterMetadata | undefined {
         return metadataStorage.getFilter(filterId);
     }
 
@@ -43,7 +59,7 @@ export class CommonFilterApi {
      *
      * @returns common filters metadata array
      */
-    public static getFiltersMetadata(): CommonFilterMetadata[] {
+    public static getFiltersMetadata(): RegularFilterMetadata[] {
         return metadataStorage.getFilters();
     }
 
@@ -67,7 +83,7 @@ export class CommonFilterApi {
      *
      * @returns updated filter metadata or null, if update is not required
      */
-    public static async updateFilter(filterId: number): Promise<CommonFilterMetadata | null> {
+    public static async updateFilter(filterId: number): Promise<RegularFilterMetadata | null> {
         log.info(`Update filter ${filterId}`);
 
         const filterMetadata = CommonFilterApi.getFilterMetadata(filterId);
@@ -117,7 +133,7 @@ export class CommonFilterApi {
             version,
             expires,
             timeUpdated,
-        } = CommonFilterApi.getFilterMetadata(filterId) as CommonFilterMetadata;
+        } = CommonFilterApi.getFilterMetadata(filterId) as RegularFilterMetadata;
 
         filterVersionStorage.set(filterId, {
             version,
@@ -186,7 +202,7 @@ export class CommonFilterApi {
      *
      * @returns true, if filter update is required, else returns false.
      */
-    private static isFilterNeedUpdate(filterMetadata: CommonFilterMetadata): boolean {
+    private static isFilterNeedUpdate(filterMetadata: RegularFilterMetadata): boolean {
         log.info(`Check if filter ${filterMetadata.filterId} need to update`);
 
         const filterVersion = filterVersionStorage.get(filterMetadata.filterId);

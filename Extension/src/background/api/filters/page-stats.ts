@@ -1,4 +1,5 @@
 /**
+ * @file
  * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
  *
  * Adguard Browser Extension is free software: you can redistribute it and/or modify
@@ -20,8 +21,9 @@ import {
     pageStatsStorage,
     PageStatsStorage,
     PageStatsDataItem,
-    GroupMetadata,
 } from '../../storages';
+
+import { GroupMetadata } from '../../schema';
 
 export type GetStatisticsDataResponse = {
     today: PageStatsDataItem[],
