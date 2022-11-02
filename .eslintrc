@@ -97,7 +97,9 @@
     "jsdoc/require-param-type": "off",
     "jsdoc/require-returns-type": "off",
 
-    "jsdoc/tag-lines": "off"
+    "jsdoc/tag-lines": "off",
+    "jsdoc/require-throws": "error",
+    "jsdoc/require-file-overview": "error",
   },
   "globals": {
     "adguard": true,
