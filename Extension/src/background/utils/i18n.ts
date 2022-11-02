@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-import { collections } from './collections';
 
 /**
  * Simple i18n utils
@@ -46,7 +45,7 @@ export const i18n = (function () {
 
             let search;
 
-            if (collections.isArray(locales)) {
+            if (Array.isArray(locales)) {
                 search = isArrayElement;
             } else {
                 search = isObjectKey;

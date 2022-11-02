@@ -16,10 +16,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 export * from './browser-utils';
-export * from './collections';
-export * from './filters';
 export * from './i18n';
-export * from './lazy';
 export * from './string-storage';
 export * from './url';
 export * from './version';
