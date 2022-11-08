@@ -66,10 +66,13 @@ import { getRunInfo } from './utils';
 import { CLIENT_ID_KEY } from '../common/constants';
 
 /**
- * App entry point
+ * This class is app entry point
+ *
+ * {@link App.init} Initializes all app services
+ * and handle webextension API events for first install and update scenario
  */
 export class App {
-    static uninstallUrl = Forward.get({
+    private static uninstallUrl = Forward.get({
         action: ForwardAction.UninstallExtension,
         from: ForwardFrom.Background,
     });
@@ -78,7 +81,7 @@ export class App {
      * Initializes all app services
      * and handle webextension API events for first install and update scenario
      */
-    static async init(): Promise<void> {
+    public static async init(): Promise<void> {
         // Initializes connection and message handler as soon as possible
         // to prevent connection errors from extension pages
         ConnectionHandler.init();
