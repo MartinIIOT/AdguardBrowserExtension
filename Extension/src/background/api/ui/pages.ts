@@ -17,6 +17,7 @@
  */
 import browser, { Windows } from 'webextension-polyfill';
 import { UserAgent } from '../../../common/user-agent';
+import { AddFilteringSubscriptionMessage } from '../../../common/messages';
 import {
     Forward,
     ForwardAction,
@@ -203,7 +204,7 @@ export class PagesApi {
         });
     }
 
-    public static async openSettingsPageWithCustomFilterModal(message): Promise<void> {
+    public static async openSettingsPageWithCustomFilterModal(message: AddFilteringSubscriptionMessage): Promise<void> {
         const { url, title } = message.data;
 
         let path = 'options.html#filters?group=0';

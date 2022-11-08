@@ -1,3 +1,20 @@
+/**
+ * @file
+ * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
+ *
+ * Adguard Browser Extension is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Adguard Browser Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
+ */
 import { Windows } from 'webextension-polyfill';
 import { ForwardFrom } from '../forward';
 import { SettingOption, Settings } from '../../background/schema';
@@ -86,6 +103,21 @@ export enum MessageType {
   AppInitialized = 'appInitialized',
   UpdateTotalBlocked = 'updateTotalBlocked',
 }
+
+export type ApplySettingsJsonMessage = {
+    type: MessageType.ApplySettingsJson,
+    data: {
+        json: string,
+    },
+};
+
+export type AddFilteringSubscriptionMessage = {
+    type: MessageType.AddFilteringSubscription,
+    data: {
+        url: string,
+        title?: string,
+    }
+};
 
 export type CreateEventListenerMessage = {
   type: MessageType.CreateEventListener,
@@ -349,6 +381,8 @@ export type DisableFiltersGroupMessage = {
 };
 
 export type Message = (
+  | ApplySettingsJsonMessage
+  | AddFilteringSubscriptionMessage
   | GetTabInfoForPopupMessage
   | ChangeApplicationFilteringDisabledMessage
   | OpenSettingsTabMessage

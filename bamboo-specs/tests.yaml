@@ -35,6 +35,7 @@ Test:
 
             yarn install ${bamboo.varsYarn}
             yarn lint
+            yarn check-types
             yarn test
             yarn dev
             rm -rf node_modules

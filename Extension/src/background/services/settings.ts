@@ -16,7 +16,12 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import browser from 'webextension-polyfill';
-import { MessageType } from '../../common/messages';
+
+import {
+    MessageType,
+    ChangeUserSettingMessage,
+    ApplySettingsJsonMessage,
+} from '../../common/messages';
 import { SettingOption } from '../schema';
 import { messageHandler } from '../message-handler';
 import { UserAgent } from '../../common/user-agent';
@@ -28,8 +33,13 @@ import { listeners } from '../notifier';
 import { ContextMenuAction, contextMenuEvents, settingsEvents } from '../events';
 import { fullscreenUserRulesEditor } from './fullscreen-user-rules-editor';
 
+type ExportMessageResponse = {
+    content: string,
+    appVersion: string,
+};
+
 export class SettingsService {
-    static init() {
+    static init(): void {
         messageHandler.addListener(MessageType.GetOptionsData, SettingsService.getOptionsData);
         messageHandler.addListener(MessageType.ResetSettings, SettingsService.reset);
         messageHandler.addListener(MessageType.ChangeUserSettings, SettingsService.changeUserSettings);
@@ -95,12 +105,12 @@ export class SettingsService {
         };
     }
 
-    static async changeUserSettings(message) {
+    static async changeUserSettings(message: ChangeUserSettingMessage): Promise<void> {
         const { key, value } = message.data;
         await SettingsApi.setSetting(key, value);
     }
 
-    static async reset() {
+    static async reset(): Promise<boolean> {
         try {
             await SettingsApi.reset();
             await Engine.update();
@@ -110,7 +120,7 @@ export class SettingsService {
         }
     }
 
-    static async import(message) {
+    static async import(message: ApplySettingsJsonMessage): Promise<boolean> {
         const { json } = message.data;
 
         const isImported = await SettingsApi.import(json);
@@ -121,14 +131,14 @@ export class SettingsService {
         return isImported;
     }
 
-    static async export() {
+    static async export(): Promise<ExportMessageResponse> {
         return {
             content: await SettingsApi.export(),
             appVersion: browser.runtime.getManifest().version,
         };
     }
 
-    static async onFilteringStateChange() {
+    static async onFilteringStateChange(): Promise<void> {
         await Engine.update();
 
         const activeTab = await TabsApi.getActive();
@@ -138,11 +148,11 @@ export class SettingsService {
         }
     }
 
-    static async enableFiltering() {
+    static async enableFiltering(): Promise<void> {
         await SettingsApi.setSetting(SettingOption.DisableFiltering, false);
     }
 
-    static async disableFiltering() {
+    static async disableFiltering(): Promise<void> {
         await SettingsApi.setSetting(SettingOption.DisableFiltering, true);
     }
 }

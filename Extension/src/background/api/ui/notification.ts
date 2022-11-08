@@ -32,7 +32,7 @@ import { UiApi } from './main';
 export class NotificationApi {
     private static checkTimeoutMs = 10 * 60 * 1000; // 10 minutes
 
-    private static minPeriodMs = 30 * 1000; // 30 minutes
+    private static minPeriodMs = 30 * 1000; // 30 seconds
 
     private static delayMs = 30 * 1000; // clear notification in 30 seconds
 
