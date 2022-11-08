@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export type AppStorageData = {
+export type AppContextData = {
     isInit: boolean,
     clientId?: string,
 };
@@ -23,9 +23,9 @@ export type AppStorageData = {
 /**
  * Memory storage for app global context
  */
-export class AppStorage {
+export class AppContext {
     // Initialize with default data
-    private data: AppStorageData = {
+    private data: AppContextData = {
         isInit: false,
     };
 
@@ -35,7 +35,7 @@ export class AppStorage {
      * @param key - context key
      * @returns context value
      */
-    public get<T extends keyof AppStorageData>(key: T): AppStorageData[T] {
+    public get<T extends keyof AppContextData>(key: T): AppContextData[T] {
         return this.data[key];
     }
 
@@ -45,9 +45,9 @@ export class AppStorage {
      * @param key - context key
      * @param value - context value
      */
-    public set<T extends keyof AppStorageData>(key: T, value: AppStorageData[T]): void {
+    public set<T extends keyof AppContextData>(key: T, value: AppContextData[T]): void {
         this.data[key] = value;
     }
 }
 
-export const appStorage = new AppStorage();
+export const appContext = new AppContext();

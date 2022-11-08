@@ -23,7 +23,7 @@ import {
 } from '@adguard/tswebextension';
 import { AntiBannerFiltersId } from '../../../common/constants';
 import { SettingOption } from '../../schema';
-import { appStorage } from '../../storages';
+import { appContext } from '../../storages';
 import { PageStatsApi } from '../filters';
 import { SettingsApi } from '../settings';
 
@@ -68,7 +68,7 @@ export class FramesApi {
 
         const urlFilteringDisabled = !url || !isHttpRequest(url);
 
-        const applicationAvailable = appStorage.get('isInit') && !urlFilteringDisabled;
+        const applicationAvailable = appContext.get('isInit') && !urlFilteringDisabled;
 
         let frameRule: FrameRule | undefined;
         let documentAllowlisted = false;

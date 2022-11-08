@@ -16,7 +16,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Prefs } from '../prefs';
-import { appStorage } from '../storages';
+import { appContext } from '../storages';
 
 import { Version } from './version';
 
@@ -34,9 +34,10 @@ export class BrowserUtils {
      * @see PagesApi.openThankYouPage
      *
      * @returns extension specified query params array
+     * @throws error if client id is undefined
      */
     public static getExtensionParams(): string[] {
-        const persistedClientId = appStorage.get('clientId');
+        const persistedClientId = appContext.get('clientId');
 
         if (typeof persistedClientId !== 'string') {
             throw new Error('client id is not found');

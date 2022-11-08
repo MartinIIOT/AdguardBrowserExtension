@@ -19,20 +19,28 @@ import zod from 'zod';
 
 /**
  * In some cases we want to preprocessing input before validation
- * For example, cast stringified value to needed type
+ * For example, cast loaded filter metadata item id field from string to number before validation:
+ *
+ * { filterId: "1", ... } -> { filterId: 1, ... }
  */
 export class SchemaPreprocessor {
-    public static booleanValidator = zod.preprocess(
-        SchemaPreprocessor.castStringToBoolean,
-        zod.boolean(),
-    );
+    /**
+     * {@link zod} runtime validator with {@link castStringToBoolean} preprocessor
+     */
+    public static booleanValidator = zod.preprocess(SchemaPreprocessor.castStringToBoolean, zod.boolean());
 
-    public static numberValidator = zod.preprocess(
-        SchemaPreprocessor.castStringToNumber,
-        zod.number(),
-    );
+    /**
+     * {@link zod} runtime validator with {@link castStringToNumber} preprocessor
+     */
+    public static numberValidator = zod.preprocess(SchemaPreprocessor.castStringToNumber, zod.number());
 
-    private static castStringToNumber(value: unknown) {
+    /**
+     * If {@link value} is string, cast it to number, else returns original value.
+     *
+     * @param value - preprocessed value
+     * @returns number value, if string passed, else returns original value
+     */
+    private static castStringToNumber(value: unknown): number | unknown {
         if (typeof value === 'string') {
             return Number(value);
         }
@@ -40,7 +48,13 @@ export class SchemaPreprocessor {
         return value;
     }
 
-    private static castStringToBoolean(value: unknown) {
+    /**
+     * If {@link value} is string, cast it to boolean, else returns original value.
+     *
+     * @param value - preprocessed value
+     * @returns boolean value, if string passed, else returns original value
+     */
+    private static castStringToBoolean(value: unknown): boolean | unknown {
         if (typeof value === 'string') {
             try {
                 return Boolean(JSON.parse(value));

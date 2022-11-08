@@ -16,14 +16,14 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import browser from 'webextension-polyfill';
-
+import zod from 'zod';
 import { MessageType, sendMessage } from '../common/messages';
 import { log } from '../common/log';
 
 import { messageHandler } from './message-handler';
 import { ConnectionHandler } from './connection-handler';
 import { Engine } from './engine';
-import { appStorage, settingsStorage, storage } from './storages';
+import { appContext, settingsStorage, storage } from './storages';
 import {
     toasts,
     CommonFilterApi,
@@ -100,14 +100,10 @@ export class App {
             await UpdateApi.update(runInfo);
         }
 
-        /**
-         * Initializes App storage data
-         */
+        // Initializes App storage data
         await App.initClientId();
 
-        /**
-         * Initializes Settings storage data
-         */
+        // Initializes Settings storage data
         await SettingsApi.init();
 
         /**
@@ -207,7 +203,7 @@ export class App {
         // Runs tswebextension
         await Engine.start();
 
-        appStorage.set('isInit', true);
+        appContext.set('isInit', true);
 
         await sendMessage<MessageType.AppInitialized>({ type: MessageType.AppInitialized });
     }
@@ -244,13 +240,18 @@ export class App {
     }
 
     private static async initClientId(): Promise<void> {
-        const clientId = await storage.get(CLIENT_ID_KEY);
+        const storageClientId = await storage.get(CLIENT_ID_KEY);
+        let clientId: string;
 
-        if (typeof clientId !== 'string') {
-            throw new Error('client id is not found');
+        try {
+            clientId = zod.string().parse(storageClientId);
+        } catch (e) {
+            log.warn('Error while parsing client id, generating a new one');
+            clientId = InstallApi.genClientId();
+            await storage.set(CLIENT_ID_KEY, clientId);
         }
 
-        appStorage.set('clientId', clientId);
+        appContext.set('clientId', clientId);
     }
 }
 

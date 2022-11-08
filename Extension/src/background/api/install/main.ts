@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
+import { nanoid } from 'nanoid';
 import {
     ADGUARD_SETTINGS_KEY,
     APP_VERSION_KEY,
@@ -32,14 +33,8 @@ export class InstallApi {
      * @returns client id string
      */
     public static genClientId(): string {
-        const result: string[] = [];
         const suffix = (Date.now()) % 1e8;
-        const symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890';
-        for (let i = 0; i < 8; i += 1) {
-            const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-            result.push(symbol);
-        }
-        return result.join('') + suffix;
+        return nanoid(8) + suffix;
     }
 
     /**
