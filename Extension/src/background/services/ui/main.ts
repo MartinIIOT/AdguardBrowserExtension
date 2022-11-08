@@ -32,7 +32,7 @@ import {
 } from '../../../common/messages';
 import { UserAgent } from '../../../common/user-agent';
 import { Engine } from '../../engine';
-import { AntiBannerFiltersId } from '../../../common/constants';
+import { AntiBannerFiltersId, NotifierType } from '../../../common/constants';
 import { listeners } from '../../notifier';
 
 import {
@@ -44,9 +44,34 @@ import {
     AssistantApi,
     UiApi,
     PageStatsApi,
+    SettingsData,
+    FilterMetadata,
 } from '../../api';
 import { ContextMenuAction, contextMenuEvents } from '../../events';
 import { ForwardFrom } from '../../../common/forward';
+
+export type InitializeFrameScriptResponse = {
+    userSettings: SettingsData,
+    enabledFilters: Record<string, boolean>,
+    filtersMetadata: FilterMetadata[],
+    requestFilterInfo: {
+        rulesCount: number,
+    },
+    environmentOptions: {
+        isMacOs: boolean,
+        canBlockWebRTC: boolean,
+        isChrome: boolean,
+        Prefs: {
+            locale: string,
+            mobile: boolean,
+        },
+        appVersion: string,
+    },
+    constants: {
+        AntiBannerFiltersId: typeof AntiBannerFiltersId,
+        EventNotifierType: typeof NotifierType,
+    },
+};
 
 export class UiService {
     public static async init(): Promise<void> {
@@ -78,7 +103,7 @@ export class UiService {
         messageHandler.addListener(MessageType.OpenAssistant, AssistantApi.openAssistant);
         contextMenuEvents.addListener(ContextMenuAction.BlockSiteAds, AssistantApi.openAssistant);
 
-        messageHandler.addListener(MessageType.InitializeFrameScript, UiService.initializeFrameScriptRequest);
+        messageHandler.addListener(MessageType.InitializeFrameScript, UiService.initializeFrameScript);
 
         tsWebExtTabApi.onUpdate.subscribe(UiApi.update);
         tsWebExtTabApi.onActivated.subscribe(UiApi.update);
@@ -118,7 +143,7 @@ export class UiService {
         }
     }
 
-    private static initializeFrameScriptRequest() {
+    private static initializeFrameScript(): InitializeFrameScriptResponse {
         const enabledFilters = {};
         Object.values(AntiBannerFiltersId).forEach((filterId) => {
             const enabled = FiltersApi.isFilterEnabled(Number(filterId));

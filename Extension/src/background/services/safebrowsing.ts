@@ -22,10 +22,10 @@ import { SafebrowsingApi, TabsApi } from '../api';
 import { SettingOption } from '../schema';
 import { settingsEvents } from '../events';
 import { messageHandler } from '../message-handler';
-import { MessageType } from '../../common/messages';
+import { MessageType, OpenSafebrowsingTrustedMessage } from '../../common/messages';
 
 export class SafebrowsingService {
-    public static async init() {
+    public static async init(): Promise<void> {
         await SafebrowsingApi.initCache();
 
         settingsEvents.addListener(
@@ -38,7 +38,7 @@ export class SafebrowsingService {
         messageHandler.addListener(MessageType.OpenSafebrowsingTrusted, SafebrowsingService.onAddTrustedDomain);
     }
 
-    private static onHeaderReceived({ context }: RequestData<WebRequest.OnHeadersReceivedDetailsType>) {
+    private static onHeaderReceived({ context }: RequestData<WebRequest.OnHeadersReceivedDetailsType>): void {
         const {
             requestType,
             statusCode,
@@ -57,7 +57,7 @@ export class SafebrowsingService {
         }
     }
 
-    private static async onAddTrustedDomain({ data }): Promise<void> {
+    private static async onAddTrustedDomain({ data }: OpenSafebrowsingTrustedMessage): Promise<void> {
         const { url } = data;
         await SafebrowsingApi.addToSafebrowsingTrusted(url);
 

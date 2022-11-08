@@ -105,18 +105,18 @@ export enum MessageType {
 }
 
 export type ApplySettingsJsonMessage = {
-    type: MessageType.ApplySettingsJson,
-    data: {
-        json: string,
-    },
+  type: MessageType.ApplySettingsJson,
+  data: {
+    json: string,
+  },
 };
 
 export type AddFilteringSubscriptionMessage = {
-    type: MessageType.AddFilteringSubscription,
-    data: {
-        url: string,
-        title?: string,
-    }
+  type: MessageType.AddFilteringSubscription,
+  data: {
+    url: string,
+    title?: string,
+  }
 };
 
 export type CreateEventListenerMessage = {
@@ -380,6 +380,27 @@ export type DisableFiltersGroupMessage = {
   }
 };
 
+export type OpenSafebrowsingTrustedMessage = {
+  type: MessageType.OpenSafebrowsingTrusted,
+  data: {
+    url: string,
+  }
+};
+
+export type AddUrlToTrustedMessage = {
+  type: MessageType.AddUrlToTrusted,
+  data: {
+    url: string,
+  }
+};
+
+export type SetNotificationViewedMessage = {
+  type: MessageType.SetNotificationViewed,
+  data: {
+    withDelay: boolean,
+  }
+};
+
 export type Message = (
   | ApplySettingsJsonMessage
   | AddFilteringSubscriptionMessage
@@ -422,6 +443,8 @@ export type Message = (
   | SetFilteringLogWindowStateMessage
   | EnableFiltersGroupMessage
   | DisableFiltersGroupMessage
+  | OpenSafebrowsingTrustedMessage
+  | SetNotificationViewedMessage
 ) &
   MessageCommonProps;
 

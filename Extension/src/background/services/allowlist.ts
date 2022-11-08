@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-import browser from 'webextension-polyfill';
-
 import { log } from '../../common/log';
 import {
     MessageType,
@@ -29,6 +27,12 @@ import { Engine } from '../engine';
 import { SettingOption } from '../schema';
 import { AllowlistApi, TabsApi } from '../api';
 import { ContextMenuAction, contextMenuEvents, settingsEvents } from '../events';
+import { Prefs } from '../prefs';
+
+export type GetAllowlistDomainsResponse = {
+    content: string,
+    appVersion: string,
+};
 
 /**
  * Service for processing events with a allowlist
@@ -37,7 +41,7 @@ export class AllowlistService {
     /**
      * Initialize handlers
      */
-    public static async init() {
+    public static init(): void {
         messageHandler.addListener(MessageType.GetAllowlistDomains, AllowlistService.onGetAllowlistDomains);
         messageHandler.addListener(MessageType.SaveAllowlistDomains, AllowlistService.handleDomainsSave);
         messageHandler.addListener(MessageType.AddAllowlistDomainPopup, AllowlistService.onAddAllowlistDomain);
@@ -66,24 +70,26 @@ export class AllowlistService {
 
     /**
      * Gets domains depending on current allowlist mode
+     *
+     * @returns - {@link GetAllowlistDomainsResponse}
      */
-    private static onGetAllowlistDomains() {
+    private static onGetAllowlistDomains(): GetAllowlistDomainsResponse {
         const domains = AllowlistApi.isInverted()
             ? AllowlistApi.getInvertedAllowlistDomains()
             : AllowlistApi.getAllowlistDomains();
 
         const content = domains.join('\n');
 
-        return { content, appVersion: browser.runtime.getManifest().version };
+        return { content, appVersion: Prefs.version };
     }
 
-    private static async onAddAllowlistDomain(message: AddAllowlistDomainPopupMessage) {
+    private static async onAddAllowlistDomain(message: AddAllowlistDomainPopupMessage): Promise<void> {
         const { tabId } = message.data;
 
         await AllowlistApi.addTabUrlToAllowlist(tabId);
     }
 
-    private static async onRemoveAllowlistDomain(message: RemoveAllowlistDomainMessage) {
+    private static async onRemoveAllowlistDomain(message: RemoveAllowlistDomainMessage): Promise<void> {
         const { tabId } = message.data;
 
         await AllowlistApi.removeTabUrlFromAllowlist(tabId);
@@ -91,8 +97,10 @@ export class AllowlistService {
 
     /**
      * Stores domains depending on current allowlist mode
+     *
+     * @param message -message data
      */
-    private static async handleDomainsSave(message: SaveAllowlistDomainsMessage) {
+    private static async handleDomainsSave(message: SaveAllowlistDomainsMessage): Promise<void> {
         const { value } = message.data;
 
         const domains = value.split(/[\r\n]+/);
@@ -106,7 +114,7 @@ export class AllowlistService {
         await Engine.update();
     }
 
-    private static async enableSiteFilteringFromContextMenu() {
+    private static async enableSiteFilteringFromContextMenu(): Promise<void> {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.id) {
@@ -116,7 +124,7 @@ export class AllowlistService {
         }
     }
 
-    private static async disableSiteFilteringFromContextMenu() {
+    private static async disableSiteFilteringFromContextMenu(): Promise<void> {
         const activeTab = await TabsApi.getActive();
 
         if (activeTab?.id) {
@@ -129,14 +137,14 @@ export class AllowlistService {
     /**
      * Triggers engine update on enabling
      */
-    static async onEnableStateChange() {
+    static async onEnableStateChange(): Promise<void> {
         await Engine.update();
     }
 
     /**
      * Triggers engine update on mode switch
      */
-    static async onAllowlistModeChange() {
+    static async onAllowlistModeChange(): Promise<void> {
         await Engine.update();
     }
 }

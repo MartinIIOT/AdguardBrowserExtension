@@ -24,12 +24,12 @@ import { NotifierType } from '../../common/constants';
 class FullscreenUserRulesEditor {
     openPagesCount = 0;
 
-    onOpenPage() {
+    onOpenPage(): void {
         this.openPagesCount += 1;
         this.onPagesCountChanged();
     }
 
-    onClosePage() {
+    onClosePage(): void {
         if (this.openPagesCount <= 0) {
             return;
         }
@@ -37,11 +37,11 @@ class FullscreenUserRulesEditor {
         this.onPagesCountChanged();
     }
 
-    onPagesCountChanged() {
+    onPagesCountChanged(): void {
         listeners.notifyListeners(NotifierType.FullscreenUserRulesEditorUpdated, this.isOpen());
     }
 
-    isOpen() {
+    isOpen(): boolean {
         return this.openPagesCount > 0;
     }
 }

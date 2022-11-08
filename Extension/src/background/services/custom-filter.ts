@@ -25,9 +25,10 @@ import {
     RemoveAntiBannerFilterMessage,
 } from '../../common/messages';
 import { BACKGROUND_TAB_ID } from '../../common/constants';
-import { CustomFilterApi } from '../api';
+import { CustomFilterApi, GetCustomFilterInfoResult } from '../api';
 import { messageHandler } from '../message-handler';
 import { Engine } from '../engine';
+import { CustomFilterMetadata } from '../schema';
 
 /**
  * Service for processing events with custom filters
@@ -36,7 +37,7 @@ export class CustomFilterService {
     /**
      * Init handlers
      */
-    static async init() {
+    static init(): void {
         messageHandler.addListener(MessageType.LoadCustomFilterInfo, CustomFilterService.onCustomFilterInfoLoad);
         messageHandler.addListener(
             MessageType.SubscribeToCustomFilter,
@@ -49,8 +50,10 @@ export class CustomFilterService {
 
     /**
      * Get custom filter info for modal window
+     *
+     * @param message - message data
      */
-    static async onCustomFilterInfoLoad(message: LoadCustomFilterInfoMessage) {
+    static async onCustomFilterInfoLoad(message: LoadCustomFilterInfoMessage): Promise<GetCustomFilterInfoResult> {
         const { url, title } = message.data;
 
         return CustomFilterApi.getFilterInfo(url, title);
@@ -58,8 +61,10 @@ export class CustomFilterService {
 
     /**
      * Add new custom filter
+     *
+     * @param message - message data
      */
-    static async onCustomFilterSubscription(message: SubscribeToCustomFilterMessage) {
+    static async onCustomFilterSubscription(message: SubscribeToCustomFilterMessage): Promise<CustomFilterMetadata> {
         const { filter } = message.data;
 
         const { customUrl, name, trusted } = filter;
@@ -78,8 +83,10 @@ export class CustomFilterService {
 
     /**
      * Remove custom filter
+     *
+     * @param message - message data
      */
-    static async onCustomFilterRemove(message: RemoveAntiBannerFilterMessage) {
+    static async onCustomFilterRemove(message: RemoveAntiBannerFilterMessage): Promise<void> {
         const { filterId } = message.data;
 
         await CustomFilterApi.removeFilter(filterId);
@@ -87,8 +94,10 @@ export class CustomFilterService {
 
     /**
      * Inject custom filter subscription content script to tab
+     *
+     * @param details - onCommitted event request details
      */
-    static injectSubscriptionScript(details: WebNavigation.OnCommittedDetailsType) {
+    static injectSubscriptionScript(details: WebNavigation.OnCommittedDetailsType): void {
         const { tabId, frameId } = details;
 
         if (tabId === BACKGROUND_TAB_ID) {

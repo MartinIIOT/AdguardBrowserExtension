@@ -28,14 +28,37 @@ import { UserAgent } from '../../common/user-agent';
 import { AntiBannerFiltersId } from '../../common/constants';
 
 import { Engine } from '../engine';
-import { Categories, SettingsApi, TabsApi } from '../api';
+import {
+    Categories,
+    CategoriesData,
+    SettingsApi,
+    SettingsData,
+    TabsApi,
+} from '../api';
+import { Prefs } from '../prefs';
 import { listeners } from '../notifier';
 import { ContextMenuAction, contextMenuEvents, settingsEvents } from '../events';
 import { fullscreenUserRulesEditor } from './fullscreen-user-rules-editor';
 
-type ExportMessageResponse = {
+export type ExportMessageResponse = {
     content: string,
     appVersion: string,
+};
+
+export type GetOptionsDataResponse = {
+    settings: SettingsData,
+    appVersion: string,
+    environmentOptions: {
+        isChrome: boolean,
+    },
+    constants: {
+        AntiBannerFiltersId: typeof AntiBannerFiltersId,
+    },
+    filtersInfo: {
+        rulesCount: number,
+    },
+    filtersMetadata: CategoriesData,
+    fullscreenUserRulesEditorIsOpen: boolean,
 };
 
 export class SettingsService {
@@ -87,10 +110,10 @@ export class SettingsService {
         );
     }
 
-    static getOptionsData() {
+    static getOptionsData(): GetOptionsDataResponse {
         return {
             settings: SettingsApi.getData(),
-            appVersion: browser.runtime.getManifest().version,
+            appVersion: Prefs.version,
             environmentOptions: {
                 isChrome: UserAgent.isChrome,
             },

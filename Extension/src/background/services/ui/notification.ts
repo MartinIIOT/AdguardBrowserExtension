@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-import { MessageType } from '../../../common/messages';
+import { MessageType, SetNotificationViewedMessage } from '../../../common/messages';
 import { notificationApi } from '../../api';
 import { messageHandler } from '../../message-handler';
 
@@ -29,7 +29,7 @@ export class NotificationService {
         messageHandler.addListener(MessageType.SetNotificationViewed, NotificationService.setNotificationViewed);
     }
 
-    private static async setNotificationViewed({ data }): Promise<void> {
+    private static async setNotificationViewed({ data }: SetNotificationViewedMessage): Promise<void> {
         const { withDelay } = data;
 
         await notificationApi.setNotificationViewed(withDelay);

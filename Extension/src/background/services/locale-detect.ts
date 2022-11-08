@@ -115,24 +115,26 @@ export class LocaleDetect {
         this.onTabUpdated = this.onTabUpdated.bind(this);
     }
 
-    public init() {
+    public init(): void {
         browser.tabs.onUpdated.addListener(this.onTabUpdated);
     }
 
-    private onTabUpdated(
+    private async onTabUpdated(
         _tabId: number,
         _changeInfo: Tabs.OnUpdatedChangeInfoType,
         tab: Tabs.Tab,
-    ) {
+    ): Promise<void> {
         if (tab.status === 'complete') {
-            this.detectTabLanguage(tab);
+            await this.detectTabLanguage(tab);
         }
     }
 
     /**
      * Detects language for the specified tab
+     *
+     * @param tab - Tab details
      */
-    private async detectTabLanguage(tab: Tabs.Tab) {
+    private async detectTabLanguage(tab: Tabs.Tab): Promise<void> {
         const isDetectDisabled = settingsStorage.get(SettingOption.DisableDetectFilters);
         const isFilteringDisabled = settingsStorage.get(SettingOption.DisableFiltering);
 
@@ -180,7 +182,7 @@ export class LocaleDetect {
      * @param language Page language
      * @private
      */
-    private detectLanguage(language: string) {
+    private detectLanguage(language: string): void {
         /**
          * For an unknown language "und" will be returned
          * https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/tabs/detectLanguage
@@ -214,7 +216,7 @@ export class LocaleDetect {
      * @param filterIds List of detected language-specific filters identifiers
      * @private
      */
-    private static async onFilterDetectedByLocale(filterIds: number[]) {
+    private static async onFilterDetectedByLocale(filterIds: number[]): Promise<void> {
         if (!filterIds || filterIds.length === 0) {
             return;
         }

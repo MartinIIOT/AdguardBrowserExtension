@@ -132,10 +132,10 @@ export class App {
         await FiltersService.init();
 
         // Adds listeners specified for custom filters
-        await CustomFilterService.init();
+        CustomFilterService.init();
 
         // Adds listeners for allowlist events
-        await AllowlistService.init();
+        AllowlistService.init();
 
         // Adds listeners for userrules list events
         await UserRulesService.init();

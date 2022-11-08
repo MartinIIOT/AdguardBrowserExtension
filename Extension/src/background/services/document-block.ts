@@ -17,7 +17,7 @@
  */
 import browser from 'webextension-polyfill';
 
-import { MessageType } from '../../common/messages';
+import { AddUrlToTrustedMessage, MessageType } from '../../common/messages';
 import { DocumentBlockApi, TabsApi } from '../api';
 import { Engine } from '../engine';
 import { messageHandler } from '../message-handler';
@@ -29,7 +29,7 @@ export class DocumentBlockService {
         messageHandler.addListener(MessageType.AddUrlToTrusted, DocumentBlockService.onAddUrlToTrusted);
     }
 
-    private static async onAddUrlToTrusted({ data }): Promise<void> {
+    private static async onAddUrlToTrusted({ data }: AddUrlToTrustedMessage): Promise<void> {
         const { url } = data;
 
         await DocumentBlockApi.setTrustedDomain(url);

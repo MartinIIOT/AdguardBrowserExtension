@@ -41,7 +41,6 @@ export type GetUserRulesEditorDataResponse = {
     userRules: string,
     settings: SettingsData,
 };
-
 export class UserRulesService {
     public static async init(): Promise<void> {
         await UserRulesApi.init();
