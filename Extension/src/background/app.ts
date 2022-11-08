@@ -23,7 +23,12 @@ import { log } from '../common/log';
 import { messageHandler } from './message-handler';
 import { ConnectionHandler } from './connection-handler';
 import { Engine } from './engine';
-import { appContext, settingsStorage, storage } from './storages';
+import {
+    appContext,
+    AppContextKey,
+    settingsStorage,
+    storage,
+} from './storages';
 import {
     toasts,
     CommonFilterApi,
@@ -203,7 +208,7 @@ export class App {
         // Runs tswebextension
         await Engine.start();
 
-        appContext.set('isInit', true);
+        appContext.set(AppContextKey.IsInit, true);
 
         await sendMessage<MessageType.AppInitialized>({ type: MessageType.AppInitialized });
     }
@@ -251,7 +256,7 @@ export class App {
             await storage.set(CLIENT_ID_KEY, clientId);
         }
 
-        appContext.set('clientId', clientId);
+        appContext.set(AppContextKey.ClientId, clientId);
     }
 }
 

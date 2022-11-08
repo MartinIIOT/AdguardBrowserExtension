@@ -15,9 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
+
+export const enum AppContextKey {
+    IsInit = 'isInit',
+    ClientId = 'clientId',
+}
+
 export type AppContextData = {
-    isInit: boolean,
-    clientId?: string,
+    [AppContextKey.IsInit]: boolean,
+    [AppContextKey.ClientId]?: string,
 };
 
 /**
@@ -26,7 +32,7 @@ export type AppContextData = {
 export class AppContext {
     // Initialize with default data
     private data: AppContextData = {
-        isInit: false,
+        [AppContextKey.IsInit]: false,
     };
 
     /**
@@ -35,7 +41,7 @@ export class AppContext {
      * @param key - context key
      * @returns context value
      */
-    public get<T extends keyof AppContextData>(key: T): AppContextData[T] {
+    public get<T extends AppContextKey>(key: T): AppContextData[T] {
         return this.data[key];
     }
 
@@ -45,7 +51,7 @@ export class AppContext {
      * @param key - context key
      * @param value - context value
      */
-    public set<T extends keyof AppContextData>(key: T, value: AppContextData[T]): void {
+    public set<T extends AppContextKey>(key: T, value: AppContextData[T]): void {
         this.data[key] = value;
     }
 }

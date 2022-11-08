@@ -16,7 +16,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import { Prefs } from '../prefs';
-import { appContext } from '../storages';
+import { appContext, AppContextKey } from '../storages';
 
 import { Version } from './version';
 
@@ -37,7 +37,7 @@ export class BrowserUtils {
      * @throws error if client id is undefined
      */
     public static getExtensionParams(): string[] {
-        const persistedClientId = appContext.get('clientId');
+        const persistedClientId = appContext.get(AppContextKey.ClientId);
 
         if (typeof persistedClientId !== 'string') {
             throw new Error('client id is not found');

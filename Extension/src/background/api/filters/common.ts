@@ -150,7 +150,7 @@ export class CommonFilterApi {
      */
     public static async initDefaultFilters(): Promise<void> {
         groupStateStorage.enableGroups([
-            1,
+            AntibannerGroupsId.AdBlockingGroupId,
             AntibannerGroupsId.LanguageFiltersGroupId,
             AntibannerGroupsId.OtherFiltersGroupId,
             AntibannerGroupsId.CustomFilterGroupId,

@@ -70,11 +70,7 @@ export class Engine {
     private static async getConfiguration(): Promise<ConfigurationMV2> {
         const enabledFilters = FiltersApi.getEnabledFilters();
 
-        const filters: ({
-            filterId: number,
-            content: string,
-            trusted: boolean,
-        })[] = [];
+        const filters: ConfigurationMV2['filters'] = [];
 
         const tasks = enabledFilters.map(async (filterId) => {
             const rules = await FiltersStorage.get(filterId);
