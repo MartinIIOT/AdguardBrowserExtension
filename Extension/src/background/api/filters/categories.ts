@@ -21,10 +21,6 @@ import {
     filterStateStorage,
     groupStateStorage,
     filterVersionStorage,
-    GroupState,
-    FilterState,
-    FilterVersionData,
-    CustomFilterMetadata,
 } from '../../storages';
 import { CommonFilterApi } from './common';
 import { FilterMetadata, FiltersApi } from './main';
@@ -32,6 +28,10 @@ import {
     GroupMetadata,
     TagMetadata,
     RegularFilterMetadata,
+    GroupStateData,
+    FilterStateData,
+    FilterVersionData,
+    CustomFilterMetadata,
 } from '../../schema';
 
 /**
@@ -39,7 +39,7 @@ import {
  */
 export type CategoriesFilterData = (
     (RegularFilterMetadata | CustomFilterMetadata) &
-    FilterState &
+    FilterStateData &
     FilterVersionData &
     { tagsDetails: TagMetadata[] }
 );
@@ -49,7 +49,7 @@ export type CategoriesFilterData = (
  */
 export type CategoriesGroupData = (
     GroupMetadata &
-    GroupState &
+    GroupStateData &
     { filters?: CategoriesFilterData[] }
 );
 

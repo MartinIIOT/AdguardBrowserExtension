@@ -17,35 +17,28 @@
  */
 import { StringStorage } from '../utils/string-storage';
 import { settingsStorage } from './settings';
-import { SettingOption } from '../schema';
-
-export type CustomFilterMetadata = {
-    filterId: number,
-    displayNumber: number,
-    groupId: number,
-    name: string,
-    description: string,
-    homepage: string,
-    tags: number[],
-    customUrl: string,
-    trusted: boolean,
-    checksum: string | null,
-    version: string,
-    expires: number,
-    timeUpdated: number,
-    languages?: string[],
-};
+import {
+    SettingOption,
+    CustomFilterMetadata,
+    CustomFilterMetadataStorageData,
+} from '../schema';
 
 /**
- * Storage for custom filters metadata
+ * Class for synchronous control {@link CustomFilterMetadataStorageData},
+ * that is persisted as string in another key value storage
+ *
+ * @see {@link StringStorage}
  */
 export class CustomFilterMetadataStorage extends StringStorage<
     SettingOption.CustomFilters,
-    CustomFilterMetadata[],
+    CustomFilterMetadataStorageData,
     'sync'
 > {
     /**
      * Get custom filter metadata by filter id
+     *
+     * @param filterId - filter id
+     * @returns custom filter metadata
      */
     public getById(filterId: number): CustomFilterMetadata | undefined {
         return this.getData().find(f => f.filterId === filterId);
@@ -53,6 +46,9 @@ export class CustomFilterMetadataStorage extends StringStorage<
 
     /**
      * Get custom filter metadata by filter subscription url
+     *
+     * @param url - subscription url
+     * @returns custom filter metadata
      */
     public getByUrl(url: string): CustomFilterMetadata {
         return this.getData().find(f => f.customUrl === url);
@@ -60,6 +56,8 @@ export class CustomFilterMetadataStorage extends StringStorage<
 
     /**
      * Set custom filter metadata with filterId key
+     *
+     * @param filter - custom filter metadata
      */
     public set(filter: CustomFilterMetadata): void {
         const data = this.getData().filter(f => f.filterId !== filter.filterId);
@@ -71,6 +69,8 @@ export class CustomFilterMetadataStorage extends StringStorage<
 
     /**
      * Remove custom filter metadata
+     *
+     * @param filterId - filter id
      */
     public remove(filterId: number): void {
         const data = this.getData().filter(f => f.filterId !== filterId);

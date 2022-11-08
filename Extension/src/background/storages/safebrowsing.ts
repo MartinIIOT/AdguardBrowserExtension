@@ -17,12 +17,22 @@
  */
 import { LRUMap } from 'lru_map';
 import { SB_LRU_CACHE_KEY } from '../../common/constants';
+import { log } from '../../common/log';
 import { storage } from './main';
 
+/**
+ * Class for control persisted {@link LRUMap} safebrowsing cache
+ */
 export class SbCache {
     private cache = new LRUMap<string, string>(1000);
 
-    public async init() {
+    /**
+     * Reads safebrowsing {@link LRUMap} stringified entries from {@link storage},
+     * parse it and sets to {@link cache}
+     *
+     * @returns promise, resolved when data successfully initialized
+     */
+    public async init(): Promise<void> {
         const storageData = await storage.get(SB_LRU_CACHE_KEY);
 
         if (typeof storageData !== 'string') {
@@ -33,18 +43,34 @@ export class SbCache {
             const entries = JSON.parse(storageData);
             this.cache.assign(entries);
         } catch (e) {
-            // do nothing
+            log.error(e.message);
         }
     }
 
+    /**
+     * Saves stringified safebrowsing {@link cache} entries in {@link storage}
+     */
     public async save(): Promise<void> {
         await storage.set(SB_LRU_CACHE_KEY, JSON.stringify(this.cache.toJSON()));
     }
 
+    /**
+     * Gets value from {@link cache}
+     *
+     * @param key - cache key
+     * @returns cache value
+     */
     public get(key: string): string {
         return this.cache.get(key);
     }
 
+    /**
+     * Sets value to {@link cache}
+     *
+     * @param key - cache key
+     * @param value - cache value
+     * @returns updated {@link SbCache} instance
+     */
     public async set(key: string, value: string): Promise<SbCache> {
         this.cache.set(key, value);
 
@@ -55,6 +81,9 @@ export class SbCache {
         return this;
     }
 
+    /**
+     * Clear {@link cache} and {@link storage} data
+     */
     public async clear(): Promise<void> {
         this.cache.clear();
         await this.save();

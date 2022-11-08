@@ -39,6 +39,6 @@ export class CustomFilterLoader {
             new Promise((_, reject) => {
                 setTimeout(() => reject(new Error('Fetch timeout is over')), CustomFilterLoader.DOWNLOAD_LIMIT_MS);
             }),
-        ]);
+        ]) as Promise<string[]>;
     }
 }

@@ -15,6 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// entry point of `storages` layer
+// `storages` contains app data storage models based on `schema` layer
+
 export * from './app';
 export * from './allowlist';
 export * from './custom-filter-metadata';

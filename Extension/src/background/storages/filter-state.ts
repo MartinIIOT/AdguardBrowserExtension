@@ -18,57 +18,75 @@
 import { AntiBannerFiltersId } from '../../common/constants';
 import { StringStorage } from '../utils/string-storage';
 import { settingsStorage } from './settings';
-import { SettingOption, Metadata } from '../schema';
+import {
+    SettingOption,
+    Metadata,
+    FilterStateData,
+    FilterStateStorageData,
+} from '../schema';
 
-export type FilterState = {
-    enabled: boolean;
-    installed: boolean;
-    loaded: boolean;
-};
-
-export type FilterStateStorageData = Record<number, FilterState>;
-
+/**
+ * Class for synchronous control {@link FilterStateStorageData},
+ * that is persisted as string in another key value storage
+ *
+ * @see {@link StringStorage}
+ */
 export class FilterStateStorage extends StringStorage<
     SettingOption.FiltersState,
     FilterStateStorageData,
     'sync'
 > {
-    /**
-     * This filters have own complex state management
-     */
+    // This filters have own complex state management
     private static unsupportedFiltersIds = [
         AntiBannerFiltersId.AllowlistFilterId,
         AntiBannerFiltersId.UserFilterId,
     ];
 
+    // default filter state
     private static defaultState = {
         enabled: false,
         installed: false,
         loaded: false,
     };
 
-    public get(filterId: number): FilterState {
+    /**
+     * Gets specified filter state
+     *
+     * @param filterId - filter id
+     * @returns specified filter state
+     */
+    public get(filterId: number): FilterStateData {
         return this.data[filterId];
     }
 
-    public set(filterId: number, state: FilterState) {
+    /**
+     * Sets specified filter state
+     *
+     * @param filterId - filter id
+     * @param state - filter state
+     */
+    public set(filterId: number, state: FilterStateData): void {
         this.data[filterId] = state;
 
         this.save();
     }
 
-    public setEnabled(filterId: number, enabled: boolean) {
-        this.data[filterId].enabled = enabled;
-
-        this.save();
-    }
-
-    public delete(filterId: number) {
+    /**
+     * Deletes specified filter state
+     *
+     * @param filterId - filter id
+     */
+    public delete(filterId: number): void {
         delete this.data[filterId];
 
         this.save();
     }
 
+    /**
+     * Gets list of enabled filters ids
+     *
+     * @returns list of enabled filters ids
+     */
     public getEnabledFilters(): number[] {
         return Object
             .entries(this.data)
@@ -76,6 +94,11 @@ export class FilterStateStorage extends StringStorage<
             .map(([id]) => Number(id));
     }
 
+    /**
+     * Gets list of installed filters ids
+     *
+     * @returns list of installed filters ids
+     */
     public getInstalledFilters(): number[] {
         return Object
             .entries(this.data)
@@ -83,7 +106,12 @@ export class FilterStateStorage extends StringStorage<
             .map(([id]) => Number(id));
     }
 
-    public enableFilters(filtersIds: number[]) {
+    /**
+     * Enables specified filters
+     *
+     * @param filtersIds - list of filters to enable
+     */
+    public enableFilters(filtersIds: number[]): void {
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
             this.data[filterId] = { ...this.data[filterId], enabled: true };
@@ -92,7 +120,12 @@ export class FilterStateStorage extends StringStorage<
         this.save();
     }
 
-    public disableFilters(filtersIds: number[]) {
+    /**
+     * Disables specified filters
+     *
+     * @param filtersIds - list of filters to disable
+     */
+    public disableFilters(filtersIds: number[]): void {
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
             this.data[filterId] = { ...this.data[filterId], enabled: false };
@@ -101,10 +134,17 @@ export class FilterStateStorage extends StringStorage<
         this.save();
     }
 
+    /**
+     * Sets {@link defaultState} for new filters, found in passed {@link Metadata}
+     *
+     * @param states - current {@link FilterStateStorageData}
+     * @param metadata - app {@link Metadata}
+     * @returns - updated {@link FilterStateStorageData}
+     */
     public static applyMetadata(
         states: FilterStateStorageData,
         metadata: Metadata,
-    ) {
+    ): FilterStateStorageData {
         const { filters } = metadata;
         /**
          * Don't create filter state context for allowlist and user rules lists
@@ -126,4 +166,9 @@ export class FilterStateStorage extends StringStorage<
     }
 }
 
+/**
+ * {@link FilterStateStorage} instance, that stores
+ * stringified {@link FilterStateStorageData} in {@link settingsStorage} under
+ * {@link SettingOption.FiltersState} key
+ */
 export const filterStateStorage = new FilterStateStorage(SettingOption.FiltersState, settingsStorage);

@@ -32,23 +32,57 @@ import { StringStorage } from '../utils/string-storage';
 import { i18n } from '../utils/i18n';
 import { settingsStorage } from './settings';
 
+/**
+ * Class for synchronous control {@link Metadata} storage,
+ * that is persisted as string in another key value storage
+ *
+ * @see {@link StringStorage}
+ */
 export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metadata, 'sync'> {
+    /**
+     * Gets regular filters metadata
+     *
+     * @returns regular filters metadata
+     */
     public getFilters(): RegularFilterMetadata[] {
         return this.data.filters;
     }
 
+    /**
+     * Gets specified regular filter metadata
+     *
+     * @param filterId - filter id
+     * @returns specified regular filter metadata
+     */
     public getFilter(filterId: number): RegularFilterMetadata {
         return this.data.filters.find(el => el.filterId === filterId);
     }
 
+    /**
+     * Gets groups metadata
+     *
+     * @returns groups metadata
+     */
     public getGroups(): GroupMetadata[] {
         return this.data.groups;
     }
 
+    /**
+     * Gets specified group metadata
+     *
+     * @param groupId - group id
+     * @returns specified group metadata
+     */
     public getGroup(groupId: number): GroupMetadata {
         return this.data.groups.find(el => el.groupId === groupId);
     }
 
+    /**
+     * Gets specified group metadata by filter id
+     *
+     * @param filterId - filter id
+     * @returns specified group metadata
+     */
     public getGroupByFilterId(filterId: number): GroupMetadata | undefined {
         const filter = this.getFilter(filterId);
 
@@ -59,16 +93,30 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
         return this.getGroup(filter.groupId);
     }
 
+    /**
+     * Gets tags metadata
+     *
+     * @returns tags metadata
+     */
     public getTags(): TagMetadata[] {
         return this.data.tags;
     }
 
+    /**
+     * Get specified tag metadata
+     *
+     * @param tagId - tag id
+     * @returns specified tag metadata
+     */
     public getTag(tagId: number): TagMetadata {
         return this.data.tags.find(el => el.tagId === tagId);
     }
 
     /**
      * Gets list of filters for the specified languages
+     *
+     * @param locale - locale string
+     * @returns list of language specific filters ids
      */
     public getFilterIdsForLanguage(locale: string): number[] {
         if (!locale) {
@@ -92,12 +140,16 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
 
     /**
      * Refreshes metadata objects with i18n metadata
-     * @param i18nMetadata
+     *
+     * @param metadata - current {@link Metadata}
+     * @param i18nMetadata - {@link I18nMetadata}
+     *
+     * @returns updated {@link Metadata}
      */
     public static applyI18nMetadata(
         metadata: Metadata,
         i18nMetadata: I18nMetadata,
-    ) {
+    ): Metadata {
         const tagsI18n = i18nMetadata.tags;
         const filtersI18n = i18nMetadata.filters;
         const groupsI18n = i18nMetadata.groups;
@@ -121,11 +173,14 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
 
     /**
      * Localize tag
+     *
+     * @param tag - tag metadata
+     * @param tagsI18n - tag i18n metadata
      */
     private static applyFilterTagLocalization(
         tag: TagMetadata,
         tagsI18n: TagsI18n,
-    ) {
+    ): void {
         const { tagId } = tag;
         const localizations = tagsI18n[tagId];
         if (localizations) {
@@ -140,6 +195,9 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
 
     /**
      * Localize filter
+     *
+     * @param filter - regular filter metadata
+     * @param filtersI18n - regular filter i18n metadata
      */
     private static applyFilterLocalization(
         filter: RegularFilterMetadata,
@@ -159,6 +217,9 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
 
     /**
      * Localize group
+     *
+     * @param group - group metadata
+     * @param groupsI18n - group i18n metadata
      */
     private static applyGroupLocalization(
         group: GroupMetadata,
@@ -176,4 +237,9 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
     }
 }
 
+/**
+ * {@link MetadataStorage} instance, that stores
+ * stringified {@link Metadata} in {@link settingsStorage} under
+ * {@link SettingOption.Metadata} key
+ */
 export const metadataStorage = new MetadataStorage(SettingOption.Metadata, settingsStorage);

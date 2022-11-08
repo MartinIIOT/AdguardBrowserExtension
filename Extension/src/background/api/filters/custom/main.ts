@@ -20,9 +20,9 @@ import MD5 from 'crypto-js/md5';
 import { BrowserUtils } from '../../../utils/browser-utils';
 import { log } from '../../../../common/log';
 import { AntibannerGroupsId, CUSTOM_FILTERS_START_ID } from '../../../../common/constants';
+import { CustomFilterMetadata, customFilterMetadataStorageDataValidator } from '../../../schema';
 import {
     customFilterMetadataStorage,
-    CustomFilterMetadata,
     filterStateStorage,
     FiltersStorage,
     filterVersionStorage,
@@ -108,7 +108,8 @@ export class CustomFilterApi {
         try {
             const storageData = customFilterMetadataStorage.read();
             if (typeof storageData === 'string') {
-                customFilterMetadataStorage.setCache(JSON.parse(storageData));
+                const data = customFilterMetadataStorageDataValidator.parse(JSON.parse(storageData));
+                customFilterMetadataStorage.setCache(data);
             } else {
                 customFilterMetadataStorage.setData([]);
             }

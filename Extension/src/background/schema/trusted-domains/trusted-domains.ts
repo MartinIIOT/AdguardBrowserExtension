@@ -15,39 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export type AppStorageData = {
-    isInit: boolean,
-    clientId?: string,
-};
+import zod from 'zod';
 
 /**
- * Memory storage for app global context
+ * Runtime validator for persistent trusted domains data
  */
-export class AppStorage {
-    // Initialize with default data
-    private data: AppStorageData = {
-        isInit: false,
-    };
+export const trustedDomainDataValidator = zod.object({
+    domain: zod.string(),
+    expires: zod.number(),
+});
 
-    /**
-     * Gets app context value
-     *
-     * @param key - context key
-     * @returns context value
-     */
-    public get<T extends keyof AppStorageData>(key: T): AppStorageData[T] {
-        return this.data[key];
-    }
-
-    /**
-     * Sets app context value
-     *
-     * @param key - context key
-     * @param value - context value
-     */
-    public set<T extends keyof AppStorageData>(key: T, value: AppStorageData[T]): void {
-        this.data[key] = value;
-    }
-}
-
-export const appStorage = new AppStorage();
+export type TrustedDomainData = zod.infer<typeof trustedDomainDataValidator>;

@@ -28,8 +28,8 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
     static saveTimeoutMs = 100;
 
     /**
-    * save settings in browser.storage.local
-    */
+     * Saves settings in browser.storage.local with {@link saveTimeoutMs} debounce
+     */
     private save = debounce(() => {
         storage.set(ADGUARD_SETTINGS_KEY, this.settings);
     }, SettingsStorage.saveTimeoutMs);
@@ -37,7 +37,10 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
     private settings: Settings;
 
     /**
-     * Set setting to storage
+     * Sets setting to storage
+     *
+     * @param key - setting key
+     * @param value - setting value
      */
     public set<T extends SettingOption>(key: T, value: Settings[T]): void {
         this.settings[key] = value;
@@ -45,7 +48,10 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
     }
 
     /**
-     * Get setting from  storage
+     * Gets setting from storage
+     *
+     * @param key - setting key
+     * @returns setting value
      */
     public get<T extends SettingOption>(key: T): Settings[T] {
         return this.settings[key];
@@ -53,6 +59,8 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
 
     /**
      * Remove setting from storage
+     *
+     * @param key - setting key
      */
     public remove(key: SettingOption): void {
         if (this.settings[key]) {
@@ -62,7 +70,9 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
     }
 
     /**
-     * Get all current settings
+     * Gets current settings
+     *
+     * @returns current settings
      */
     public getData(): Settings {
         return this.settings;
@@ -70,15 +80,19 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
 
     /**
      * Set settings to memory cache
+     *
+     * @param settings - settings data
      */
-    public setCache(settings: Settings) {
+    public setCache(settings: Settings): void {
         this.settings = settings;
     }
 
     /**
-     * Set settings to storage
+     * Set settings to cache and save in browser.storage.local
+     *
+     * @param settings - settings data
      */
-    public setData(settings: Settings) {
+    public setData(settings: Settings): void {
         this.setCache(settings);
         this.save();
     }

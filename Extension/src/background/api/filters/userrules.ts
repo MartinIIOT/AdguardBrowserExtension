@@ -37,9 +37,14 @@ export class UserRulesApi {
      * If it's undefined, sets empty user rules list
      */
     public static async init(): Promise<void> {
-        const userRules = await FiltersStorage.get(AntiBannerFiltersId.UserFilterId);
+        try {
+            const userRules = await FiltersStorage.get(AntiBannerFiltersId.UserFilterId);
 
-        if (!userRules) {
+            if (!userRules) {
+                await FiltersStorage.set(AntiBannerFiltersId.UserFilterId, []);
+            }
+        } catch (e) {
+            log.warn('Can\'t parse user filter list from persisted storage, reset to default');
             await FiltersStorage.set(AntiBannerFiltersId.UserFilterId, []);
         }
     }

@@ -15,39 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export type AppStorageData = {
-    isInit: boolean,
-    clientId?: string,
-};
+import zod from 'zod';
+import { SchemaPreprocessor } from '../preprocessor';
 
 /**
- * Memory storage for app global context
+ * Runtime validator for persistent group state data
  */
-export class AppStorage {
-    // Initialize with default data
-    private data: AppStorageData = {
-        isInit: false,
-    };
+export const groupStateDataValidator = zod.object({
+    enabled: zod.boolean(),
+    toggled: zod.boolean(),
+});
 
-    /**
-     * Gets app context value
-     *
-     * @param key - context key
-     * @returns context value
-     */
-    public get<T extends keyof AppStorageData>(key: T): AppStorageData[T] {
-        return this.data[key];
-    }
+export type GroupStateData = zod.infer<typeof groupStateDataValidator>;
 
-    /**
-     * Sets app context value
-     *
-     * @param key - context key
-     * @param value - context value
-     */
-    public set<T extends keyof AppStorageData>(key: T, value: AppStorageData[T]): void {
-        this.data[key] = value;
-    }
-}
+/**
+ * Runtime validator for persistent key value storage of group state data.
+ *
+ * Key is group metadata id.
+ * Value is {@link GroupStateData}.
+ */
+export const groupStateStorageDataValidator = zod.record(
+    SchemaPreprocessor.numberValidator,
+    groupStateDataValidator,
+);
 
-export const appStorage = new AppStorage();
+export type GroupStateStorageData = zod.infer<typeof groupStateStorageDataValidator>;

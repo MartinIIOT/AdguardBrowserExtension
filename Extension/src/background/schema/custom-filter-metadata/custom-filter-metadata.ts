@@ -15,39 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export type AppStorageData = {
-    isInit: boolean,
-    clientId?: string,
-};
+import zod from 'zod';
 
-/**
- * Memory storage for app global context
- */
-export class AppStorage {
-    // Initialize with default data
-    private data: AppStorageData = {
-        isInit: false,
-    };
+export const customFilterMetadataValidator = zod.object({
+    filterId: zod.number(),
+    displayNumber: zod.number(),
+    groupId: zod.number(),
+    name: zod.string(),
+    description: zod.string(),
+    homepage: zod.string(),
+    tags: zod.number().array(),
+    customUrl: zod.string(),
+    trusted: zod.boolean(),
+    checksum: zod.string().or(zod.null()),
+    version: zod.string(),
+    expires: zod.number(),
+    timeUpdated: zod.number(),
+    languages: zod.string().array().optional(),
+});
 
-    /**
-     * Gets app context value
-     *
-     * @param key - context key
-     * @returns context value
-     */
-    public get<T extends keyof AppStorageData>(key: T): AppStorageData[T] {
-        return this.data[key];
-    }
+export type CustomFilterMetadata = zod.infer<typeof customFilterMetadataValidator>;
 
-    /**
-     * Sets app context value
-     *
-     * @param key - context key
-     * @param value - context value
-     */
-    public set<T extends keyof AppStorageData>(key: T, value: AppStorageData[T]): void {
-        this.data[key] = value;
-    }
-}
+export const customFilterMetadataStorageDataValidator = customFilterMetadataValidator.array();
 
-export const appStorage = new AppStorage();
+export type CustomFilterMetadataStorageData = zod.infer<typeof customFilterMetadataStorageDataValidator>;

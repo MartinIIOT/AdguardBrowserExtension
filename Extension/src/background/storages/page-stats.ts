@@ -26,22 +26,19 @@ import {
 import { PAGE_STATISTIC_KEY } from '../../common/constants';
 
 import { StringStorage } from '../utils/string-storage';
+import {
+    PageStats,
+    PageStatsData,
+    PageStatsDataItem,
+} from '../schema';
 import { storage } from './main';
 
-export type PageStatsDataItem = Record<string, number>;
-
-export type PageStatsData = {
-    hours: PageStatsDataItem[],
-    days: PageStatsDataItem[],
-    months: PageStatsDataItem[],
-    updated: number;
-};
-
-export type PageStats = {
-    totalBlocked?: number,
-    data?: PageStatsData,
-};
-
+/**
+ * Class for asynchronous control {@link PageStats} storage data,
+ * that is persisted as string in another key value storage
+ *
+ * @see {@link StringStorage}
+ */
 export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, PageStats, 'async'> {
     public static TOTAL_GROUP_ID = 'total';
 
@@ -55,23 +52,23 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
         return this.getData().totalBlocked;
     }
 
-    public setTotalBlocked(value: number) {
+    public setTotalBlocked(value: number): Promise<void> {
         this.data.totalBlocked = value;
         return this.save();
     }
 
-    public setStatisticsData(data: PageStatsData) {
+    public setStatisticsData(data: PageStatsData): Promise<void> {
         this.data.data = data;
         return this.save();
     }
 
     /**
-     * Returns page statistics data object
+     * Gets page statistics data.
+     * If page statistics data is not defined, creates new
+     *
+     * @returns page statistics data
      */
-    public getStatisticsData() {
-        /**
-         * If page stats data is not defined, creates new
-         */
+    public getStatisticsData(): PageStatsData {
         if (!this.data.data) {
             this.setStatisticsData(PageStatsStorage.createStatsData(null, 0));
         }
@@ -80,8 +77,13 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
     }
 
     /**
-    * Creates blocked types to filters relation dictionary
-    */
+     * Creates page statistics data for specified filter group
+     *
+     * @param groupId - group id
+     * @param blocked - number of request blocks
+     *
+     * @returns page statistics data
+     */
     public static createStatsData(
         groupId: number | null,
         blocked: number,
@@ -115,8 +117,14 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
     }
 
     /**
-    * Updates blocked types to filters relation dictionary
-    */
+     * Updates page statistics data for specified filter group
+     *
+     * @param groupId - group id
+     * @param blocked - number of request blocks
+     * @param data - current page statistics data
+     *
+     * @returns updated page statistics data
+     */
     public static updateStatsData(
         groupId: number,
         blocked: number,
@@ -185,6 +193,14 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
         return data;
     }
 
+    /**
+     * Creates page statistics data item for specified filter group
+     *
+     * @param groupId - group id
+     * @param blocked - number of request blocks
+     *
+     * @returns updated page statistics data item
+     */
     private static createStatsDataItem(
         groupId: number | null,
         blocked: number,
@@ -199,6 +215,15 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
         return data;
     }
 
+    /**
+     * Updates page statistics data item for specified filter group
+     *
+     * @param groupId - group id
+     * @param blocked - number of request blocks
+     * @param data - current page statistics data item
+     *
+     * @returns updated page statistics data item
+     */
     private static updateStatsDataItem(
         groupId: number,
         blocked: number,
@@ -211,6 +236,11 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
     }
 }
 
+/**
+ * {@link PageStatsStorage} instance, that stores
+ * stringified {@link PageStats} in {@link storage} under
+ * {@link PAGE_STATISTIC_KEY} key
+ */
 export const pageStatsStorage = new PageStatsStorage(
     PAGE_STATISTIC_KEY,
     storage,

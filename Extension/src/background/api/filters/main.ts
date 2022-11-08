@@ -23,7 +23,6 @@ import {
 import { translator } from '../../../common/translators/translator';
 
 import {
-    CustomFilterMetadata,
     filterStateStorage,
     groupStateStorage,
     i18nMetadataStorage,
@@ -35,7 +34,17 @@ import {
     FilterVersionStorage,
     FiltersStorage,
 } from '../../storages';
-import { Metadata, RegularFilterMetadata } from '../../schema';
+
+import {
+    Metadata,
+    RegularFilterMetadata,
+    CustomFilterMetadata,
+    i18nMetadataValidator,
+    metadataValidator,
+    filterStateStorageDataValidator,
+    filterVersionStorageDataValidator,
+    groupStateStorageDataValidator,
+} from '../../schema';
 
 import { network } from '../network';
 import { UserRulesApi } from './userrules';
@@ -325,7 +334,8 @@ export class FiltersApi {
         }
 
         try {
-            i18nMetadataStorage.setCache(JSON.parse(storageData));
+            const i18nMetadata = i18nMetadataValidator.parse(JSON.parse(storageData));
+            i18nMetadataStorage.setCache(i18nMetadata);
         } catch (e) {
             log.warn(`Can't parse data from ${i18nMetadataStorage.key} storage, load it from local assets`);
             await FiltersApi.loadI18nMetadataFromBackend(false);
@@ -345,7 +355,8 @@ export class FiltersApi {
         }
 
         try {
-            metadataStorage.setCache(JSON.parse(storageData));
+            const metadata = metadataValidator.parse(JSON.parse(storageData));
+            metadataStorage.setCache(metadata);
         } catch (e) {
             log.warn(`Can't parse data from ${metadataStorage.key} storage, load it from local assets`);
             await FiltersApi.loadMetadataFromFromBackend(false);
@@ -378,10 +389,8 @@ export class FiltersApi {
         }
 
         try {
-            const data = FilterStateStorage.applyMetadata(
-                JSON.parse(storageData),
-                metadata,
-            );
+            let data = filterStateStorageDataValidator.parse(JSON.parse(storageData));
+            data = FilterStateStorage.applyMetadata(data, metadata);
 
             filterStateStorage.setData(data);
         } catch (e) {
@@ -405,10 +414,8 @@ export class FiltersApi {
         }
 
         try {
-            const data = GroupStateStorage.applyMetadata(
-                JSON.parse(storageData),
-                metadata,
-            );
+            let data = groupStateStorageDataValidator.parse(JSON.parse(storageData));
+            data = GroupStateStorage.applyMetadata(data, metadata);
 
             groupStateStorage.setData(data);
         } catch (e) {
@@ -432,10 +439,8 @@ export class FiltersApi {
         }
 
         try {
-            const data = FilterVersionStorage.applyMetadata(
-                JSON.parse(storageData),
-                metadata,
-            );
+            let data = filterVersionStorageDataValidator.parse(JSON.parse(storageData));
+            data = FilterVersionStorage.applyMetadata(data, metadata);
 
             filterVersionStorage.setData(data);
         } catch (e) {

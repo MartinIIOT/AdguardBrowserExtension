@@ -71,7 +71,7 @@ export type SettingsData = {
 };
 
 export class SettingsApi {
-    public static async init() {
+    public static async init(): Promise<void> {
         const data = await storage.get(ADGUARD_SETTINGS_KEY);
         const settings = settingsValidator.parse(data);
         settingsStorage.setCache(settings);

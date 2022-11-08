@@ -16,14 +16,17 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import { translator } from '../../../common/translators/translator';
+import { log } from '../../../common/log';
 import {
     metadataStorage,
     pageStatsStorage,
     PageStatsStorage,
-    PageStatsDataItem,
 } from '../../storages';
-
-import { GroupMetadata } from '../../schema';
+import {
+    GroupMetadata,
+    PageStatsDataItem,
+    pageStatsValidator,
+} from '../../schema';
 
 export type GetStatisticsDataResponse = {
     today: PageStatsDataItem[],
@@ -47,12 +50,13 @@ export class PageStatsApi {
         try {
             const storageData = await pageStatsStorage.read();
             if (typeof storageData === 'string') {
-                // TODO: schema validation
-                pageStatsStorage.setCache(JSON.parse(storageData));
+                const data = pageStatsValidator.parse(JSON.parse(storageData));
+                pageStatsStorage.setCache(data);
             } else {
                 pageStatsStorage.setData({});
             }
         } catch (e) {
+            log.warn(`Can't parse data from ${pageStatsStorage.key} storage, set default states`);
             pageStatsStorage.setData({});
         }
     }

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
+import zod from 'zod';
 import { getHost, tabsApi as tsWebExtTabsApi } from '@adguard/tswebextension';
 import browser from 'webextension-polyfill';
 
@@ -281,7 +282,8 @@ export class AllowlistApi {
         try {
             const storageData = storage.read();
             if (typeof storageData === 'string') {
-                storage.setCache(JSON.parse(storageData));
+                const data = zod.string().array().parse(JSON.parse(storageData));
+                storage.setCache(data);
             } else {
                 storage.setData(defaultData);
             }

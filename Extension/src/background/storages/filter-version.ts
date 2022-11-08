@@ -15,41 +15,65 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-import { SettingOption, Metadata } from '../schema';
+import {
+    SettingOption,
+    Metadata,
+    FilterVersionStorageData,
+    FilterVersionData,
+} from '../schema';
 import { StringStorage } from '../utils/string-storage';
 import { settingsStorage } from './settings';
 
-export type FilterVersionData = {
-    version: string,
-    lastCheckTime: number,
-    lastUpdateTime: number,
-    expires: number,
-};
-
-export type FilterVersionStorageData = Record<number, FilterVersionData>;
-
+/**
+ * Class for synchronous control {@link FilterVersionStorageData},
+ * that is persisted as string in another key value storage
+ *
+ * @see {@link StringStorage}
+ */
 export class FilterVersionStorage extends StringStorage<
     SettingOption.FiltersVersion,
     FilterVersionStorageData,
     'sync'
 > {
+    /**
+     * Gets specified filter version
+     *
+     * @param filterId - filter id
+     * @returns specified filter state
+     */
     public get(filterId: number): FilterVersionData {
         return this.data[filterId];
     }
 
-    public set(filterId: number, data: FilterVersionData) {
+    /**
+     * Sets specified filter version
+     *
+     * @param filterId - filter id
+     * @param data - filter version data
+     */
+    public set(filterId: number, data: FilterVersionData): void {
         this.data[filterId] = data;
 
         this.save();
     }
 
-    public delete(filterId: number) {
+    /**
+     * Deletes specified filter version
+     *
+     * @param filterId - filter id
+     */
+    public delete(filterId: number): void {
         delete this.data[filterId];
 
         this.save();
     }
 
-    public refreshLastCheckTime(filtersIds: number[]) {
+    /**
+     * Update last check time stamp for specified filters with current time
+     *
+     * @param filtersIds - list of filters ids
+     */
+    public refreshLastCheckTime(filtersIds: number[]): void {
         const now = Date.now();
 
         for (let i = 0; i < filtersIds.length; i += 1) {
@@ -63,10 +87,17 @@ export class FilterVersionStorage extends StringStorage<
         this.save();
     }
 
+    /**
+     * Sets version data for new filters, found in passed {@link Metadata}
+     *
+     * @param data - current {@link FilterVersionStorageData}
+     * @param metadata - app {@link Metadata}
+     * @returns - updated {@link FilterVersionStorageData}
+     */
     public static applyMetadata(
         data: FilterVersionStorageData,
         metadata: Metadata,
-    ) {
+    ): FilterVersionStorageData {
         const { filters } = metadata;
 
         for (let i = 0; i < filters.length; i += 1) {
@@ -91,4 +122,9 @@ export class FilterVersionStorage extends StringStorage<
     }
 }
 
+/**
+ * {@link FilterVersionStorage} instance, that stores
+ * stringified {@link FilterVersionStorageData} in {@link settingsStorage} under
+ * {@link SettingOption.FiltersVersion} key
+ */
 export const filterVersionStorage = new FilterVersionStorage(SettingOption.FiltersVersion, settingsStorage);

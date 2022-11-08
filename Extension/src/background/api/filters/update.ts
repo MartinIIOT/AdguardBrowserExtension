@@ -16,13 +16,16 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import {
-    CustomFilterMetadata,
     filterStateStorage,
     filterVersionStorage,
     settingsStorage,
 } from '../../storages';
 import { FilterMetadata, FiltersApi } from './main';
-import { SettingOption, RegularFilterMetadata } from '../../schema';
+import {
+    SettingOption,
+    RegularFilterMetadata,
+    CustomFilterMetadata,
+} from '../../schema';
 import { DEFAULT_FILTERS_UPDATE_PERIOD } from '../../../common/settings';
 import { CustomFilterApi } from './custom';
 import { CommonFilterApi } from './common';

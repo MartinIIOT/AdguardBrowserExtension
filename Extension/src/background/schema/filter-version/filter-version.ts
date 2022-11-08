@@ -15,39 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export type AppStorageData = {
-    isInit: boolean,
-    clientId?: string,
-};
+import zod from 'zod';
+import { SchemaPreprocessor } from '../preprocessor';
 
 /**
- * Memory storage for app global context
+ * Runtime validator for persistent filter version data
  */
-export class AppStorage {
-    // Initialize with default data
-    private data: AppStorageData = {
-        isInit: false,
-    };
+export const filterVersionDataValidator = zod.object({
+    version: zod.string(),
+    lastCheckTime: zod.number(),
+    lastUpdateTime: zod.number(),
+    expires: zod.number(),
+});
 
-    /**
-     * Gets app context value
-     *
-     * @param key - context key
-     * @returns context value
-     */
-    public get<T extends keyof AppStorageData>(key: T): AppStorageData[T] {
-        return this.data[key];
-    }
+export type FilterVersionData = zod.infer<typeof filterVersionDataValidator>;
 
-    /**
-     * Sets app context value
-     *
-     * @param key - context key
-     * @param value - context value
-     */
-    public set<T extends keyof AppStorageData>(key: T, value: AppStorageData[T]): void {
-        this.data[key] = value;
-    }
-}
+/**
+ * Runtime validator for persistent key value storage of filter version data.
+ *
+ * Key is filter metadata id.
+ * Value is {@link FilterVersionData}.
+ */
+export const filterVersionStorageDataValidator = zod.record(
+    SchemaPreprocessor.numberValidator,
+    filterVersionDataValidator,
+);
 
-export const appStorage = new AppStorage();
+export type FilterVersionStorageData = zod.infer<typeof filterVersionStorageDataValidator>;

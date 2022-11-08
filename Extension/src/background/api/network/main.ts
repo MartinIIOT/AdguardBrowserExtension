@@ -22,7 +22,10 @@ import { NetworkSettings } from './settings';
 import { UserAgent } from '../../../common/user-agent';
 import { strings } from '../../../common/strings';
 import {
-    I18nMetadata, i18nMetadataValidator, Metadata, metadataValidator,
+    I18nMetadata,
+    i18nMetadataValidator,
+    Metadata,
+    metadataValidator,
 } from '../../schema';
 
 export type NetworkConfiguration = {
@@ -127,7 +130,7 @@ export class Network {
     public async getLocalFiltersMetadata(): Promise<Metadata> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/filters.json`);
 
-        let response;
+        let response: ExtensionXMLHttpRequest;
 
         try {
             response = await Network.executeRequestAsync(url, 'application/json');
@@ -160,7 +163,8 @@ export class Network {
     public async getLocalFiltersI18nMetadata(): Promise<I18nMetadata> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/filters_i18n.json`);
 
-        let response;
+        let response: ExtensionXMLHttpRequest;
+
         try {
             response = await Network.executeRequestAsync(url, 'application/json');
         } catch (e) {
@@ -216,7 +220,7 @@ export class Network {
      *
      * @throws Error if metadata is invalid
      */
-    public async downloadMetadataFromBackend(): Promise<unknown> {
+    public async downloadMetadataFromBackend(): Promise<Metadata> {
         const url = this.settings.filtersMetadataUrl;
         const response = await Network.executeRequestAsync(url, 'application/json');
         if (!response?.responseText) {
@@ -224,7 +228,8 @@ export class Network {
         }
 
         try {
-            return JSON.parse(response.responseText);
+            const metadata = JSON.parse(response.responseText);
+            return metadataValidator.parse(metadata);
         } catch (e) {
             throw Network.createError('invalid response', url, response, e);
         }

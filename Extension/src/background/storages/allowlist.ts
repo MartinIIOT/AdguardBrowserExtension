@@ -19,6 +19,11 @@ import { SettingOption } from '../schema';
 import { StringStorage } from '../utils/string-storage';
 import { settingsStorage } from './settings';
 
+/**
+ * {@link StringStorage} instance, that stores
+ * stringified allowlist in {@link settingsStorage} under
+ * {@link SettingOption.AllowlistDomains} key
+ */
 export const allowlistDomainsStorage = new StringStorage<SettingOption.AllowlistDomains, string[], 'sync'>(
     SettingOption.AllowlistDomains,
     settingsStorage,

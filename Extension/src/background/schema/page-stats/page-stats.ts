@@ -15,39 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export type AppStorageData = {
-    isInit: boolean,
-    clientId?: string,
-};
+import zod from 'zod';
 
-/**
- * Memory storage for app global context
- */
-export class AppStorage {
-    // Initialize with default data
-    private data: AppStorageData = {
-        isInit: false,
-    };
+export const pageStatsDataItemValidator = zod.record(zod.string(), zod.number());
 
-    /**
-     * Gets app context value
-     *
-     * @param key - context key
-     * @returns context value
-     */
-    public get<T extends keyof AppStorageData>(key: T): AppStorageData[T] {
-        return this.data[key];
-    }
+export type PageStatsDataItem = zod.infer<typeof pageStatsDataItemValidator>;
 
-    /**
-     * Sets app context value
-     *
-     * @param key - context key
-     * @param value - context value
-     */
-    public set<T extends keyof AppStorageData>(key: T, value: AppStorageData[T]): void {
-        this.data[key] = value;
-    }
-}
+export const pageStatsDataValidator = zod.object({
+    hours: pageStatsDataItemValidator.array(),
+    days: pageStatsDataItemValidator.array(),
+    months: pageStatsDataItemValidator.array(),
+    updated: zod.number(),
+});
 
-export const appStorage = new AppStorage();
+export type PageStatsData = zod.infer<typeof pageStatsDataValidator>;
+
+export const pageStatsValidator = zod.object({
+    totalBlocked: zod.number().optional(),
+    data: pageStatsDataValidator.optional(),
+});
+
+export type PageStats = zod.infer<typeof pageStatsValidator>;
