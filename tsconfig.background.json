@@ -3,6 +3,5 @@
     "include": [
         "Extension/src/background",
         "Extension/src/common",
-        "Extension/src/new_api",
     ]
 }

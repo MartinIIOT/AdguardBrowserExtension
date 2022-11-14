@@ -144,7 +144,7 @@ export class UiService {
     }
 
     private static initializeFrameScript(): InitializeFrameScriptResponse {
-        const enabledFilters = {};
+        const enabledFilters: Record<string, boolean> = {};
         Object.values(AntiBannerFiltersId).forEach((filterId) => {
             const enabled = FiltersApi.isFilterEnabled(Number(filterId));
             if (enabled) {

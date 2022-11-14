@@ -33,6 +33,13 @@ export type RunInfo = {
     clientId: string | null,
 };
 
+/**
+ * Gets data from storage by specified key
+ *
+ * @param key - storage key
+ * @param fallback - if true, try to get data from legacy destination
+ * @returns specified storage value
+ */
 async function getData(key: string, fallback = true): Promise<unknown | null> {
     const data = await storage.get(key);
 
@@ -93,6 +100,9 @@ async function getSchemaVersion(): Promise<number | null> {
     return 0;
 }
 
+/**
+ * Gets app running info from storage
+ */
 export async function getRunInfo(): Promise<RunInfo> {
     const currentAppVersion = Prefs.version;
 

@@ -34,7 +34,7 @@ export class UrlUtils {
 
     static RE_BAD_ADDRESS = /([0-9a-f]{5,}|:{3,}|[^:]:$|^:[^:]$)/i;
 
-    static toPunyCode(domain: string) {
+    static toPunyCode(domain: string): string {
         // eslint-disable-next-line no-control-regex
         if (/^[\x00-\x7F]+$/.test(domain)) {
             return domain;
@@ -92,7 +92,7 @@ export class UrlUtils {
         return host.indexOf('www.') === 0 ? host.substring(4) : host;
     }
 
-    static isIpv4(address: string) {
+    static isIpv4(address: string): boolean {
         if (UrlUtils.RE_V4.test(address)) {
             return true;
         }
@@ -105,7 +105,7 @@ export class UrlUtils {
         return false;
     }
 
-    static isIpv6(address: string) {
+    static isIpv6(address: string): boolean {
         let a4addon = 0;
         const address4 = address.match(UrlUtils.RE_V4_IN_V6);
         if (address4) {
@@ -132,9 +132,9 @@ export class UrlUtils {
             return false;
         }
 
-        function count(string, substring) {
+        const count = (string: string, substring: string): number => {
             return (string.length - string.replace(new RegExp(substring, 'g'), '').length) / substring.length;
-        }
+        };
 
         const halves = count(address, '::');
         if (halves === 1 && count(address, ':') <= 6 + 2 + a4addon) {

@@ -146,7 +146,6 @@ class Messenger {
         return this.sendMessage(MessageType.ResetBlockedAdsCount);
     }
 
-    // TODO: implement in new background
     async setFilteringLogWindowState(windowState) {
         return this.sendMessage(MessageType.SetFilteringLogWindowState, { windowState });
     }
