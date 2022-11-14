@@ -161,7 +161,16 @@ export class UiService {
             },
             environmentOptions: {
                 isMacOs: UserAgent.isMacOs,
-                canBlockWebRTC: true, // TODO
+                /**
+                 * Browsers api doesn't allow to get optional permissions
+                 * via chrome.permissions.getAll and we can't check privacy
+                 * availability via `browser.privacy !== undefined` till permission
+                 * isn't enabled by the user
+                 *
+                 * That's why use edge browser detection
+                 * Privacy methods are not working at all in the Edge
+                 */
+                canBlockWebRTC: !UserAgent.isEdge,
                 isChrome: UserAgent.isChrome,
                 Prefs: {
                     locale: browser.i18n.getUILanguage(),

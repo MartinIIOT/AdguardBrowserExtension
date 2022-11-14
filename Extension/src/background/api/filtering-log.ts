@@ -183,8 +183,6 @@ export class FilteringLogApi {
         tabInfo.title = title;
         tabInfo.isExtensionTab = isExtensionUrl(url);
 
-        // this.tabsInfoMap[id] = tabInfo;
-
         listeners.notifyListeners(listeners.TabUpdate, tabInfo);
     }
 
