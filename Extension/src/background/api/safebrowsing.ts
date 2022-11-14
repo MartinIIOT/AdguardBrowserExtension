@@ -46,6 +46,10 @@ export class SafebrowsingApi {
 
     private static SB_ALLOW_LIST = 'allowlist';
 
+    /**
+     * Initialize new safebrowsing cache from {@link Storage}
+     * @see {@link SbCache#init}
+     */
     public static async initCache(): Promise<void> {
         await sbCache.init();
     }

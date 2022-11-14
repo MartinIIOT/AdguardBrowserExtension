@@ -99,7 +99,7 @@
 
     "jsdoc/tag-lines": "off",
     "jsdoc/require-throws": "error",
-    "jsdoc/require-file-overview": "error",
+    "jsdoc/require-file-overview": "error"
   },
   "globals": {
     "adguard": true,

@@ -6,17 +6,14 @@ import { log } from '../../../../../Extension/src/common/log';
 // TODO: fix
 
 describe('safebrowsing', () => {
-    it('Calculate hash', () => {
-        const host = UrlUtils.getHost('http://test.yandex.ru/someurl.html');
-        const hosts = SafebrowsingApi.extractHosts(host);
+    it('Check saving of domain', async () => {
+        const url = 'http://test.yandex.ru/someurl.html';
+        const referrerUrl = 'http://example.com';
+        await SafebrowsingApi.addToSafebrowsingTrusted(url)
 
-        expect(hosts[0]).toBe('test.yandex.ru');
-        expect('yandex.ru').toBe(hosts[1]);
+        const errorUrl = await SafebrowsingApi.checkSafebrowsingFilter(url, referrerUrl);
 
-        const hashes = SafebrowsingApi.createHashesMap(hosts);
-
-        expect(hashes['7FF9C98C9AABC19DDB67F8A0030B0691451738E7B8E75393BC6C9F6137F269BB']).toBe('test.yandex.ru');
-        expect(hashes['A42653DA210A54B6874F37F0D4A12DA5E89BB436F2C6A01F83246E71CDB544E5']).toBe('yandex.ru');
+        expect(errorUrl).toBe('test.yandex.ru');
     });
 
     it('Process response', () => {
