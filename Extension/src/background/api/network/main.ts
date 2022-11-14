@@ -24,6 +24,8 @@ import { strings } from '../../../common/strings';
 import {
     I18nMetadata,
     i18nMetadataValidator,
+    LocalScriptRules,
+    localScriptRulesValidator,
     Metadata,
     metadataValidator,
 } from '../../schema';
@@ -193,10 +195,11 @@ export class Network {
      *
      * @returns Array of string script rules
      */
-    public async getLocalScriptRules(): Promise<string[]> {
+    public async getLocalScriptRules(): Promise<LocalScriptRules> {
         const url = browser.runtime.getURL(`${this.settings.localFiltersFolder}/local_script_rules.json`);
 
-        let response;
+        let response: ExtensionXMLHttpRequest;
+
         try {
             response = await Network.executeRequestAsync(url, 'application/json');
         } catch (e) {
@@ -209,7 +212,9 @@ export class Network {
         }
 
         try {
-            return JSON.parse(response.responseText);
+            const localScriptRules = JSON.parse(response.responseText);
+
+            return localScriptRulesValidator.parse(localScriptRules);
         } catch (e) {
             throw Network.createError('invalid response', url, response, e);
         }

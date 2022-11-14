@@ -27,7 +27,9 @@ import {
     UserRulesApi,
     SettingsApi,
     DocumentBlockApi,
+    network,
 } from './api';
+import { UserAgent } from '../common/user-agent';
 
 export type { Message as EngineMessage } from '@adguard/tswebextension';
 
@@ -39,6 +41,22 @@ export class Engine {
     static handleMessage = Engine.api.getMessageHandler();
 
     static async start(): Promise<void> {
+        /**
+         * By the rules of Firefox AMO we cannot use remote scripts (and our JS rules can be counted as such).
+         * Because of that we use the following approach (that was accepted by AMO reviewers):
+         *
+         * 1. We pre-build JS rules from AdGuard filters into the JSON file.
+         * 2. At runtime we check every JS rule if it's included into JSON.
+         *  If it is included we allow this rule to work since it's pre-built. Other rules are discarded.
+         * 3. We also allow "User rules" to work since those rules are added manually by the user.
+         *  This way filters maintainers can test new rules before including them in the filters.
+         */
+        if (UserAgent.isFirefox) {
+            const localScriptRules = await network.getLocalScriptRules();
+
+            Engine.api.setLocalScriptRules(localScriptRules);
+        }
+
         const configuration = await Engine.getConfiguration();
 
         log.info('Start tswebextension...');
