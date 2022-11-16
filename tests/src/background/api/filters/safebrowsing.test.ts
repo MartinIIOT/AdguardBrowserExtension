@@ -36,8 +36,6 @@ describe('safebrowsing', () => {
 
         await SafebrowsingApi.clearCache();
 
-        
-
         expect(browser.storage.local.clear.calledOnce).toBe(true);
         expect(sbCache.get("CBD6FBF8EB019EBF5865D2A9120D27AC9FC44323A07AED8879E6CD9D28276669")).toBe(undefined);
     })

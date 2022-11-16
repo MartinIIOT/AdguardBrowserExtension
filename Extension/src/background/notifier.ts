@@ -37,6 +37,8 @@ class Notifier {
 
     constructor() {
         Object.entries(NotifierType).forEach(([key, value]) => {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             this[key] = value;
             this.eventNotifierEventsMap[value] = key;
         });
@@ -51,6 +53,8 @@ class Notifier {
      * @returns listener id
      * @throws error if listener is not a function
      */
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     addSpecifiedListener(events, listener: Listener): number {
         if (typeof listener !== 'function') {
             throw new Error('Illegal listener');
@@ -106,6 +110,8 @@ class Notifier {
             this.listenersMap as Record<string, Listener>,
         ).forEach(([listenerId, listener]) => {
             const events = this.listenersEventsMap[Number(listenerId)];
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             if (events && events.length > 0 && events.indexOf(event) < 0) {
                 return;
             }
