@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
+import zod from 'zod';
 import { LRUMap } from 'lru_map';
 import { SB_LRU_CACHE_KEY } from '../../common/constants';
-import { log } from '../../common/log';
+import { Log } from '../../common/log';
 import { storage } from './main';
 
 /**
@@ -40,10 +41,14 @@ export class SbCache {
         }
 
         try {
-            const entries = JSON.parse(storageData);
-            this.cache.assign(entries);
-        } catch (e) {
-            log.error(e.message);
+            const data = zod.object({
+                key: zod.string(),
+                value: zod.string(),
+            }).array().parse(JSON.parse(storageData));
+
+            this.cache.assign(data.map<[string, string]>(({ key, value }) => [key, value]));
+        } catch (e: unknown) {
+            Log.error(e);
         }
     }
 
@@ -60,7 +65,7 @@ export class SbCache {
      * @param key - cache key
      * @returns cache value
      */
-    public get(key: string): string {
+    public get(key: string): string | undefined {
         return this.cache.get(key);
     }
 
@@ -69,9 +74,10 @@ export class SbCache {
      *
      * @param key - cache key
      * @param value - cache value
-     * @returns updated {@link SbCache} instance
+     * @returns updated {@link cache} instance
      */
     public async set(key: string, value: string): Promise<SbCache> {
+        console.log(value);
         this.cache.set(key, value);
 
         if (this.cache.size % 20 === 0) {

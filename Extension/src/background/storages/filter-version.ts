@@ -40,8 +40,13 @@ export class FilterVersionStorage extends StringStorage<
      *
      * @param filterId - filter id
      * @returns specified filter state
+     * @throws error if filter version data is not initialized
      */
     public get(filterId: number): FilterVersionData {
+        if (!this.data) {
+            throw FilterVersionStorage.createNotInitializedError();
+        }
+
         return this.data[filterId];
     }
 
@@ -50,8 +55,13 @@ export class FilterVersionStorage extends StringStorage<
      *
      * @param filterId - filter id
      * @param data - filter version data
+     * @throws error if filter version data is not initialized
      */
     public set(filterId: number, data: FilterVersionData): void {
+        if (!this.data) {
+            throw FilterVersionStorage.createNotInitializedError();
+        }
+
         this.data[filterId] = data;
 
         this.save();
@@ -61,8 +71,13 @@ export class FilterVersionStorage extends StringStorage<
      * Deletes specified filter version
      *
      * @param filterId - filter id
+     * @throws error if filter version data is not initialized
      */
     public delete(filterId: number): void {
+        if (!this.data) {
+            throw FilterVersionStorage.createNotInitializedError();
+        }
+
         delete this.data[filterId];
 
         this.save();
@@ -72,8 +87,13 @@ export class FilterVersionStorage extends StringStorage<
      * Update last check time stamp for specified filters with current time
      *
      * @param filtersIds - list of filters ids
+     * @throws error if filter version data is not initialized
      */
     public refreshLastCheckTime(filtersIds: number[]): void {
+        if (!this.data) {
+            throw FilterVersionStorage.createNotInitializedError();
+        }
+
         const now = Date.now();
 
         for (let i = 0; i < filtersIds.length; i += 1) {
@@ -119,6 +139,10 @@ export class FilterVersionStorage extends StringStorage<
         }
 
         return data;
+    }
+
+    private static createNotInitializedError(): Error {
+        return new Error('Filter version data is not initialized');
     }
 }
 

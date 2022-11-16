@@ -48,16 +48,46 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
 
     public static MAX_MONTHS_HISTORY = 3;
 
+    /**
+     * Gets number of total blocked requests
+     *
+     * @returns number of total blocked requests or undefined, if it is not set
+     */
     public getTotalBlocked(): number | undefined {
         return this.getData().totalBlocked;
     }
 
+    /**
+     * Sets number of total blocked requests
+     *
+     * @param value - number of total blocked requests
+     *
+     * @returns promise, resolved when total blocked requests number is successfully set
+     * @throws error if page stats data is not initialized
+     */
     public setTotalBlocked(value: number): Promise<void> {
+        if (!this.data) {
+            throw PageStatsStorage.createNotInitializedError();
+        }
+
         this.data.totalBlocked = value;
         return this.save();
     }
 
+    /**
+     * Sets page statistics data.
+     * If page statistics data is empty, creates new
+     *
+     * @param data - page stats data
+     *
+     * @returns promise, resolved when data is successfully set
+     * @throws error if page stats data is not initialized
+     */
     public setStatisticsData(data: PageStatsData): Promise<void> {
+        if (!this.data) {
+            throw PageStatsStorage.createNotInitializedError();
+        }
+
         this.data.data = data;
         return this.save();
     }
@@ -67,10 +97,15 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
      * If page statistics data is not defined, creates new
      *
      * @returns page statistics data
+     * @throws error if page stats data is not initialized
      */
     public getStatisticsData(): PageStatsData {
+        if (!this.data) {
+            throw PageStatsStorage.createNotInitializedError();
+        }
+
         if (!this.data.data) {
-            this.setStatisticsData(PageStatsStorage.createStatsData(null, 0));
+            this.data.data = PageStatsStorage.createStatsData(null, 0);
         }
 
         return this.data.data;
@@ -205,7 +240,7 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
         groupId: number | null,
         blocked: number,
     ): PageStatsDataItem {
-        const data = {};
+        const data: PageStatsDataItem = {};
 
         if (groupId) {
             data[String(groupId)] = blocked;
@@ -233,6 +268,10 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
         data[PageStatsStorage.TOTAL_GROUP_ID] = (data[PageStatsStorage.TOTAL_GROUP_ID] || 0) + blocked;
 
         return data;
+    }
+
+    private static createNotInitializedError(): Error {
+        return new Error('Page stats is not initialized');
     }
 }
 

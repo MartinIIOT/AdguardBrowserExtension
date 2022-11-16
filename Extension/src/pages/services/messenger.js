@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
 import { nanoid } from 'nanoid';
 
-import { log } from '../../common/log';
+import { Log } from '../../common/log';
 import { MessageType, APP_MESSAGE_HANDLER_NAME } from '../../common/messages';
 
 class Messenger {
@@ -9,9 +9,9 @@ class Messenger {
 
     // eslint-disable-next-line class-methods-use-this
     async sendMessage(type, data) {
-        log.debug('Request type:', type);
+        Log.debug('Request type:', type);
         if (data) {
-            log.debug('Request data:', data);
+            Log.debug('Request data:', data);
         }
 
         const response = await browser.runtime.sendMessage({
@@ -21,8 +21,8 @@ class Messenger {
         });
 
         if (response) {
-            log.debug('Response type:', type);
-            log.debug('Response data:', response);
+            Log.debug('Response type:', type);
+            Log.debug('Response data:', response);
         }
 
         return response;
@@ -52,7 +52,7 @@ class Messenger {
 
         port.onDisconnect.addListener(() => {
             if (browser.runtime.lastError) {
-                log.error(browser.runtime.lastError.message);
+                Log.error(browser.runtime.lastError.message);
             }
         });
 

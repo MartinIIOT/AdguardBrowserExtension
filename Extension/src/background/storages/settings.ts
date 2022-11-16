@@ -34,15 +34,21 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
         storage.set(ADGUARD_SETTINGS_KEY, this.settings);
     }, SettingsStorage.saveTimeoutMs);
 
-    private settings: Settings;
+    private settings: Settings | undefined;
 
     /**
      * Sets setting to storage
      *
      * @param key - setting key
      * @param value - setting value
+     *
+     * @throws error if settings is not initialized
      */
     public set<T extends SettingOption>(key: T, value: Settings[T]): void {
+        if (!this.settings) {
+            throw SettingsStorage.createNotInitializedError();
+        }
+
         this.settings[key] = value;
         this.save();
     }
@@ -52,8 +58,13 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
      *
      * @param key - setting key
      * @returns setting value
+     * @throws error if settings is not initialized
      */
     public get<T extends SettingOption>(key: T): Settings[T] {
+        if (!this.settings) {
+            throw SettingsStorage.createNotInitializedError();
+        }
+
         return this.settings[key];
     }
 
@@ -61,8 +72,13 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
      * Remove setting from storage
      *
      * @param key - setting key
+     * @throws error if settings is not initialized
      */
     public remove(key: SettingOption): void {
+        if (!this.settings) {
+            throw SettingsStorage.createNotInitializedError();
+        }
+
         if (this.settings[key]) {
             delete this.settings[key];
             this.save();
@@ -73,8 +89,13 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
      * Gets current settings
      *
      * @returns current settings
+     * @throws error if settings is not initialized
      */
     public getData(): Settings {
+        if (!this.settings) {
+            throw SettingsStorage.createNotInitializedError();
+        }
+
         return this.settings;
     }
 
@@ -95,6 +116,10 @@ export class SettingsStorage implements StorageInterface<SettingOption, Settings
     public setData(settings: Settings): void {
         this.setCache(settings);
         this.save();
+    }
+
+    private static createNotInitializedError(): Error {
+        return new Error('settings is not initialized');
     }
 }
 

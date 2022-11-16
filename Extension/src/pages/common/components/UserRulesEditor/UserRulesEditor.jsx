@@ -21,7 +21,7 @@ import { MessageType } from '../../../../common/messages';
 import { NotifierType } from '../../../../common/constants';
 import { HANDLER_DELAY_MS } from '../../constants';
 import { handleFileUpload } from '../../../helpers';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 import { ToggleWrapButton } from './ToggleWrapButton';
 import { exportData, ExportTypes } from '../../utils/export';
 
@@ -61,7 +61,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                             break;
                         }
                         default: {
-                            log.debug('Undefined message type:', type);
+                            Log.debug('Undefined message type:', type);
                             break;
                         }
                     }
@@ -154,7 +154,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                             break;
                         }
                         default: {
-                            log.debug('Undefined message type:', type);
+                            Log.debug('Undefined message type:', type);
                             break;
                         }
                     }
@@ -228,7 +228,7 @@ export const UserRulesEditor = observer(({ fullscreen, uiStore }) => {
                 await store.saveUserRules(rulesUnionString);
             }
         } catch (e) {
-            log.debug(e.message);
+            Log.debug(e.message);
             if (uiStore?.addNotification) {
                 uiStore.addNotification({ description: e.message });
             }

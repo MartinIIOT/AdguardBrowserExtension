@@ -19,7 +19,7 @@ import zod from 'zod';
 import { getHost, tabsApi as tsWebExtTabsApi } from '@adguard/tswebextension';
 import browser from 'webextension-polyfill';
 
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import { SettingOption } from '../../schema';
 import { listeners } from '../../notifier';
 import {
@@ -288,7 +288,7 @@ export class AllowlistApi {
                 storage.setData(defaultData);
             }
         } catch (e) {
-            log.warn(`Can't parse ${storage.key} storage data from persisted storage, reset to default`);
+            Log.warn(`Can't parse ${storage.key} storage data from persisted storage, reset to default`);
             storage.setData(defaultData);
         }
     }

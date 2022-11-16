@@ -17,7 +17,7 @@
  */
 import { RuleConverter, RuleSyntaxUtils } from '@adguard/tsurlfilter';
 
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import { AntiBannerFiltersId } from '../../../common/constants';
 import { SettingOption } from '../../schema';
 import { listeners } from '../../notifier';
@@ -44,7 +44,7 @@ export class UserRulesApi {
                 await FiltersStorage.set(AntiBannerFiltersId.UserFilterId, []);
             }
         } catch (e) {
-            log.warn('Can\'t parse user filter list from persisted storage, reset to default');
+            Log.warn('Can\'t parse user filter list from persisted storage, reset to default');
             await FiltersStorage.set(AntiBannerFiltersId.UserFilterId, []);
         }
     }
@@ -160,8 +160,8 @@ export class UserRulesApi {
             let converted: string[] = [];
             try {
                 converted = RuleConverter.convertRule(line);
-            } catch (e) {
-                log.info(`Error converting rule ${line}, due to: ${e.message}`);
+            } catch (e: unknown) {
+                Log.info(`Error converting rule ${line}, due to: ${e instanceof Error ? e.message : e}`);
             }
             result.push(...converted);
 
@@ -175,7 +175,7 @@ export class UserRulesApi {
             }
         }
 
-        log.debug('Converted {0} rules to {1} for user filter', rules.length, result.length);
+        Log.debug('Converted {0} rules to {1} for user filter', rules.length, result.length);
 
         return result;
     }

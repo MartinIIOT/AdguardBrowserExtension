@@ -5,7 +5,7 @@ import { SettingsSection } from '../Settings/SettingsSection';
 import { SettingsSetCheckbox } from '../Settings/SettingsSetCheckbox';
 import { Setting, SETTINGS_TYPES } from '../Settings/Setting';
 import { rootStore } from '../../stores/RootStore';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import {
     GLOBAL_PRIVACY_CONTROL_URL,
@@ -37,7 +37,7 @@ const Stealth = observer(() => {
     };
 
     const settingChangeHandler = async ({ id, data }) => {
-        log.info(`Setting ${id} set to ${data}`);
+        Log.info(`Setting ${id} set to ${data}`);
         await settingsStore.updateSetting(id, data);
     };
 

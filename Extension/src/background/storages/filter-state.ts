@@ -54,8 +54,13 @@ export class FilterStateStorage extends StringStorage<
      *
      * @param filterId - filter id
      * @returns specified filter state
+     * @throws error if filter state data is not initialized
      */
     public get(filterId: number): FilterStateData {
+        if (!this.data) {
+            throw FilterStateStorage.createNotInitializedError();
+        }
+
         return this.data[filterId];
     }
 
@@ -64,8 +69,13 @@ export class FilterStateStorage extends StringStorage<
      *
      * @param filterId - filter id
      * @param state - filter state
+     * @throws error if filter state data is not initialized
      */
     public set(filterId: number, state: FilterStateData): void {
+        if (!this.data) {
+            throw FilterStateStorage.createNotInitializedError();
+        }
+
         this.data[filterId] = state;
 
         this.save();
@@ -75,8 +85,13 @@ export class FilterStateStorage extends StringStorage<
      * Deletes specified filter state
      *
      * @param filterId - filter id
+     * @throws error if filter state data is not initialized
      */
     public delete(filterId: number): void {
+        if (!this.data) {
+            throw FilterStateStorage.createNotInitializedError();
+        }
+
         delete this.data[filterId];
 
         this.save();
@@ -86,8 +101,13 @@ export class FilterStateStorage extends StringStorage<
      * Gets list of enabled filters ids
      *
      * @returns list of enabled filters ids
+     * @throws error if filter state data is not initialized
      */
     public getEnabledFilters(): number[] {
+        if (!this.data) {
+            throw FilterStateStorage.createNotInitializedError();
+        }
+
         return Object
             .entries(this.data)
             .filter(([,state]) => state.enabled)
@@ -98,8 +118,13 @@ export class FilterStateStorage extends StringStorage<
      * Gets list of installed filters ids
      *
      * @returns list of installed filters ids
+     * @throws error if filter state data is not initialized
      */
     public getInstalledFilters(): number[] {
+        if (!this.data) {
+            throw FilterStateStorage.createNotInitializedError();
+        }
+
         return Object
             .entries(this.data)
             .filter(([,state]) => state.installed)
@@ -110,8 +135,13 @@ export class FilterStateStorage extends StringStorage<
      * Enables specified filters
      *
      * @param filtersIds - list of filters to enable
+     * @throws error if filter state data is not initialized
      */
     public enableFilters(filtersIds: number[]): void {
+        if (!this.data) {
+            throw FilterStateStorage.createNotInitializedError();
+        }
+
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
             this.data[filterId] = { ...this.data[filterId], enabled: true };
@@ -124,8 +154,12 @@ export class FilterStateStorage extends StringStorage<
      * Disables specified filters
      *
      * @param filtersIds - list of filters to disable
+     * @throws error if filter state data is not initialized
      */
     public disableFilters(filtersIds: number[]): void {
+        if (!this.data) {
+            throw FilterStateStorage.createNotInitializedError();
+        }
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
             this.data[filterId] = { ...this.data[filterId], enabled: false };
@@ -163,6 +197,10 @@ export class FilterStateStorage extends StringStorage<
         }
 
         return states;
+    }
+
+    private static createNotInitializedError(): Error {
+        return new Error('Filter state data is not initialized');
     }
 }
 

@@ -18,7 +18,7 @@ import { rootStore } from '../../stores/RootStore';
 import { Notifications } from '../Notifications';
 import { updateFilterDescription } from '../../../helpers';
 import { messenger } from '../../../services/messenger';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 import { Icons } from '../../../common/components/ui/Icons';
 import { NotifierType } from '../../../../common/constants';
 import { useAppearanceTheme } from '../../../common/hooks/useAppearanceTheme';
@@ -74,7 +74,7 @@ const Options = observer(() => {
                             break;
                         }
                         default: {
-                            log.debug('Undefined message type:', type);
+                            Log.debug('Undefined message type:', type);
                             break;
                         }
                     }

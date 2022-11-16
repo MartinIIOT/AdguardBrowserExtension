@@ -48,9 +48,9 @@ export class CustomFilterMetadataStorage extends StringStorage<
      * Get custom filter metadata by filter subscription url
      *
      * @param url - subscription url
-     * @returns custom filter metadata
+     * @returns custom filter metadata or undefined, if metadata is not found
      */
-    public getByUrl(url: string): CustomFilterMetadata {
+    public getByUrl(url: string): CustomFilterMetadata | undefined {
         return this.getData().find(f => f.customUrl === url);
     }
 

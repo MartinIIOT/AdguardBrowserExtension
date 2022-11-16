@@ -23,7 +23,7 @@ import {
     tabsApi as tsWebExtTabApi,
 } from '@adguard/tswebextension';
 
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import { messageHandler } from '../../message-handler';
 import {
     MessageType,
@@ -123,7 +123,7 @@ export class UiService {
         if (activeTab?.url) {
             await PagesApi.openAbusePage(activeTab.url, ForwardFrom.ContextMenu);
         } else {
-            log.warn('Can`t open abuse page for active tab');
+            Log.warn('Can`t open abuse page for active tab');
         }
     }
 
@@ -139,7 +139,7 @@ export class UiService {
         if (activeTab?.url) {
             await PagesApi.openSiteReportPage(activeTab.url, ForwardFrom.ContextMenu);
         } else {
-            log.warn('Can`t open site report page for active tab');
+            Log.warn('Can`t open site report page for active tab');
         }
     }
 

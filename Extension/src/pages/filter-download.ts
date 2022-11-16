@@ -18,7 +18,7 @@
 import Nanobar from 'nanobar';
 
 import { MessageType } from '../common/messages';
-import { log } from '../common/log';
+import { Log } from '../common/log';
 import { messenger } from './services/messenger';
 
 import '../common/i18n'; // !!! DO NOT REMOVE, THIS MODULE HANDLES TRANSLATIONS
@@ -52,7 +52,7 @@ export class FilterDownload {
                 setTimeout(FilterDownload.checkRequestFilterReady, FilterDownload.checkRequestTimeoutMs);
             }
         } catch (e) {
-            log.error(e);
+            Log.error(e);
             // retry request, if message handler is not ready
             setTimeout(FilterDownload.checkRequestFilterReady, FilterDownload.checkRequestTimeoutMs);
         }

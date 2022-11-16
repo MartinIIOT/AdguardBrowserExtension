@@ -16,7 +16,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import browser from 'webextension-polyfill';
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import { BrowserUtils } from '../../utils/browser-utils';
 
 import { translator } from '../../../common/translators/translator';
@@ -42,7 +42,7 @@ export class Toasts {
         try {
             if (triesCount > Toasts.maxTries) {
                 // Give up
-                log.warn('Reached max tries on attempts to show alert popup');
+                Log.warn('Reached max tries on attempts to show alert popup');
                 return;
             }
 
@@ -136,7 +136,7 @@ export class Toasts {
         try {
             if (triesCount > Toasts.maxTries) {
                 // Give up
-                log.warn('Reached max tries on attempts to show application update popup');
+                Log.warn('Reached max tries on attempts to show application update popup');
                 return;
             }
 

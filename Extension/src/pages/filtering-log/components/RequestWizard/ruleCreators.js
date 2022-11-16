@@ -8,7 +8,7 @@ import { CosmeticRuleMarker } from '@adguard/tsurlfilter/dist/es/cosmetic-rule-m
 
 import { strings } from '../../../../common/strings';
 import { UrlUtils } from './utils';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 
 /**
  * Splits request url by backslash to block or allow patterns
@@ -136,7 +136,7 @@ export const createExceptionCssRule = (rule, event) => {
         return domainPart + generateExceptionRule(ruleText, CosmeticRuleMarker.Html);
     }
 
-    log.error('Cannot createExceptionCssRule for the rule:', rule);
+    Log.error('Cannot createExceptionCssRule for the rule:', rule);
 
     return '';
 };

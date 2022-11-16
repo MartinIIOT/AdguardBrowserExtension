@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import throttle from 'lodash/throttle';
 import { Filters } from '../Filters';
 import { messenger } from '../../../services/messenger';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 import { rootStore } from '../../stores/RootStore';
 import { RequestModal } from '../RequestWizard/RequestModal';
 import { Icons } from '../../../common/components/ui/Icons';
@@ -101,7 +101,7 @@ const FilteringLog = observer(() => {
                             break;
                         }
                         default: {
-                            log.debug('There is no listener for type:', type);
+                            Log.debug('There is no listener for type:', type);
                             break;
                         }
                     }

@@ -16,11 +16,10 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import browser from 'webextension-polyfill';
-import FiltersDownloader from '@adguard/filters-downloader';
+import FiltersDownloader from '@adguard/filters-downloader/browser';
 
 import { NetworkSettings } from './settings';
 import { UserAgent } from '../../../common/user-agent';
-import { strings } from '../../../common/strings';
 import {
     I18nMetadata,
     i18nMetadataValidator,
@@ -29,6 +28,14 @@ import {
     Metadata,
     metadataValidator,
 } from '../../schema';
+
+declare module '@adguard/filters-downloader/browser' {
+    interface ResolveConditions {
+        (lines: string[], options: DefinedExpressions): string[];
+    }
+
+    const resolveConditions: ResolveConditions;
+}
 
 export type NetworkConfiguration = {
     filtersMetadataUrl?: string,
@@ -62,7 +69,7 @@ export class Network {
     /**
      * Loading subscriptions map
      */
-    private loadingSubscriptions = {};
+    private loadingSubscriptions: Record<string, boolean> = {};
 
     /**
      * Downloads filter rules by filter ID
@@ -95,7 +102,7 @@ export class Network {
      *
      * @param url - Subscription url
      */
-    public async downloadFilterRulesBySubscriptionUrl(url: string): Promise<string[]> {
+    public async downloadFilterRulesBySubscriptionUrl(url: string): Promise<string[] | undefined> {
         if (url in this.loadingSubscriptions) {
             return;
         }
@@ -115,9 +122,12 @@ export class Network {
             }
 
             return lines;
-        } catch (e) {
+        } catch (e: unknown) {
             delete this.loadingSubscriptions[url];
-            const message = e instanceof Error ? e.message : e;
+            const message = e instanceof Error
+                ? e.message
+                : 'Unknown error while filter downloading by subscription url';
+
             throw new Error(message);
         }
     }
@@ -136,8 +146,8 @@ export class Network {
 
         try {
             response = await Network.executeRequestAsync(url, 'application/json');
-        } catch (e) {
-            const exMessage = e?.message || 'couldn\'t load local filters metadata';
+        } catch (e: unknown) {
+            const exMessage = e instanceof Error ? e.message : 'couldn\'t load local filters metadata';
             throw Network.createError(exMessage, url);
         }
 
@@ -148,10 +158,10 @@ export class Network {
         try {
             const metadata = JSON.parse(response.responseText);
             return metadataValidator.parse(metadata);
-        } catch (e) {
+        } catch (e: unknown) {
             // FIXME: Return regular error
             // FIXME: Zod error doesn't display
-            throw Network.createError('invalid response', url, response, e);
+            throw Network.createError('invalid response', url, response, e instanceof Error ? e : undefined);
         }
     }
 
@@ -169,8 +179,8 @@ export class Network {
 
         try {
             response = await Network.executeRequestAsync(url, 'application/json');
-        } catch (e) {
-            const exMessage = e?.message || 'couldn\'t load local filters i18n metadata';
+        } catch (e: unknown) {
+            const exMessage = e instanceof Error ? e.message : 'couldn\'t load local filters i18n metadata';
             throw Network.createError(exMessage, url);
         }
 
@@ -181,10 +191,10 @@ export class Network {
         try {
             const metadata = JSON.parse(response.responseText);
             return i18nMetadataValidator.parse(metadata);
-        } catch (e) {
+        } catch (e: unknown) {
             // FIXME: Return regular error
             // FIXME: Zod error doesn't display
-            throw Network.createError('invalid response', url, response, e);
+            throw Network.createError('invalid response', url, response, e instanceof Error ? e : undefined);
         }
     }
 
@@ -202,8 +212,8 @@ export class Network {
 
         try {
             response = await Network.executeRequestAsync(url, 'application/json');
-        } catch (e) {
-            const exMessage = e?.message || 'couldn\'t load local script rules';
+        } catch (e: unknown) {
+            const exMessage = e instanceof Error ? e.message : 'couldn\'t load local script rules';
             throw Network.createError(exMessage, url);
         }
 
@@ -215,8 +225,8 @@ export class Network {
             const localScriptRules = JSON.parse(response.responseText);
 
             return localScriptRulesValidator.parse(localScriptRules);
-        } catch (e) {
-            throw Network.createError('invalid response', url, response, e);
+        } catch (e: unknown) {
+            throw Network.createError('invalid response', url, response, e instanceof Error ? e : undefined);
         }
     }
 
@@ -235,8 +245,8 @@ export class Network {
         try {
             const metadata = JSON.parse(response.responseText);
             return metadataValidator.parse(metadata);
-        } catch (e) {
-            throw Network.createError('invalid response', url, response, e);
+        } catch (e: unknown) {
+            throw Network.createError('invalid response', url, response, e instanceof Error ? e : undefined);
         }
     }
 
@@ -338,7 +348,7 @@ export class Network {
      */
     private getUrlForDownloadFilterRules(filterId: number, useOptimizedFilters: boolean): string {
         const url = useOptimizedFilters ? this.settings.optimizedFilterRulesUrl : this.settings.filterRulesUrl;
-        return strings.replaceAll(url, '{filter_id}', filterId);
+        return url.replaceAll('{filter_id}', String(filterId));
     }
 
     /**
@@ -371,10 +381,10 @@ export class Network {
                     resolve(request);
                 };
 
-                const errorCallbackWrapper = (errorMessage) => {
-                    return (e) => {
+                const errorCallbackWrapper = (errorMessage: string) => {
+                    return (e: unknown) => {
                         let errorText = errorMessage;
-                        if (e?.message) {
+                        if (e instanceof Error) {
                             errorText = `${errorText}: ${e?.message}`;
                         }
                         const error = new Error(`Error: "${errorText}", statusText: ${request.statusText}`);

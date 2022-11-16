@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import { storage } from '../../storages';
 import {
     ADGUARD_SETTINGS_KEY,
@@ -109,7 +109,7 @@ export class UpdateApi {
 
             await schemaMigrationAction();
         } catch (e) {
-            log.error(`Error while schema migrating from ${
+            Log.error(`Error while schema migrating from ${
                 previousSchemaVersion
             } to ${
                 currentSchemaVersion
@@ -117,7 +117,7 @@ export class UpdateApi {
                 e.message
             }`);
 
-            log.info('Reset settings...');
+            Log.info('Reset settings...');
             await storage.set(ADGUARD_SETTINGS_KEY, defaultSettings);
         }
     }

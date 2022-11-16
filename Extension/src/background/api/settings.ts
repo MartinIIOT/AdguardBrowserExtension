@@ -17,7 +17,7 @@
  */
 import browser from 'webextension-polyfill';
 import { SettingsConfig } from '@adguard/tswebextension';
-import { log } from '../../common/log';
+import { Log } from '../../common/log';
 import {
     AppearanceTheme,
     defaultSettings,
@@ -167,7 +167,7 @@ export class SettingsApi {
 
             return true;
         } catch (e) {
-            log.error(e);
+            Log.error(e);
             return false;
         }
     }

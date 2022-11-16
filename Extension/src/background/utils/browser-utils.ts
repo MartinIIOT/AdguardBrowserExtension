@@ -126,7 +126,7 @@ export class BrowserUtils {
      */
     public static getMajorVersionNumber(version: string): string {
         const v = new Version(version);
-        return v.data[0];
+        return String(v.data[0]);
     }
 
     /**
@@ -138,6 +138,6 @@ export class BrowserUtils {
      */
     public static getMinorVersionNumber(version: string): string {
         const v = new Version(version);
-        return v.data[1];
+        return String(v.data[1]);
     }
 }

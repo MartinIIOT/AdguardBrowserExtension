@@ -16,7 +16,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import { TsWebExtension, ConfigurationMV2, MESSAGE_HANDLER_NAME } from '@adguard/tswebextension';
-import { log } from '../common/log';
+import { Log } from '../common/log';
 import { listeners } from './notifier';
 
 import { FiltersStorage } from './storages';
@@ -59,11 +59,11 @@ export class Engine {
 
         const configuration = await Engine.getConfiguration();
 
-        log.info('Start tswebextension...');
+        Log.info('Start tswebextension...');
         await Engine.api.start(configuration);
 
         const rulesCount = Engine.api.getRulesCount();
-        log.info(`tswebextension is started. Rules count: ${rulesCount}`);
+        Log.info(`tswebextension is started. Rules count: ${rulesCount}`);
         listeners.notifyListeners(listeners.RequestFilterUpdated, {
             rulesCount,
         });
@@ -72,11 +72,11 @@ export class Engine {
     static async update(): Promise<void> {
         const configuration = await Engine.getConfiguration();
 
-        log.info('Update tswebextension configuration...');
+        Log.info('Update tswebextension configuration...');
         await Engine.api.configure(configuration);
 
         const rulesCount = Engine.api.getRulesCount();
-        log.info(`tswebextension configuration is updated. Rules count: ${rulesCount}`);
+        Log.info(`tswebextension configuration is updated. Rules count: ${rulesCount}`);
         listeners.notifyListeners(listeners.RequestFilterUpdated, {
             rulesCount,
         });

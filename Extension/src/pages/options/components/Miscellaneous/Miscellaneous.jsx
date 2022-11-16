@@ -7,7 +7,7 @@ import { SETTINGS_TYPES } from '../Settings/Setting';
 import { messenger } from '../../../services/messenger';
 import { rootStore } from '../../stores/RootStore';
 import { userRulesEditorStore } from '../../../common/components/UserRulesEditor/UserRulesEditorStore';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { ConfirmModal } from '../../../common/components/ConfirmModal';
 import { COLLECT_HITS_LEARN_MORE_URL } from '../../constants';
@@ -30,7 +30,7 @@ const Miscellaneous = observer(() => {
     }
 
     const settingChangeHandler = async ({ id, data }) => {
-        log.info(`Setting ${id} set to ${data}`);
+        Log.info(`Setting ${id} set to ${data}`);
         await settingsStore.updateSetting(id, data);
     };
 

@@ -39,6 +39,10 @@ export class SafebrowsingService {
     }
 
     private static onHeaderReceived({ context }: RequestData<WebRequest.OnHeadersReceivedDetailsType>): void {
+        if (!context) {
+            return;
+        }
+
         const {
             requestType,
             statusCode,
@@ -51,7 +55,9 @@ export class SafebrowsingService {
             SafebrowsingApi
                 .checkSafebrowsingFilter(requestUrl, referrerUrl)
                 .then((safebrowsingUrl) => {
-                    browser.tabs.update(tabId, { url: safebrowsingUrl });
+                    if (safebrowsingUrl) {
+                        browser.tabs.update(tabId, { url: safebrowsingUrl });
+                    }
                 })
                 .catch(() => {});
         }

@@ -24,7 +24,7 @@ import {
 
 import { MessageType } from '../common/messages';
 
-import { log } from '../common/log';
+import { Log } from '../common/log';
 import { listeners } from './notifier';
 import { filteringLogApi } from './api';
 import { fullscreenUserRulesEditor } from './services';
@@ -37,7 +37,7 @@ export class ConnectionHandler {
     private static handleConnection(port: Runtime.Port): void {
         let listenerId: number;
 
-        log.info(`Port: "${port.name}" connected`);
+        Log.info(`Port: "${port.name}" connected`);
 
         ConnectionHandler.onPortConnection(port);
 
@@ -50,7 +50,7 @@ export class ConnectionHandler {
                     try {
                         port.postMessage({ type, data });
                     } catch (e) {
-                        log.error(e.message);
+                        Log.error(e.message);
                     }
                 });
             }
@@ -59,7 +59,7 @@ export class ConnectionHandler {
         port.onDisconnect.addListener(() => {
             ConnectionHandler.onPortDisconnection(port);
             listeners.removeListener(listenerId);
-            log.info(`Port: "${port.name}" disconnected`);
+            Log.info(`Port: "${port.name}" disconnected`);
         });
     }
 

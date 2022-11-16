@@ -18,8 +18,7 @@
 import browser from 'webextension-polyfill';
 import SHA256 from 'crypto-js/sha256';
 
-import { log } from '../../common/log';
-import { strings } from '../../common/strings';
+import { Log } from '../../common/log';
 import { SB_SUSPENDED_CACHE_KEY, SAFEBROWSING_PAGE_PATH } from '../../common/constants';
 
 import {
@@ -48,6 +47,7 @@ export class SafebrowsingApi {
 
     /**
      * Initialize new safebrowsing cache from {@link Storage}
+     *
      * @see {@link SbCache#init}
      */
     public static async initCache(): Promise<void> {
@@ -69,6 +69,7 @@ export class SafebrowsingApi {
      */
     public static async addToSafebrowsingTrusted(url: string): Promise<void> {
         const host = UrlUtils.getHost(url);
+        console.log('kek', host);
         if (!host) {
             return;
         }
@@ -83,23 +84,23 @@ export class SafebrowsingApi {
      * @param requestUrl Request URL
      * @param referrerUrl Referrer URL
      */
-    public static async checkSafebrowsingFilter(requestUrl: string, referrerUrl: string): Promise<string> {
+    public static async checkSafebrowsingFilter(requestUrl: string, referrerUrl: string): Promise<string | undefined> {
         const safebrowsingDisabled = settingsStorage.get(SettingOption.DisableSafebrowsing);
 
         if (safebrowsingDisabled) {
             return;
         }
 
-        log.debug('Checking safebrowsing filter for {0}', requestUrl);
+        Log.debug('Checking safebrowsing filter for {0}', requestUrl);
 
         const sbList = await SafebrowsingApi.lookupUrl(requestUrl);
 
         if (!sbList) {
-            log.debug('No safebrowsing rule found');
+            Log.debug('No safebrowsing rule found');
             return;
         }
 
-        log.debug('Following safebrowsing filter has been fired: {0}', sbList);
+        Log.debug('Following safebrowsing filter has been fired: {0}', sbList);
         return SafebrowsingApi.getErrorPageURL(requestUrl, referrerUrl, sbList);
     }
 
@@ -108,17 +109,17 @@ export class SafebrowsingApi {
      *
      * @param requestUrl - request url
      *
-     * @returns safebrowsing list we've detected or undefined
+     * @returns safebrowsing list we've detected or null
      */
-    private static async lookupUrl(requestUrl: string): Promise<string | undefined> {
+    private static async lookupUrl(requestUrl: string): Promise<string | null> {
         const host = UrlUtils.getHost(requestUrl);
         if (!host) {
-            return;
+            return null;
         }
 
         const hosts = SafebrowsingApi.extractHosts(host);
         if (!hosts || hosts.length === 0) {
-            return;
+            return null;
         }
 
         // try find request url in cache
@@ -131,7 +132,7 @@ export class SafebrowsingApi {
         const now = Date.now();
         const suspendedFrom = Number(await storage.get(SB_SUSPENDED_CACHE_KEY));
         if (suspendedFrom && (now - suspendedFrom) < SafebrowsingApi.SUSPEND_TTL_MS) {
-            return;
+            return null;
         }
 
         const hashesMap = SafebrowsingApi.createHashesMap(hosts);
@@ -156,21 +157,21 @@ export class SafebrowsingApi {
         try {
             response = await network.lookupSafebrowsing(shortHashes);
         } catch (e) {
-            log.error('Error response from safebrowsing lookup server for {0}', host);
+            Log.error('Error response from safebrowsing lookup server for {0}', host);
             await SafebrowsingApi.suspendSafebrowsing();
-            return;
+            return null;
         }
 
         if (response && response.status >= 500) {
             // Error on server side, suspend request
-            log.error('Error response status {0} received from safebrowsing lookup server.', response.status);
+            Log.error('Error response status {0} received from safebrowsing lookup server.', response.status);
             await SafebrowsingApi.suspendSafebrowsing();
-            return;
+            return null;
         }
 
         if (!response) {
-            log.error('Can`t read response from the server');
-            return;
+            Log.error('Can`t read response from the server');
+            return null;
         }
 
         await SafebrowsingApi.resumeSafebrowsing();
@@ -191,6 +192,19 @@ export class SafebrowsingApi {
     }
 
     /**
+     * Calculates hash for host string
+     *
+     * Public for test purposes
+     *
+     * @param host - host string
+     *
+     * @returns host SHA256 hash
+     */
+    public static createHash(host: string): string {
+        return SHA256(`${host}/`).toString().toUpperCase();
+    }
+
+    /**
      * Access Denied page URL
      *
      * @param requestUrl    Request URL
@@ -204,10 +218,16 @@ export class SafebrowsingApi {
         sbList: string,
     ): string {
         const listName = sbList || 'malware';
-        const isMalware = strings.contains(listName, 'malware');
+        const isMalware = listName.includes('malware');
         let url = SAFEBROWSING_PAGE_PATH;
         url += `?malware=${isMalware}`;
-        url += `&host=${encodeURIComponent(UrlUtils.getHost(requestUrl))}`;
+
+        const host = UrlUtils.getHost(requestUrl);
+
+        if (host) {
+            url += `&host=${encodeURIComponent(host)}`;
+        }
+
         url += `&url=${encodeURIComponent(requestUrl)}`;
         url += `&ref=${encodeURIComponent(referrerUrl)}`;
 
@@ -254,7 +274,7 @@ export class SafebrowsingApi {
 
             return null;
         } catch (ex) {
-            log.error('Error parse safebrowsing response, cause {0}', ex);
+            Log.error('Error parse safebrowsing response, cause {0}', ex);
         }
         return null;
     }
@@ -281,17 +301,6 @@ export class SafebrowsingApi {
      */
     private static async suspendSafebrowsing(): Promise<void> {
         await storage.set(SB_SUSPENDED_CACHE_KEY, Date.now());
-    }
-
-    /**
-     * Calculates hash for host string
-     *
-     * @param host - host string
-     *
-     * @returns host SHA256 hash
-     */
-    private static createHash(host: string): string {
-        return SHA256(`${host}/`).toString().toUpperCase();
     }
 
     /**
@@ -351,7 +360,7 @@ export class SafebrowsingApi {
             hosts.push(host);
         } else {
             for (let i = 0; i <= parts.length - 2; i += 1) {
-                hosts.push(strings.join(parts, '.', i, parts.length));
+                hosts.push(parts.slice(i).join('.'));
             }
         }
 

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import {
     AntibannerGroupsId,
     CUSTOM_FILTERS_GROUP_DISPLAY_NUMBER,
@@ -133,7 +133,7 @@ export class FiltersApi {
 
         const metadata = CustomFilterApi.getFilterMetadata(filterId);
 
-        return metadata.trusted;
+        return !!metadata?.trusted;
     }
 
     /**
@@ -215,7 +215,7 @@ export class FiltersApi {
      *
      * @returns filter metadata
      */
-    public static getFilterMetadata(filterId: number): FilterMetadata {
+    public static getFilterMetadata(filterId: number): FilterMetadata | undefined {
         if (CustomFilterApi.isCustomFilter(filterId)) {
             return CustomFilterApi.getFilterMetadata(filterId);
         }
@@ -247,7 +247,7 @@ export class FiltersApi {
         return enabledFilters.filter(id => {
             const filterMetadata = FiltersApi.getFilterMetadata(id);
 
-            return enabledGroups.some(groupId => groupId === filterMetadata.groupId);
+            return enabledGroups.some(groupId => groupId === filterMetadata?.groupId);
         });
     }
 
@@ -337,7 +337,7 @@ export class FiltersApi {
             const i18nMetadata = i18nMetadataValidator.parse(JSON.parse(storageData));
             i18nMetadataStorage.setCache(i18nMetadata);
         } catch (e) {
-            log.warn(`Can't parse data from ${i18nMetadataStorage.key} storage, load it from local assets`);
+            Log.warn(`Can't parse data from ${i18nMetadataStorage.key} storage, load it from local assets`);
             await FiltersApi.loadI18nMetadataFromBackend(false);
         }
     }
@@ -358,7 +358,7 @@ export class FiltersApi {
             const metadata = metadataValidator.parse(JSON.parse(storageData));
             metadataStorage.setCache(metadata);
         } catch (e) {
-            log.warn(`Can't parse data from ${metadataStorage.key} storage, load it from local assets`);
+            Log.warn(`Can't parse data from ${metadataStorage.key} storage, load it from local assets`);
             await FiltersApi.loadMetadataFromFromBackend(false);
         }
     }
@@ -394,7 +394,7 @@ export class FiltersApi {
 
             filterStateStorage.setData(data);
         } catch (e) {
-            log.warn(`Can't parse data from ${filterStateStorage.key} storage, load default states`);
+            Log.warn(`Can't parse data from ${filterStateStorage.key} storage, load default states`);
             filterStateStorage.setData(FilterStateStorage.applyMetadata({}, metadata));
         }
     }
@@ -419,7 +419,7 @@ export class FiltersApi {
 
             groupStateStorage.setData(data);
         } catch (e) {
-            log.warn(`Can't parse data from ${groupStateStorage.key} storage, set default states`);
+            Log.warn(`Can't parse data from ${groupStateStorage.key} storage, set default states`);
             groupStateStorage.setData(GroupStateStorage.applyMetadata({}, metadata));
         }
     }
@@ -444,7 +444,7 @@ export class FiltersApi {
 
             filterVersionStorage.setData(data);
         } catch (e) {
-            log.warn(`Can't parse data from ${filterVersionStorage.key} storage, set default states`);
+            Log.warn(`Can't parse data from ${filterVersionStorage.key} storage, set default states`);
             filterVersionStorage.setData(FilterVersionStorage.applyMetadata({}, metadata));
         }
     }
@@ -463,7 +463,7 @@ export class FiltersApi {
                 filterStateStorage.delete(id);
                 await FiltersStorage.remove(id);
 
-                log.info(`Filter with id: ${id} removed from the storage`);
+                Log.info(`Filter with id: ${id} removed from the storage`);
             });
 
         await Promise.allSettled(tasks);

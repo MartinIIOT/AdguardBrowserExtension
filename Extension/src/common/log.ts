@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
+ * @file
+ *
  * This file is part of Adguard Browser Extension (https://github.com/AdguardTeam/AdguardBrowserExtension).
  *
  * Adguard Browser Extension is free software: you can redistribute it and/or modify
@@ -20,37 +23,57 @@
 /**
  * Simple logger with log levels
  */
-export const log = (() => {
-    // Redefine if you need it
-    const CURRENT_LEVEL = 'INFO';
 
-    const LEVELS = {
-        ERROR: 1,
-        WARN: 2,
-        INFO: 3,
-        DEBUG: 4,
-    };
+export const enum LogLevel {
+    Error = 1,
+    Warn,
+    Info,
+    Debug,
+}
 
-    /**
-     * Pretty-print javascript error
-     */
-    const errorToString = function (error) {
+export const enum LogMethod {
+    Log = 'log',
+    Info = 'info',
+    Error = 'error',
+}
+
+export class Log {
+    private static currentLevel = LogLevel.Info;
+
+    public static debug(...args: unknown[]): void {
+        Log.print(LogLevel.Debug, LogMethod.Log, args);
+    }
+
+    public static info(...args: unknown[]): void {
+        Log.print(LogLevel.Info, LogMethod.Info, args);
+    }
+
+    public static warn(...args: unknown[]): void {
+        Log.print(LogLevel.Warn, LogMethod.Info, args);
+    }
+
+    public static error(...args: unknown[]): void {
+        Log.print(LogLevel.Error, LogMethod.Error, args);
+    }
+
+    private static errorToString(error: Error): string {
         return `${error.toString()}\nStack trace:\n${error.stack}`;
-    };
+    }
 
-    const getLocalTimeString = (date) => {
+    private static getLocalTimeString(date: Date): string {
         const ONE_MINUTE_MS = 60 * 1000;
         const timeZoneOffsetMs = date.getTimezoneOffset() * ONE_MINUTE_MS;
-        const localTime = new Date(date - timeZoneOffsetMs);
+        const localTime = new Date(date.getMilliseconds() - timeZoneOffsetMs);
         return localTime.toISOString().replace('Z', '');
-    };
+    }
 
-    /**
-     * Prints log message
-     */
-    const print = function (level, method, args) {
+    private static print(
+        level: LogLevel,
+        method: LogMethod,
+        args: any[],
+    ): void {
         // check log level
-        if (LEVELS[CURRENT_LEVEL] < LEVELS[level]) {
+        if (this.currentLevel < level) {
             return;
         }
         if (!args || args.length === 0 || !args[0]) {
@@ -59,44 +82,29 @@ export const log = (() => {
 
         const str = `${args[0]}`;
         args = Array.prototype.slice.call(args, 1);
-        let formatted = str.replace(/{(\d+)}/g, (match, number) => {
+        let formatted = str.replace(/{(\d+)}/g, (match: string, number: number): string => {
             if (typeof args[number] !== 'undefined') {
-                let value = args[number];
+                const value = args[number];
+
                 if (value instanceof Error) {
-                    value = errorToString(value);
-                } else if (value && value.message) {
-                    value = value.message;
-                } else if (typeof value === 'object') {
-                    value = JSON.stringify(value);
+                    return Log.errorToString(value);
                 }
-                return value;
+
+                if (typeof value.message === 'string') {
+                    return value.message;
+                }
+
+                if (typeof value === 'object') {
+                    return JSON.stringify(value);
+                }
+
+                return String(value);
             }
 
             return match;
         });
 
-        formatted = `${getLocalTimeString(new Date())}: ${formatted}`;
+        formatted = `${Log.getLocalTimeString(new Date())}: ${formatted}`;
         console[method](formatted);
-    };
-
-    /**
-     * Expose public API
-     */
-    return {
-        debug(...args) {
-            print('DEBUG', 'log', args);
-        },
-
-        info(...args) {
-            print('INFO', 'info', args);
-        },
-
-        warn(...args) {
-            print('WARN', 'info', args);
-        },
-
-        error(...args) {
-            print('ERROR', 'error', args);
-        },
-    };
-})();
+    }
+}

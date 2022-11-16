@@ -5,7 +5,7 @@ import {
     observable,
     runInAction,
 } from 'mobx';
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import { createSavingService, EVENTS as SAVING_FSM_EVENTS, STATES } from '../../common/components/Editor/savingFSM';
 import { MIN_FILTERS_UPDATE_DISPLAY_DURATION } from '../../common/constants';
 import { sleep } from '../../helpers';
@@ -354,7 +354,7 @@ class SettingsStore {
                 this.stripTrackingParameters = enabled;
             }
         } catch (e) {
-            log.error(e);
+            Log.error(e);
             this.setFilterEnabledState(filterId, !enabled);
         }
     }
@@ -419,7 +419,7 @@ class SettingsStore {
             const { content } = await messenger.getAllowlist();
             this.setAllowlist(content);
         } catch (e) {
-            log.debug(e);
+            Log.debug(e);
         }
     };
 

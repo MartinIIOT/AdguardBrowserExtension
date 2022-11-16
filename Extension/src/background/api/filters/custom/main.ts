@@ -18,7 +18,7 @@
 import MD5 from 'crypto-js/md5';
 
 import { BrowserUtils } from '../../../utils/browser-utils';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 import { AntibannerGroupsId, CUSTOM_FILTERS_START_ID } from '../../../../common/constants';
 import { CustomFilterMetadata, customFilterMetadataStorageDataValidator } from '../../../schema';
 import {
@@ -114,7 +114,7 @@ export class CustomFilterApi {
                 customFilterMetadataStorage.setData([]);
             }
         } catch (e) {
-            log.warn('Can`t parse custom filter metadata from persisted storage, reset to default');
+            Log.warn('Can`t parse custom filter metadata from persisted storage, reset to default');
             customFilterMetadataStorage.setData([]);
         }
     }
@@ -181,7 +181,7 @@ export class CustomFilterApi {
         // create new filter id
         const filterId = CustomFilterApi.genFilterId();
 
-        log.info(`Create new custom filter with id ${filterId}`);
+        Log.info(`Create new custom filter with id ${filterId}`);
 
         const trusted = !!filterData.trusted;
         const enabled = !!filterData.enabled;
@@ -256,12 +256,12 @@ export class CustomFilterApi {
      * or new version is not available.
      */
     public static async updateFilter(filterId: number): Promise<CustomFilterMetadata | null> {
-        log.info(`Update Custom filter ${filterId} ...`);
+        Log.info(`Update Custom filter ${filterId} ...`);
 
         const filterMetadata = customFilterMetadataStorage.getById(filterId);
 
         if (!filterMetadata) {
-            log.error(`Can't find custom filter ${filterId} metadata`);
+            Log.error(`Can't find custom filter ${filterId} metadata`);
             return null;
         }
 
@@ -270,11 +270,11 @@ export class CustomFilterApi {
         const filterRemoteData = await CustomFilterApi.getRemoteFilterData(customUrl);
 
         if (!CustomFilterApi.isFilterNeedUpdate(filterMetadata, filterRemoteData)) {
-            log.info(`Custom filter ${filterId} is already updated`);
+            Log.info(`Custom filter ${filterId} is already updated`);
             return null;
         }
 
-        log.info(`Successfully update custom filter ${filterId}`);
+        Log.info(`Successfully update custom filter ${filterId}`);
         return CustomFilterApi.updateFilterData(filterMetadata, filterRemoteData);
     }
 
@@ -286,7 +286,7 @@ export class CustomFilterApi {
      * @param filterId - custom filter id
      */
     public static async removeFilter(filterId: number): Promise<void> {
-        log.info(`Remove Custom filter ${filterId} ...`);
+        Log.info(`Remove Custom filter ${filterId} ...`);
 
         customFilterMetadataStorage.remove(filterId);
         filterVersionStorage.delete(filterId);
@@ -438,7 +438,7 @@ export class CustomFilterApi {
         filter: CustomFilterMetadata,
         { checksum, parsed }: GetRemoteCustomFilterResult,
     ): boolean {
-        log.info(`Check if custom filter ${filter.filterId} need to update`);
+        Log.info(`Check if custom filter ${filter.filterId} need to update`);
 
         if (BrowserUtils.isSemver(filter.version) && BrowserUtils.isSemver(parsed.version)) {
             return !BrowserUtils.isGreaterOrEqualsVersion(filter.version, parsed.version);
@@ -459,7 +459,7 @@ export class CustomFilterApi {
      * @returns downloaded and parsed filter data
      */
     private static async getRemoteFilterData(url: string): Promise<GetRemoteCustomFilterResult> {
-        log.info(`Get custom filter data from ${url}`);
+        Log.info(`Get custom filter data from ${url}`);
 
         const rules = await CustomFilterLoader.downloadRulesWithTimeout(url);
 

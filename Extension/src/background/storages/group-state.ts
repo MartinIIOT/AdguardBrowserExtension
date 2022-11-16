@@ -46,8 +46,13 @@ export class GroupStateStorage extends StringStorage<
      *
      * @param groupId - group id
      * @returns specified group state
+     * @throws error if group state data is not initialized
      */
     public get(groupId: number): GroupStateData {
+        if (!this.data) {
+            throw GroupStateStorage.createNotInitializedError();
+        }
+
         return this.data[groupId];
     }
 
@@ -56,8 +61,13 @@ export class GroupStateStorage extends StringStorage<
      *
      * @param groupId - group id
      * @param state - group state
+     * @throws error if group state data is not initialized
      */
     public set(groupId: number, state: GroupStateData): void {
+        if (!this.data) {
+            throw GroupStateStorage.createNotInitializedError();
+        }
+
         this.data[groupId] = state;
 
         this.save();
@@ -67,8 +77,13 @@ export class GroupStateStorage extends StringStorage<
      * Delete specified group state
      *
      * @param groupId - group id
+     * @throws error if group state data is not initialized
      */
     public delete(groupId: number): void {
+        if (!this.data) {
+            throw GroupStateStorage.createNotInitializedError();
+        }
+
         delete this.data[groupId];
 
         this.save();
@@ -78,8 +93,13 @@ export class GroupStateStorage extends StringStorage<
      * Gets list of enabled groups ids
      *
      * @returns list of enabled groups ids
+     * @throws error if group state data is not initialized
      */
     public getEnabledGroups(): number[] {
+        if (!this.data) {
+            throw GroupStateStorage.createNotInitializedError();
+        }
+
         return Object
             .entries(this.data)
             .filter(([,state]) => state.enabled)
@@ -91,8 +111,13 @@ export class GroupStateStorage extends StringStorage<
      *
      * @param groupIds - list of groups to enable
      * @param toggled - mark groups as toggled on enabling
+     * @throws error if group state data is not initialized
      */
     public enableGroups(groupIds: number[], toggled = true): void {
+        if (!this.data) {
+            throw GroupStateStorage.createNotInitializedError();
+        }
+
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
             this.data[groupId] = {
@@ -109,8 +134,13 @@ export class GroupStateStorage extends StringStorage<
      *
      * @param groupIds - list of groups to disable
      * @param toggled - mark groups as toggled on disabling
+     * @throws error if group state data is not initialized
      */
     public disableGroups(groupIds: number[], toggled = true): void {
+        if (!this.data) {
+            throw GroupStateStorage.createNotInitializedError();
+        }
+
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
             this.data[groupId] = {
@@ -144,6 +174,10 @@ export class GroupStateStorage extends StringStorage<
         }
 
         return states;
+    }
+
+    private static createNotInitializedError(): Error {
+        return new Error('Group state data is not initialized');
     }
 }
 

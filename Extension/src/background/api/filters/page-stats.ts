@@ -16,7 +16,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import { translator } from '../../../common/translators/translator';
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import {
     metadataStorage,
     pageStatsStorage,
@@ -56,7 +56,7 @@ export class PageStatsApi {
                 pageStatsStorage.setData({});
             }
         } catch (e) {
-            log.warn(`Can't parse data from ${pageStatsStorage.key} storage, set default states`);
+            Log.warn(`Can't parse data from ${pageStatsStorage.key} storage, set default states`);
             pageStatsStorage.setData({});
         }
     }

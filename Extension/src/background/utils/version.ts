@@ -17,32 +17,62 @@
  */
 
 /**
- * Extension version (x.x.x)
+ * Helper class for work with semver (x.x.x)
  *
- * @param version
+ * @param version - semver string
+ * @class
+ * @throws error, if passed string cannot be parsed
  */
 export class Version {
-    public data = {};
+    // splitted semver
+    public data: number[] = [];
 
     constructor(version: string) {
         const parts = String(version || '').split('.');
 
         for (let i = 3; i >= 0; i -= 1) {
-            this.data[i] = Version.parseVersionPart(parts[i]);
+            const part = parts[i];
+
+            if (!part) {
+                throw new Error('Can not parse version string');
+            }
+
+            this.data[i] = Version.parseVersionPart(part);
         }
     }
 
+    /**
+     * Compare current semver with passed
+     *
+     * @param version - {@link Version} instance
+     * @returns number, indicates the result of the comparison (1 - greater, -1 - less, 0 - equals).
+     * @throws error, if some version data is invalid
+     */
     public compare(version: Version): number {
         for (let i = 0; i < 4; i += 1) {
-            if (this.data[i] > version.data[i]) {
+            const leftPart = this.data[i];
+            const rightPart = version.data[i];
+
+            if (!leftPart || !rightPart) {
+                throw new Error('Can not compare versions');
+            }
+
+            if (leftPart > rightPart) {
                 return 1;
-            } if (this.data[i] < version.data[i]) {
+            }
+            if (leftPart < rightPart) {
                 return -1;
             }
         }
         return 0;
     }
 
+    /**
+     * Cast semver part to number
+     *
+     * @param part - splitted semver part
+     * @returns semver part number
+     */
     private static parseVersionPart(part: string): number {
         if (Number.isNaN(part)) {
             return 0;

@@ -18,7 +18,7 @@
 import browser from 'webextension-polyfill';
 
 import { BrowserUtils } from '../../utils/browser-utils';
-import { log } from '../../../common/log';
+import { Log } from '../../../common/log';
 import { UserAgent } from '../../../common/user-agent';
 import { SettingOption, RegularFilterMetadata } from '../../schema';
 import { AntiBannerFiltersId, AntibannerGroupsId } from '../../../common/constants';
@@ -84,26 +84,26 @@ export class CommonFilterApi {
      * @returns updated filter metadata or null, if update is not required
      */
     public static async updateFilter(filterId: number): Promise<RegularFilterMetadata | null> {
-        log.info(`Update filter ${filterId}`);
+        Log.info(`Update filter ${filterId}`);
 
         const filterMetadata = CommonFilterApi.getFilterMetadata(filterId);
 
         if (!filterMetadata) {
-            log.error(`Can't find filter ${filterId} metadata`);
+            Log.error(`Can't find filter ${filterId} metadata`);
             return null;
         }
 
         if (!CommonFilterApi.isFilterNeedUpdate(filterMetadata)) {
-            log.info(`Filter ${filterId} is already updated`);
+            Log.info(`Filter ${filterId} is already updated`);
             return null;
         }
 
         try {
             await CommonFilterApi.loadFilterRulesFromBackend(filterId, true);
-            log.info(`Successfully update filter ${filterId}`);
+            Log.info(`Successfully update filter ${filterId}`);
             return filterMetadata;
         } catch (e) {
-            log.error(e);
+            Log.error(e);
             return null;
         }
     }
@@ -203,7 +203,7 @@ export class CommonFilterApi {
      * @returns true, if filter update is required, else returns false.
      */
     private static isFilterNeedUpdate(filterMetadata: RegularFilterMetadata): boolean {
-        log.info(`Check if filter ${filterMetadata.filterId} need to update`);
+        Log.info(`Check if filter ${filterMetadata.filterId} need to update`);
 
         const filterVersion = filterVersionStorage.get(filterMetadata.filterId);
 

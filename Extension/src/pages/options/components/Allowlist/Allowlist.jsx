@@ -8,7 +8,7 @@ import { SettingsSection } from '../Settings/SettingsSection';
 import { Editor } from '../../../common/components/Editor';
 import { rootStore } from '../../stores/RootStore';
 import { handleFileUpload } from '../../../helpers';
-import { log } from '../../../../common/log';
+import { Log } from '../../../../common/log';
 import { reactTranslator } from '../../../../common/translators/reactTranslator';
 import { AllowlistSavingButton } from './AllowlistSavingButton';
 import { usePrevious } from '../../../common/hooks/usePrevious';
@@ -62,7 +62,7 @@ const Allowlist = observer(() => {
             await settingsStore.appendAllowlist(content);
             setAllowlistRerender(true);
         } catch (e) {
-            log.debug(e.message);
+            Log.debug(e.message);
             uiStore.addNotification({ description: e.message });
         }
 

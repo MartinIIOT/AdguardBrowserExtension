@@ -15,34 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
+import browser from 'webextension-polyfill';
 
-/**
- * Helper class for working with i18n locales
- */
-export class I18n {
-    /**
-     * Gets matched locale from locales list or dictionary
-     *
-     * @param locales - list or dictionary of i18n locales
-     * @param locale - target locale
-     * @returns matched locale or null, if locale is not found
-     */
-    public static find(
-        locales: string[] | Record<string, unknown>,
-        locale: string,
-    ): string | null {
-        const lang = locale.replace('-', '_');
-
-        if (lang in locales) {
-            return lang;
-        }
-
-        const [localePart] = lang.split('_');
-
-        if (localePart && localePart in locales) {
-            return localePart;
-        }
-
-        return null;
-    }
-}
+export const i18n = {
+    getMessage: browser.i18n.getMessage,
+    getUILanguage: browser.i18n.getUILanguage,
+    getBaseMessage: (key: string): string => key,
+    // TODO: export 'Locales' type from '@adguard/translate'
+    getBaseUILanguage: (): string => 'en',
+};

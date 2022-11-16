@@ -18,7 +18,7 @@
 import browser from 'webextension-polyfill';
 import zod from 'zod';
 import { MessageType, sendMessage } from '../common/messages';
-import { log } from '../common/log';
+import { Log } from '../common/log';
 
 import { messageHandler } from './message-handler';
 import { ConnectionHandler } from './connection-handler';
@@ -243,7 +243,7 @@ export class App {
         try {
             await browser.runtime.setUninstallURL(App.uninstallUrl);
         } catch (e) {
-            log.error(`Can't set app uninstall url: ${e.message}`);
+            Log.error(`Can't set app uninstall url: ${e.message}`);
         }
     }
 
@@ -254,7 +254,7 @@ export class App {
         try {
             clientId = zod.string().parse(storageClientId);
         } catch (e) {
-            log.warn('Error while parsing client id, generating a new one');
+            Log.warn('Error while parsing client id, generating a new one');
             clientId = InstallApi.genClientId();
             await storage.set(CLIENT_ID_KEY, clientId);
         }

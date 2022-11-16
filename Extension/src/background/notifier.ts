@@ -16,7 +16,7 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { log } from '../common/log';
+import { Log } from '../common/log';
 import { NotifierType } from '../common/constants';
 
 type Listener = (...args: unknown[]) => unknown;
@@ -45,11 +45,13 @@ class Notifier {
     /**
      * Subscribes listener to the specified events
      *
-     * @param event    event type listener will be notified of
-     * @param listener  Listener callback
+     * @param events - Event type listener will be notified of
+     * @param listener - Listener callback
+     *
      * @returns listener id
+     * @throws error if listener is not a function
      */
-    addSpecifiedListener(events, listener: Listener) {
+    addSpecifiedListener(events, listener: Listener): number {
         if (typeof listener !== 'function') {
             throw new Error('Illegal listener');
         }
@@ -63,9 +65,11 @@ class Notifier {
     /**
      * Subscribe specified listener to all events
      *
+     * @param listener - Listener callback
      * @returns listener id
+     * @throws error if listener is not a function
      */
-    addListener(listener: Listener) {
+    addListener(listener: Listener): number {
         if (typeof listener !== 'function') {
             throw new Error('Illegal listener');
         }
@@ -77,17 +81,22 @@ class Notifier {
 
     /**
      * Unsubscribe listener
-     * @param listenerId listenerId
+     *
+     * @param listenerId - listener id
      */
-    removeListener(listenerId: number) {
+    removeListener(listenerId: number): void {
         delete this.listenersMap[listenerId];
         delete this.listenersEventsMap[listenerId];
     }
 
     /**
      * Notifies listeners about the events passed as arguments of this function.
+     *
+     * @param args - notifier event types
+     *
+     * @throws error if some event is illegal
      */
-    notifyListeners(...args: [string, ...unknown[]]) {
+    notifyListeners(...args: [string, ...unknown[]]): void {
         const [event] = args;
         if (!event || !(event in this.eventNotifierEventsMap)) {
             throw new Error(`Illegal event: ${event}`);
@@ -96,14 +105,14 @@ class Notifier {
         Object.entries(
             this.listenersMap as Record<string, Listener>,
         ).forEach(([listenerId, listener]) => {
-            const events = this.listenersEventsMap[listenerId];
+            const events = this.listenersEventsMap[Number(listenerId)];
             if (events && events.length > 0 && events.indexOf(event) < 0) {
                 return;
             }
             try {
                 listener.apply(listener, args);
             } catch (ex) {
-                log.error('Error invoking listener for {0} cause: {1}', event, ex);
+                Log.error('Error invoking listener for {0} cause: {1}', event, ex);
             }
         });
     }
@@ -112,8 +121,10 @@ class Notifier {
      * Asynchronously notifies all listeners about the events passed as arguments of this function.
      * Some events should be dispatched asynchronously, for instance this is very important for Safari:
      * https://github.com/AdguardTeam/AdguardBrowserExtension/issues/251
+     *
+     * @param args - notifier event types
      */
-    notifyListenersAsync(...args: [string, ...unknown[]]) {
+    notifyListenersAsync(...args: [string, ...unknown[]]): void {
         setTimeout(() => {
             this.notifyListeners(...args);
         }, 500);
