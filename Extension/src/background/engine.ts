@@ -64,6 +64,7 @@ export class Engine {
 
         const rulesCount = Engine.api.getRulesCount();
         Log.info(`tswebextension is started. Rules count: ${rulesCount}`);
+        // FIXME: remove
         listeners.notifyListeners(listeners.RequestFilterUpdated, {
             rulesCount,
         });
@@ -77,6 +78,7 @@ export class Engine {
 
         const rulesCount = Engine.api.getRulesCount();
         Log.info(`tswebextension configuration is updated. Rules count: ${rulesCount}`);
+        // FIXME: remove
         listeners.notifyListeners(listeners.RequestFilterUpdated, {
             rulesCount,
         });
