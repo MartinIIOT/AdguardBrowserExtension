@@ -264,14 +264,15 @@ export class FiltersApi {
         filtersIds.forEach((filterId) => {
             const filterMetadata = FiltersApi.getFilterMetadata(filterId);
 
-            const groupId = filterMetadata?.groupId;
+            if (!filterMetadata) {
+                return;
+            }
 
-            if (groupId) {
-                const group = groupStateStorage.get(groupId);
+            const { groupId } = filterMetadata;
+            const group = groupStateStorage.get(groupId);
 
-                if (!group?.toggled) {
-                    groupIds.push(filterMetadata.groupId);
-                }
+            if (!group?.toggled) {
+                groupIds.push(filterMetadata.groupId);
             }
         });
 

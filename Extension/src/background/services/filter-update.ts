@@ -49,9 +49,7 @@ export class FilterUpdateService {
      * Checks filter updates every {@link checkPeriodMs} period
      */
     private async update(): Promise<void> {
-        if (this.timerId) {
-            window.clearTimeout(this.timerId);
-        }
+        window.clearTimeout(this.timerId);
 
         await FilterUpdateApi.autoUpdateFilters();
 

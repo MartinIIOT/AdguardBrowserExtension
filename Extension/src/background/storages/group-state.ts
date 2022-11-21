@@ -120,7 +120,8 @@ export class GroupStateStorage extends StringStorage<
 
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
-            if (groupId) {
+
+            if (groupId !== undefined) {
                 this.data[groupId] = {
                     enabled: true,
                     toggled,
@@ -145,7 +146,8 @@ export class GroupStateStorage extends StringStorage<
 
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
-            if (groupId) {
+
+            if (groupId !== undefined) {
                 this.data[groupId] = {
                     enabled: false,
                     toggled,

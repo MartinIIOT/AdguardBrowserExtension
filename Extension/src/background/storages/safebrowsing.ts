@@ -77,7 +77,6 @@ export class SbCache {
      * @returns updated {@link cache} instance
      */
     public async set(key: string, value: string): Promise<SbCache> {
-        console.log(value);
         this.cache.set(key, value);
 
         if (this.cache.size % 20 === 0) {

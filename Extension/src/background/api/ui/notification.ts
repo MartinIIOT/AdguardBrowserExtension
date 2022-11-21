@@ -71,7 +71,7 @@ export class NotificationApi {
      */
     public async setNotificationViewed(withDelay: boolean): Promise<void> {
         if (withDelay) {
-            clearTimeout(this.timeoutId);
+            window.clearTimeout(this.timeoutId);
 
             this.timeoutId = window.setTimeout(() => {
                 this.setNotificationViewed(false);

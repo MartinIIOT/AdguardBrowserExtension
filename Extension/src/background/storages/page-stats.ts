@@ -248,7 +248,7 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
     ): PageStatsDataItem {
         const data: PageStatsDataItem = {};
 
-        if (groupId) {
+        if (groupId !== null) {
             data[String(groupId)] = blocked;
         }
 
