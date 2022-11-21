@@ -85,7 +85,7 @@ export class FiltersService {
         await Engine.update();
     }
 
-    private static async checkFiltersUpdate(): Promise<FilterMetadata[]> {
+    private static async checkFiltersUpdate(): Promise<FilterMetadata[] | undefined> {
         try {
             const updatedFilters = await FilterUpdateApi.updateEnabledFilters();
 

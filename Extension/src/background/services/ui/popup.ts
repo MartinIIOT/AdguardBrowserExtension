@@ -62,7 +62,9 @@ export class PopupService {
         );
     }
 
-    static async getTabInfoForPopup({ data }: GetTabInfoForPopupMessage): Promise<GetTabInfoForPopupResponse> {
+    static async getTabInfoForPopup({
+        data,
+    }: GetTabInfoForPopupMessage): Promise<GetTabInfoForPopupResponse | undefined> {
         const { tabId } = data;
 
         const tabContext = tsWebExtTabApi.getTabContext(tabId);

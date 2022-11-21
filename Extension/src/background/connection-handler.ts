@@ -50,7 +50,7 @@ export class ConnectionHandler {
                     try {
                         port.postMessage({ type, data });
                     } catch (e) {
-                        Log.error(e.message);
+                        Log.error(e);
                     }
                 });
             }

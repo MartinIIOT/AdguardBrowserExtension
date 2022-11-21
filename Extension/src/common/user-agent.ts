@@ -110,7 +110,13 @@ export class UserAgent {
         const browserDataEntries = Object.entries(UserAgent.browserDataMap);
 
         for (let i = 0; i < browserDataEntries.length; i += 1) {
-            const [name, data] = browserDataEntries[i];
+            const browserData = browserDataEntries[i];
+
+            if (!browserData) {
+                continue;
+            }
+
+            const [name, data] = browserData;
 
             if (brandsData?.some((brandData) => brandData.brand === data.brand)) {
                 return name;
@@ -136,14 +142,18 @@ export class UserAgent {
 
         const brandsData = navigator?.userAgentData?.brands;
 
-        if (!brandsData || !brand) {
+        if ((!brandsData || !brand) && uaStringName) {
             return navigator.userAgent.indexOf(uaStringName) >= 0;
+        }
+
+        if (!brandsData) {
+            return false;
         }
 
         for (let i = 0; i < brandsData.length; i += 1) {
             const data = brandsData[i];
 
-            if (data.brand === brand) {
+            if (data?.brand === brand) {
                 return true;
             }
         }
@@ -186,13 +196,18 @@ export class UserAgent {
 
         if (!brandsData || !brand) {
             const match = uaStringMask ? uaStringMask.exec(navigator.userAgent) : null;
-            return match === null ? null : Number.parseInt(match[1], 10);
+
+            if (match?.[1]) {
+                return Number.parseInt(match[1], 10);
+            }
+
+            return null;
         }
 
         for (let i = 0; i < brandsData.length; i += 1) {
             const data = brandsData[i];
 
-            if (data.brand === brand) {
+            if (data?.brand === brand) {
                 const { version } = data;
                 return Number.parseInt(version, 10);
             }

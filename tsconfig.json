@@ -7,5 +7,7 @@
       "types",
       "babel.config.js",
       "postcss.config.js",
+      "testSetup.ts",
+      "jest.config.ts",
   ]
 }

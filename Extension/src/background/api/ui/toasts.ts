@@ -20,6 +20,7 @@ import { Log } from '../../../common/log';
 import { BrowserUtils } from '../../utils/browser-utils';
 
 import { translator } from '../../../common/translators/translator';
+import { notificationTextRecordValidator } from '../../schema';
 import { TabsApi } from '../extension';
 import { notificationApi } from './notification';
 import { FilterMetadata } from '../filters';
@@ -31,7 +32,7 @@ export class Toasts {
 
     private static stylesUrl = browser.runtime.getURL('/assets/css/alert-popup.css');
 
-    private styles: string;
+    private styles: string | undefined;
 
     public async init(): Promise<void> {
         const response = await fetch(Toasts.stylesUrl);
@@ -107,11 +108,19 @@ export class Toasts {
         let offerButtonHref = 'https://link.adtidy.org/forward.html?action=learn_about_adguard&from=version_popup&app=browser_extension';
         let offerButtonText = translator.getMessage('options_popup_version_update_offer_button_text');
 
-        if (promoNotification && typeof promoNotification.text !== 'string') {
-            offer = promoNotification.text.title;
-            offerDesc = promoNotification.text.desc;
-            offerButtonText = promoNotification.text.btn;
-            offerButtonHref = `${promoNotification.url}&from=version_popup`;
+        if (promoNotification) {
+            // check if promo notification is NotificationTextRecord
+            const res = notificationTextRecordValidator.safeParse(promoNotification?.text);
+            if (res.success) {
+                const text = res.data;
+                offer = text.title;
+                offerButtonText = text.btn;
+                offerButtonHref = `${promoNotification.url}&from=version_popup`;
+
+                if (text.desc) {
+                    offerDesc = text.desc;
+                }
+            }
         }
 
         const message = {

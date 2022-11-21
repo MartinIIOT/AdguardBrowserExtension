@@ -22,25 +22,26 @@ import { UserAgent } from '../../../common/user-agent';
 import {
     notificationStorage,
     Notification,
-    NotificationText,
     storage,
 } from '../../storages';
+import { NotificationTextRecord } from '../../schema';
 import { TabsApi } from '../extension';
 import { LAST_NOTIFICATION_TIME_KEY, VIEWED_NOTIFICATIONS_KEY } from '../../../common/constants';
 import { UiApi } from './main';
+import { Log } from '../../../common/log';
 
 export class NotificationApi {
     private static checkTimeoutMs = 10 * 60 * 1000; // 10 minutes
 
-    private static minPeriodMs = 30 * 1000; // 30 seconds
+    private static minPeriodMs = 30 * 60 * 1000; // 30 minutes
 
     private static delayMs = 30 * 1000; // clear notification in 30 seconds
 
-    private currentNotification: Notification | null;
+    private currentNotification: Notification | null = null;
 
-    private notificationCheckTime: number;
+    private notificationCheckTime = 0;
 
-    private timeoutId: number;
+    private timeoutId: number | undefined = undefined;
 
     private isInit = false;
 
@@ -49,7 +50,7 @@ export class NotificationApi {
      */
     public init(): void {
         notificationStorage.forEach((notification, notificationKey, map) => {
-            notification.text = NotificationApi.getNotificationText(notification);
+            notification.text = NotificationApi.getNotificationText(notification) || null;
 
             const to = new Date(notification.to).getTime();
             const expired = new Date().getTime() > to;
@@ -88,6 +89,12 @@ export class NotificationApi {
                 await storage.set(VIEWED_NOTIFICATIONS_KEY, viewedNotifications);
 
                 const tab = await TabsApi.getActive();
+
+                if (!tab?.id) {
+                    Log.error('Can\'t get active tab');
+                    return;
+                }
+
                 const tabContext = tsWebExtTabsApi.getTabContext(tab.id);
 
                 if (tabContext) {
@@ -137,6 +144,10 @@ export class NotificationApi {
         for (let i = 0; i < notificationsValues.length; i += 1) {
             const notification = notificationsValues[i];
 
+            if (!notification) {
+                continue;
+            }
+
             const from = new Date(notification.from).getTime();
             const to = new Date(notification.to).getTime();
             if (from < currentTime
@@ -157,19 +168,19 @@ export class NotificationApi {
     /**
      * Scans notification locales and returns the one matching navigator.language
      *
-     * @param {*} notification notification object
-     * @returns {string} matching text or null
+     * @param notification notification object
+     * @returns matching text or undefined
      */
-    private static getNotificationText(notification: Notification): NotificationText | null {
+    private static getNotificationText(notification: Notification): NotificationTextRecord | undefined {
         const language = NotificationApi.normalizeLanguage(browser.i18n.getUILanguage());
 
         if (!language) {
-            return null;
+            return;
         }
 
         const languageCode = language.split('_')[0];
         if (!languageCode) {
-            return null;
+            return;
         }
 
         return notification.locales[language] || notification.locales[languageCode];

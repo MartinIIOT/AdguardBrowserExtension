@@ -33,7 +33,7 @@ export type FrameRule = {
 };
 
 export type FrameData = {
-    url: string,
+    url: string | null,
     domainName: string | null,
     applicationAvailable: boolean,
     applicationFilteringDisabled: boolean,
@@ -41,7 +41,7 @@ export type FrameData = {
     documentAllowlisted: boolean,
     userAllowlisted: boolean,
     canAddRemoveRule: boolean,
-    frameRule: FrameRule,
+    frameRule: FrameRule | null,
     totalBlockedTab: number,
     totalBlocked: number,
 };
@@ -55,14 +55,13 @@ export class FramesApi {
         frames,
         metadata,
     }: TabContext): FrameData {
-        let { url } = info;
         const { blockedRequestCount, mainFrameRule } = metadata;
 
         const mainFrame = frames.get(MAIN_FRAME_ID);
 
-        if (!url) {
-            url = mainFrame?.url;
-        }
+        const url = info?.url
+            || mainFrame?.url
+            || null;
 
         const domainName = url ? getDomain(url) : null;
 
@@ -70,7 +69,7 @@ export class FramesApi {
 
         const applicationAvailable = appContext.get(AppContextKey.IsInit) && !urlFilteringDisabled;
 
-        let frameRule: FrameRule | undefined;
+        let frameRule: FrameRule | null = null;
         let documentAllowlisted = false;
         let userAllowlisted = false;
         let canAddRemoveRule = false;
@@ -82,7 +81,7 @@ export class FramesApi {
 
         if (applicationAvailable) {
             documentAllowlisted = !!mainFrameRule && mainFrameRule.isAllowlist();
-            if (documentAllowlisted) {
+            if (documentAllowlisted && mainFrameRule) {
                 const rule = mainFrameRule;
 
                 const filterId = rule.getFilterListId();

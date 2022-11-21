@@ -76,12 +76,12 @@ export class IconsApi {
                 badge = notification.badgeText || badge;
                 badgeColor = notification.badgeBgColor || badgeColor;
 
-                if (notification.icons) {
-                    if (disabled) {
+                if (disabled) {
+                    if (notification?.icons?.ICON_GRAY) {
                         icon = notification.icons.ICON_GRAY;
-                    } else {
-                        icon = notification.icons.ICON_GREEN;
                     }
+                } else if (notification?.icons?.ICON_GREEN) {
+                    icon = notification.icons.ICON_GREEN;
                 }
             }
 

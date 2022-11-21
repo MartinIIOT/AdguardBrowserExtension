@@ -36,6 +36,12 @@ function loadImageData(size: number, url: string): Promise<ImageData> {
             canvas.width = size;
             canvas.height = size;
             const ctx = canvas.getContext('2d');
+
+            if (!ctx) {
+                reject(new Error('Can\'t load image data'));
+                return;
+            }
+
             ctx.drawImage(img, 0, 0);
             const data = ctx.getImageData(0, 0, size, size);
             canvas.remove();

@@ -153,19 +153,9 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
             return [];
         }
 
-        const filters = this.getFilters();
-        const filterIds: number[] = [];
-        for (let i = 0; i < filters.length; i += 1) {
-            const filter = filters[i];
-            const { languages } = filter;
-            if (languages && languages.length > 0) {
-                const language = I18n.find(languages, locale);
-                if (language) {
-                    filterIds.push(filter.filterId);
-                }
-            }
-        }
-        return filterIds;
+        return this.getFilters()
+            .filter(({ languages }) => languages.length > 0 && I18n.find(languages, locale))
+            .map(({ filterId }) => filterId);
     }
 
     /**
@@ -186,17 +176,9 @@ export class MetadataStorage extends StringStorage<SettingOption.Metadata, Metad
 
         const { tags, groups, filters } = metadata;
 
-        for (let i = 0; i < tags.length; i += 1) {
-            MetadataStorage.applyFilterTagLocalization(tags[i], tagsI18n);
-        }
-
-        for (let j = 0; j < filters.length; j += 1) {
-            MetadataStorage.applyFilterLocalization(filters[j], filtersI18n);
-        }
-
-        for (let k = 0; k < groups.length; k += 1) {
-            MetadataStorage.applyGroupLocalization(groups[k], groupsI18n);
-        }
+        tags.forEach((tag) => MetadataStorage.applyFilterTagLocalization(tag, tagsI18n));
+        filters.forEach((filter) => MetadataStorage.applyFilterLocalization(filter, filtersI18n));
+        groups.forEach((group) => MetadataStorage.applyGroupLocalization(group, groupsI18n));
 
         return metadata;
     }

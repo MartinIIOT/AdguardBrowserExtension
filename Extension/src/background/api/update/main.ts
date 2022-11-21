@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
+import zod from 'zod';
+
 import { Log } from '../../../common/log';
 import { storage } from '../../storages';
 import {
@@ -114,7 +116,7 @@ export class UpdateApi {
             } to ${
                 currentSchemaVersion
             }: ${
-                e.message
+                e instanceof Error ? e.message : e
             }`);
 
             Log.info('Reset settings...');
@@ -135,16 +137,13 @@ export class UpdateApi {
         // In the v4.2.0 we refactoring storage data structure
 
         // get current settings
-        const currentSettings = await storage.get(ADGUARD_SETTINGS_KEY);
+        const storageData = await storage.get(ADGUARD_SETTINGS_KEY);
 
-        if (typeof currentSettings !== 'object'
-        || Array.isArray(currentSettings)
-        || !currentSettings) {
-            throw new Error('Settings in not a object');
-        }
+        // check if current settings is record
+        const currentSettings = zod.record(zod.unknown()).parse(storageData);
 
         // delete app version from settings
-        if (currentSettings?.[APP_VERSION_KEY]) {
+        if (currentSettings[APP_VERSION_KEY]) {
             delete currentSettings[APP_VERSION_KEY];
         }
 
@@ -186,7 +185,7 @@ export class UpdateApi {
      */
     private static async moveStorageData(
         key: string,
-        currentSettings: object,
+        currentSettings: Record<string, unknown>,
     ): Promise<void> {
         const data = currentSettings?.[key];
 

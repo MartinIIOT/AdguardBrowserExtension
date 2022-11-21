@@ -246,7 +246,9 @@ export class FilteringLogService {
     private static onTabRemove(tabContext: TabContext): void {
         const { info: { id } } = tabContext;
 
-        filteringLogApi.removeTabInfo(id);
+        if (id) {
+            filteringLogApi.removeTabInfo(id);
+        }
     }
 
     private static onClearEventsByTabId({ data }: ClearEventsByTabIdMessage): void {
@@ -264,13 +266,15 @@ export class FilteringLogService {
         await browser.tabs.reload(tabId);
     }
 
-    private static onGetFilteringLogInfoById({ data }: GetFilteringInfoByTabIdMessage): FilteringLogTabInfo {
+    private static onGetFilteringLogInfoById({
+        data,
+    }: GetFilteringInfoByTabIdMessage): FilteringLogTabInfo | undefined {
         const { tabId } = data;
 
         return filteringLogApi.getFilteringInfoByTabId(tabId);
     }
 
-    private static async onSyncOpenTabs(): Promise<number[]> {
+    private static async onSyncOpenTabs(): Promise<FilteringLogTabInfo[]> {
         return filteringLogApi.synchronizeOpenTabs();
     }
 

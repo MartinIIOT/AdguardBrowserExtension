@@ -116,7 +116,7 @@ export class Network {
 
             delete this.loadingSubscriptions[url];
 
-            if (lines[0].indexOf('[') === 0) {
+            if (lines[0] && lines[0].indexOf('[') === 0) {
                 // [Adblock Plus 2.0]
                 lines.shift();
             }
@@ -325,10 +325,9 @@ export class Network {
         }
 
         if (enabledFilters) {
-            for (let i = 0; i < enabledFilters.length; i += 1) {
-                const filter = enabledFilters[i];
+            enabledFilters.forEach((filter) => {
                 params += `&f=${encodeURIComponent(`${filter.filterId},${filter.version}`)}`;
-            }
+            });
         }
         params = this.addKeyParameter(params);
 

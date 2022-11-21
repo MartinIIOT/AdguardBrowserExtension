@@ -107,11 +107,12 @@ export class UrlUtils {
 
     static isIpv6(address: string): boolean {
         let a4addon = 0;
-        const address4 = address.match(UrlUtils.RE_V4_IN_V6);
+        const address4 = address.match(UrlUtils.RE_V4_IN_V6)?.[0];
         if (address4) {
-            const temp4 = address4[0].split('.');
+            const temp4 = address4.split('.');
             for (let i = 0; i < 4; i += 1) {
-                if (/^0[0-9]+/.test(temp4[i])) {
+                const part = temp4[i];
+                if (part && /^0[0-9]+/.test(part)) {
                     return false;
                 }
             }

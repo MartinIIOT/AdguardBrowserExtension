@@ -261,9 +261,7 @@ export class FiltersApi {
     private static enableGroupsWereNotToggled(filtersIds: number[]): void {
         const groupIds: number[] = [];
 
-        for (let i = 0; i < filtersIds.length; i += 1) {
-            const filterId = filtersIds[i];
-
+        filtersIds.forEach((filterId) => {
             const filterMetadata = FiltersApi.getFilterMetadata(filterId);
 
             const groupId = filterMetadata?.groupId;
@@ -271,11 +269,11 @@ export class FiltersApi {
             if (groupId) {
                 const group = groupStateStorage.get(groupId);
 
-                if (!group.toggled) {
+                if (!group?.toggled) {
                     groupIds.push(filterMetadata.groupId);
                 }
             }
-        }
+        });
 
         if (groupIds.length > 0) {
             groupStateStorage.enableGroups(groupIds);

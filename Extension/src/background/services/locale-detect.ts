@@ -20,7 +20,7 @@ import browser, { Tabs } from 'webextension-polyfill';
 import { isHttpRequest, getDomain } from '@adguard/tswebextension';
 
 import { UserAgent } from '../../common/user-agent';
-import { SettingOption } from '../schema';
+import { RegularFilterMetadata, SettingOption } from '../schema';
 import {
     metadataStorage,
     settingsStorage,
@@ -44,7 +44,7 @@ export class LocaleDetect {
 
     static MAX_HISTORY_LENGTH = 10;
 
-    static domainToLanguagesMap = {
+    static domainToLanguagesMap: Record<string, string> = {
         // Russian
         'ru': 'ru',
         'ua': 'ru',
@@ -167,9 +167,19 @@ export class LocaleDetect {
         // https://github.com/AdguardTeam/AdguardBrowserExtension/issues/1354
         const host = getDomain(tab.url);
         if (host && host.length > 8) {
-            const parts = host ? host.split('.') : [];
-            const tld = parts[parts.length - 1];
+            const parts = host.split('.');
+            const tld = parts.at(-1);
+
+            if (!tld) {
+                return;
+            }
+
             const lang = LocaleDetect.domainToLanguagesMap[tld];
+
+            if (!lang) {
+                return;
+            }
+
             this.detectLanguage(lang);
         }
     }
@@ -230,7 +240,15 @@ export class LocaleDetect {
         await FiltersApi.loadAndEnableFilters(disabledFiltersIds);
         await Engine.update();
 
-        const filters = disabledFiltersIds.map(filterId => CommonFilterApi.getFilterMetadata(filterId));
+        const filters: RegularFilterMetadata[] = [];
+
+        disabledFiltersIds.forEach(filterId => {
+            const filter = CommonFilterApi.getFilterMetadata(filterId);
+
+            if (filter) {
+                filters.push(filter);
+            }
+        });
 
         toasts.showFiltersEnabledAlertMessage(filters);
     }

@@ -25,8 +25,6 @@ export class Prefs {
 
     public static baseUrl = browser.runtime.getURL('');
 
-    public static scheme = Prefs.baseUrl.split('://')[0];
-
     public static version = browser.runtime.getManifest().version;
 
     public static language = browser.i18n.getUILanguage();

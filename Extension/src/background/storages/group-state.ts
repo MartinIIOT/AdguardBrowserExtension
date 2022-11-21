@@ -48,7 +48,7 @@ export class GroupStateStorage extends StringStorage<
      * @returns specified group state
      * @throws error if group state data is not initialized
      */
-    public get(groupId: number): GroupStateData {
+    public get(groupId: number): GroupStateData | undefined {
         if (!this.data) {
             throw GroupStateStorage.createNotInitializedError();
         }
@@ -120,10 +120,12 @@ export class GroupStateStorage extends StringStorage<
 
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
-            this.data[groupId] = {
-                enabled: true,
-                toggled,
-            };
+            if (groupId) {
+                this.data[groupId] = {
+                    enabled: true,
+                    toggled,
+                };
+            }
         }
 
         this.save();
@@ -143,10 +145,12 @@ export class GroupStateStorage extends StringStorage<
 
         for (let i = 0; i < groupIds.length; i += 1) {
             const groupId = groupIds[i];
-            this.data[groupId] = {
-                enabled: false,
-                toggled,
-            };
+            if (groupId) {
+                this.data[groupId] = {
+                    enabled: false,
+                    toggled,
+                };
+            }
         }
 
         this.save();
@@ -165,13 +169,11 @@ export class GroupStateStorage extends StringStorage<
     ): GroupStateStorageData {
         const { groups } = metadata;
 
-        for (let i = 0; i < groups.length; i += 1) {
-            const { groupId } = groups[i];
-
+        groups.forEach(({ groupId }) => {
             if (!states[groupId]) {
                 states[groupId] = { ...GroupStateStorage.defaultState };
             }
-        }
+        });
 
         return states;
     }

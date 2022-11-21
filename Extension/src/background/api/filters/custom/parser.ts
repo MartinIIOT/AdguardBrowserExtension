@@ -66,8 +66,14 @@ export class CustomFilterParser {
         const maxLines = Math.min(CustomFilterParser.AMOUNT_OF_LINES_TO_PARSE, rules.length);
         for (let i = 0; i < maxLines; i += 1) {
             const rule = rules[i];
+
+            if (!rule) {
+                continue;
+            }
+
             const search = `! ${tagName}: `;
             const indexOfSearch = rule.indexOf(search);
+
             if (indexOfSearch >= 0) {
                 result = rule.substring(indexOfSearch + search.length);
             }

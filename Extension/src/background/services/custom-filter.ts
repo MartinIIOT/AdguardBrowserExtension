@@ -114,7 +114,7 @@ export class CustomFilterService {
 
         const { requestType } = requestContext;
 
-        if (requestType !== RequestType.Document && requestType !== RequestType.Subdocument) {
+        if (requestType !== RequestType.Document && requestType !== RequestType.SubDocument) {
             return;
         }
 

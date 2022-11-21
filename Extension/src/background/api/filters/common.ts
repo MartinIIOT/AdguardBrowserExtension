@@ -186,10 +186,11 @@ export class CommonFilterApi {
         // Get language-specific filters by navigator languages
         // Get all used languages
         const languages = BrowserUtils.getNavigatorLanguages();
-        for (let i = 0; i < languages.length; i += 1) {
-            localeFilterIds = metadataStorage.getFilterIdsForLanguage(languages[i]);
+
+        languages.forEach(language => {
+            localeFilterIds = metadataStorage.getFilterIdsForLanguage(language);
             filterIds = filterIds.concat(localeFilterIds);
-        }
+        });
 
         return Array.from(new Set(filterIds));
     }

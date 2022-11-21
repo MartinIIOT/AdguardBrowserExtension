@@ -100,7 +100,7 @@ export class PagesApi {
 
     static async openAbusePage(siteUrl: string, from: ForwardFrom): Promise<void> {
         let { browserName } = UserAgent;
-        let browserDetails: string | null;
+        let browserDetails: string | null = null;
 
         if (!UserAgent.isSupportedBrowser) {
             browserDetails = browserName;
@@ -114,9 +114,12 @@ export class PagesApi {
             from,
             product_type: 'Ext',
             product_version: encodeURIComponent(browser.runtime.getManifest().version),
-            browser: encodeURIComponent(browserName),
             url: encodeURIComponent(siteUrl),
         };
+
+        if (browserName) {
+            params.browser = encodeURIComponent(browserName);
+        }
 
         if (browserDetails) {
             params.browser_detail = encodeURIComponent(browserDetails);
@@ -268,13 +271,13 @@ export class PagesApi {
 
         const stealthOptionsEntries = [['stealth.enabled', 'true']];
 
-        for (let i = 0; i < stealthOptions.length; i += 1) {
-            const { queryKey, settingKey, settingValueKey } = stealthOptions[i];
+        stealthOptions.forEach((stealthOption) => {
+            const { queryKey, settingKey, settingValueKey } = stealthOption;
 
             const setting = settingsStorage.get(settingKey);
 
             if (!setting) {
-                continue;
+                return;
             }
 
             let option: string;
@@ -286,7 +289,7 @@ export class PagesApi {
             }
 
             stealthOptionsEntries.push([queryKey, option]);
-        }
+        });
 
         const isRemoveUrlParamsEnabled = filterIds.includes(AntiBannerFiltersId.UrlTrackingFilterId);
 

@@ -168,11 +168,13 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
         const lastUpdated = data.updated;
         const timestamp = Date.now();
 
-        if (isSameHour(timestamp, lastUpdated) && data.hours.length > 0) {
+        const lastHourStats = data.hours[data.hours.length - 1];
+
+        if (isSameHour(timestamp, lastUpdated) && lastHourStats) {
             data.hours[data.hours.length - 1] = PageStatsStorage.updateStatsDataItem(
                 groupId,
                 blocked,
-                data.hours[data.hours.length - 1],
+                lastHourStats,
             );
         } else {
             let diffHours = differenceInHours(timestamp, lastUpdated);
@@ -188,11 +190,13 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
             }
         }
 
-        if (isSameDay(timestamp, lastUpdated) && data.days.length > 0) {
+        const lastDayStats = data.days[data.days.length - 1];
+
+        if (isSameDay(timestamp, lastUpdated) && lastDayStats) {
             data.days[data.days.length - 1] = PageStatsStorage.updateStatsDataItem(
                 groupId,
                 blocked,
-                data.days[data.days.length - 1],
+                lastDayStats,
             );
         } else {
             let diffDays = differenceInDays(timestamp, lastUpdated);
@@ -208,11 +212,13 @@ export class PageStatsStorage extends StringStorage<typeof PAGE_STATISTIC_KEY, P
             }
         }
 
-        if (isSameMonth(timestamp, lastUpdated) && data.months.length > 0) {
+        const lastMonthStats = data.months[data.months.length - 1];
+
+        if (isSameMonth(timestamp, lastUpdated) && lastMonthStats) {
             data.months[data.months.length - 1] = PageStatsStorage.updateStatsDataItem(
                 groupId,
                 blocked,
-                data.months[data.months.length - 1],
+                lastMonthStats,
             );
         } else {
             let diffMonths = differenceInMonths(timestamp, lastUpdated);

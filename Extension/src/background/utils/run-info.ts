@@ -51,8 +51,8 @@ async function getData(key: string, fallback = true): Promise<unknown | null> {
     if (fallback) {
         const settings = await storage.get(ADGUARD_SETTINGS_KEY);
 
-        if (typeof settings === 'object' && typeof settings?.[key] === 'string') {
-            return settings[key];
+        if (Object(settings)[key]) {
+            return key;
         }
     }
 
@@ -88,7 +88,7 @@ async function getAppVersion(): Promise<string | null> {
 /**
  * Get schema version from storage
  */
-async function getSchemaVersion(): Promise<number | null> {
+async function getSchemaVersion(): Promise<number> {
     // don't search schema version in legacy source, because it was added in v4.2
     const schemaVersion = await getData(SCHEMA_VERSION_KEY, false);
 

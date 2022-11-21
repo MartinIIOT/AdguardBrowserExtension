@@ -15,16 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export * from './configuration';
-export * from './settings';
-export * from './preprocessor';
-export * from './metadata';
-export * from './i18n-metadata';
-export * from './filter-version';
-export * from './filter-state';
-export * from './group-state';
-export * from './trusted-domains';
-export * from './page-stats';
-export * from './custom-filter-metadata';
-export * from './local-script-rules';
-export * from './notification';
+import type { JestConfigWithTsJest } from 'ts-jest';
+
+const transformedModules = [
+    '@adguard/tsurlfilter',
+    '@adguard/tswebextension',
+];
+
+const config: JestConfigWithTsJest = {
+    verbose: true,
+    testEnvironment: 'jsdom',
+    testRegex: '(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$',
+    setupFiles: [
+        './testSetup.ts',
+    ],
+    transformIgnorePatterns: [
+        `<rootDir>/node_modules/(?!(${transformedModules.join('|')}))`,
+    ],
+    transform: {
+        '.+\\.(js|ts|jsx|tsx)': 'ts-jest',
+    },
+};
+
+export default config;

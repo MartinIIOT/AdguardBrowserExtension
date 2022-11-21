@@ -83,7 +83,7 @@ export class FilteringLogApi {
 
     private openedFilteringLogsPages = 0;
 
-    private tabsInfoMap: Record<number, FilteringLogTabInfo> = {};
+    private tabsInfoMap = new Map<number, FilteringLogTabInfo>();
 
     /**
      * Checks if filtering log page is opened
@@ -126,8 +126,7 @@ export class FilteringLogApi {
         this.openedFilteringLogsPages = Math.max(this.openedFilteringLogsPages - 1, 0);
         if (this.openedFilteringLogsPages === 0) {
             // Clear events
-            Object.keys(this.tabsInfoMap).forEach((tabId) => {
-                const tabInfo = this.tabsInfoMap[tabId];
+            this.tabsInfoMap.forEach((tabInfo) => {
                 tabInfo.filteringEvents = [];
             });
         }
@@ -142,6 +141,10 @@ export class FilteringLogApi {
     public createTabInfo(tab: Tabs.Tab, isSyntheticTab = false): void {
         const { id, title, url } = tab;
 
+        if (!id || !url || !title) {
+            return;
+        }
+
         // Background tab can't be added
         // Synthetic tabs are used to send initial requests from new tab in chrome
         if (id === BACKGROUND_TAB_ID || isSyntheticTab) {
@@ -155,7 +158,7 @@ export class FilteringLogApi {
             filteringEvents: [],
         };
 
-        this.tabsInfoMap[id] = tabInfo;
+        this.tabsInfoMap.set(id, tabInfo);
 
         listeners.notifyListeners(listeners.TabAdded, tabInfo);
     }
@@ -167,6 +170,10 @@ export class FilteringLogApi {
      */
     public updateTabInfo(tab: Tabs.Tab): void {
         const { id, title, url } = tab;
+
+        if (!id || !url || !title) {
+            return;
+        }
 
         // Background tab can't be updated
         if (id === BACKGROUND_TAB_ID) {
@@ -197,12 +204,13 @@ export class FilteringLogApi {
             return;
         }
 
-        const tabInfo = this.tabsInfoMap[id];
+        const tabInfo = this.tabsInfoMap.get(id);
 
         if (tabInfo) {
             listeners.notifyListeners(listeners.TabClose, tabInfo);
         }
-        delete this.tabsInfoMap[id];
+
+        this.tabsInfoMap.delete(id);
     }
 
     /**
@@ -212,14 +220,14 @@ export class FilteringLogApi {
      *
      * @returns tab data for filtering log window
      */
-    public getFilteringInfoByTabId(tabId: number): FilteringLogTabInfo {
-        return this.tabsInfoMap[tabId];
+    public getFilteringInfoByTabId(tabId: number): FilteringLogTabInfo | undefined {
+        return this.tabsInfoMap.get(tabId);
     }
 
     /**
      * Synchronize currently opened tabs with out state
      */
-    public async synchronizeOpenTabs(): Promise<number[]> {
+    public async synchronizeOpenTabs(): Promise<FilteringLogTabInfo[]> {
         const tabs = await TabsApi.getAll();
 
         // As Object.keys() returns strings we convert them to integers,
@@ -228,7 +236,12 @@ export class FilteringLogApi {
 
         for (let i = 0; i < tabs.length; i += 1) {
             const openTab = tabs[i];
-            const tabInfo = this.tabsInfoMap[openTab.id];
+
+            if (!openTab?.id) {
+                continue;
+            }
+
+            const tabInfo = this.tabsInfoMap.get(openTab.id);
 
             if (!tabInfo) {
                 this.createTabInfo(openTab);
@@ -241,17 +254,16 @@ export class FilteringLogApi {
                 tabIdsToRemove.splice(index, 1);
             }
         }
+
         for (let j = 0; j < tabIdsToRemove.length; j += 1) {
-            this.removeTabInfo(tabIdsToRemove[j]);
+            const tabIdToRemove = tabIdsToRemove[j];
+
+            if (tabIdToRemove) {
+                this.removeTabInfo(tabIdToRemove);
+            }
         }
 
-        const syncTabs: number[] = [];
-
-        Object.keys(this.tabsInfoMap).forEach((tabId) => {
-            syncTabs.push(this.tabsInfoMap[tabId]);
-        });
-
-        return syncTabs;
+        return Object.values(this.tabsInfoMap);
     }
 
     /**
@@ -261,7 +273,7 @@ export class FilteringLogApi {
      * @param ignorePreserveLog - is {@link preserveLogEnabled} flag ignored
      */
     public clearEventsByTabId(tabId: number, ignorePreserveLog = false): void {
-        const tabInfo = this.tabsInfoMap[tabId];
+        const tabInfo = this.tabsInfoMap.get(tabId);
 
         const preserveLog = ignorePreserveLog ? false : this.preserveLogEnabled;
 

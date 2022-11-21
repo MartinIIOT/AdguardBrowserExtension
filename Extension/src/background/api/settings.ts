@@ -79,6 +79,9 @@ export class SettingsApi {
 
     /**
      * Set setting to storage and publish setting event
+     *
+     * @param key - setting option key
+     * @param value - settings option value
      */
     public static async setSetting<T extends SettingOption>(key: T, value: Settings[T]): Promise<void> {
         settingsStorage.set(key, value);
@@ -94,6 +97,10 @@ export class SettingsApi {
 
     /**
      * Get setting from setting storage
+     *
+     * @param key - setting option key
+     *
+     * @returns settings option value
      */
     public static getSetting<T extends SettingOption>(key: T): Settings[T] {
         return settingsStorage.get(key);
@@ -158,8 +165,10 @@ export class SettingsApi {
                 validConfig[RootOption.ExtensionSpecificSettings],
             );
 
-            if (validConfig[RootOption.Stealth]) {
-                await SettingsApi.importStealth(validConfig[RootOption.Stealth]);
+            const stealthOptions = validConfig[RootOption.Stealth];
+
+            if (stealthOptions) {
+                await SettingsApi.importStealth(stealthOptions);
             }
 
             await SettingsApi.importGeneralSettings(validConfig[RootOption.GeneralSettings]);

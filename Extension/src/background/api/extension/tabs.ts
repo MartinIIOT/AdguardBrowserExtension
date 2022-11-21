@@ -42,16 +42,12 @@ export class TabsApi {
      * Get first matched tab for passed {@link Tabs.QueryQueryInfoType}
      *
      * @param queryInfo - browser.tabs.query argument
-     * @returns first matched tab or null
+     * @returns first matched tab or undefined
      */
-    public static async findOne(queryInfo: Tabs.QueryQueryInfoType): Promise<Tabs.Tab | null> {
-        const matchedTabs = await browser.tabs.query(queryInfo);
+    public static async findOne(queryInfo: Tabs.QueryQueryInfoType): Promise<Tabs.Tab | undefined> {
+        const [tab] = await browser.tabs.query(queryInfo);
 
-        if (matchedTabs.length > 0) {
-            return matchedTabs[0];
-        }
-
-        return null;
+        return tab;
     }
 
     /**
@@ -63,7 +59,9 @@ export class TabsApi {
         const { id, windowId } = tab;
 
         await browser.tabs.update(id, { active: true });
-        await browser.windows.update(windowId, { focused: true });
+        if (windowId) {
+            await browser.windows.update(windowId, { focused: true });
+        }
     }
 
     /**
@@ -78,9 +76,9 @@ export class TabsApi {
     /**
      * Get active tab in current window
      *
-     * @returns active tab info or null
+     * @returns active tab info or undefined
      */
-    public static async getActive(): Promise<Tabs.Tab | null> {
+    public static async getActive(): Promise<Tabs.Tab | undefined> {
         return TabsApi.findOne({
             currentWindow: true,
             active: true,
@@ -158,7 +156,13 @@ export class TabsApi {
 
             const { protocol, hostname } = parsed;
 
-            return protocol.indexOf(Prefs.scheme) > -1 && hostname === Prefs.id;
+            const scheme = Prefs.baseUrl.split('://')[0];
+
+            if (!scheme) {
+                return false;
+            }
+
+            return protocol.indexOf(scheme) > -1 && hostname === Prefs.id;
         } catch (e) {
             return false;
         }

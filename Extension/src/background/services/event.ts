@@ -26,7 +26,9 @@ export type CreateEventListenerResponse = {
 
 // TODO: remove listener
 export class EventService {
-    eventListeners = {};
+    // TODO: types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private eventListeners: Record<number, any> = {};
 
     constructor() {
         this.createEventListener = this.createEventListener.bind(this);

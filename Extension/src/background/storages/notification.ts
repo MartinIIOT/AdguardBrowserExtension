@@ -16,18 +16,13 @@
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
 import browser from 'webextension-polyfill';
-
-export type NotificationText = {
-     title: string,
-     desc?: string,
-     btn: string,
- };
+import { NotificationTextRecord } from '../schema';
 
 export type Notification = {
      id: string,
-     locales: Record<string, NotificationText>
+     locales: Record<string, NotificationTextRecord>
      url: string,
-     text: string | NotificationText | null,
+     text: string | NotificationTextRecord | null,
      from: string,
      to: string,
      type: string,

@@ -69,7 +69,6 @@ export class SafebrowsingApi {
      */
     public static async addToSafebrowsingTrusted(url: string): Promise<void> {
         const host = UrlUtils.getHost(url);
-        console.log('kek', host);
         if (!host) {
             return;
         }
@@ -137,13 +136,10 @@ export class SafebrowsingApi {
 
         const hashesMap = SafebrowsingApi.createHashesMap(hosts);
         const hashes = Object.keys(hashesMap);
-        let shortHashes: string[] = [];
-        for (let i = 0; i < hashes.length; i += 1) {
-            shortHashes.push(hashes[i].substring(0, SafebrowsingApi.DOMAIN_HASH_LENGTH));
-        }
-
-        // Filter already checked hashes
-        shortHashes = shortHashes.filter(x => !sbRequestCache.get(x));
+        const shortHashes = hashes
+            .map((hash) => hash.substring(0, SafebrowsingApi.DOMAIN_HASH_LENGTH))
+            // Filter already checked hashes
+            .filter(x => !sbRequestCache.get(x));
 
         if (shortHashes.length === 0) {
             // In case we have not found anything in safebrowsingCache and all short hashes have been checked in
@@ -250,16 +246,20 @@ export class SafebrowsingApi {
         }
 
         try {
-            const data = responseText.split('\n')
+            const data: { hash: string, list: string }[] = [];
+
+            responseText.split('\n')
                 // filter empty lines
                 .filter(line => !!line)
-                .map(line => {
+                .forEach(line => {
                     const row = line.split(':');
 
-                    return {
-                        hash: row[2],
-                        list: row[0],
-                    };
+                    const hash = row[2];
+                    const list = row[0];
+
+                    if (hash && list) {
+                        data.push({ hash, list });
+                    }
                 });
 
             const saveTasks = data.map(({ hash, list }) => sbCache.set(hash, list));
@@ -316,6 +316,11 @@ export class SafebrowsingApi {
 
         for (let i = 0; i < hosts.length; i += 1) {
             const host = hosts[i];
+
+            if (!host) {
+                continue;
+            }
+
             const hash = SafebrowsingApi.createHash(host);
             result[hash] = host;
         }
@@ -332,7 +337,13 @@ export class SafebrowsingApi {
      */
     private static checkHostsInSbCache(hosts: string[]): string | null {
         for (let i = 0; i < hosts.length; i += 1) {
-            const sbList = sbCache.get(SafebrowsingApi.createHash(hosts[i]));
+            const host = hosts[i];
+
+            if (!host) {
+                continue;
+            }
+
+            const sbList = sbCache.get(SafebrowsingApi.createHash(host));
             if (sbList) {
                 return sbList;
             }

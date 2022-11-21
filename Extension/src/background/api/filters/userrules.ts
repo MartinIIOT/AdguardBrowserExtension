@@ -65,7 +65,11 @@ export class UserRulesApi {
      *
      * @returns true, if user list contains rules for {@link url}, else returns false
      */
-    public static async hasRulesForUrl(url: string): Promise<boolean> {
+    public static async hasRulesForUrl(url: string | undefined): Promise<boolean> {
+        if (!url) {
+            return false;
+        }
+
         const userRules = await UserRulesApi.getUserRules();
         return userRules.some(userRuleString => RuleSyntaxUtils.isRuleForUrl(
             userRuleString,
@@ -155,8 +159,8 @@ export class UserRulesApi {
         ruleConversionStorage.clear();
 
         const result: string[] = [];
-        for (let i = 0; i < rules.length; i += 1) {
-            const line = rules[i];
+
+        rules.forEach((line) => {
             let converted: string[] = [];
             try {
                 converted = RuleConverter.convertRule(line);
@@ -173,7 +177,7 @@ export class UserRulesApi {
                     });
                 }
             }
-        }
+        });
 
         Log.debug('Converted {0} rules to {1} for user filter', rules.length, result.length);
 

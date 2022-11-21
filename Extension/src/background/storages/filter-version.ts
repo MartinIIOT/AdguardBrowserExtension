@@ -39,10 +39,10 @@ export class FilterVersionStorage extends StringStorage<
      * Gets specified filter version
      *
      * @param filterId - filter id
-     * @returns specified filter state
+     * @returns specified filter state or undefined, if it is not found
      * @throws error if filter version data is not initialized
      */
-    public get(filterId: number): FilterVersionData {
+    public get(filterId: number): FilterVersionData | undefined {
         if (!this.data) {
             throw FilterVersionStorage.createNotInitializedError();
         }
@@ -99,8 +99,14 @@ export class FilterVersionStorage extends StringStorage<
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
 
-            if (this.data[filterId]) {
-                this.data[filterId].lastCheckTime = now;
+            if (!filterId) {
+                continue;
+            }
+
+            const data = this.data[filterId];
+
+            if (data) {
+                data.lastCheckTime = now;
             }
         }
 
@@ -120,14 +126,12 @@ export class FilterVersionStorage extends StringStorage<
     ): FilterVersionStorageData {
         const { filters } = metadata;
 
-        for (let i = 0; i < filters.length; i += 1) {
-            const {
-                filterId,
-                version,
-                expires,
-                timeUpdated,
-            } = filters[i];
-
+        filters.forEach(({
+            filterId,
+            version,
+            expires,
+            timeUpdated,
+        }) => {
             if (!data[filterId]) {
                 data[filterId] = {
                     version,
@@ -136,7 +140,7 @@ export class FilterVersionStorage extends StringStorage<
                     lastCheckTime: Date.now(),
                 };
             }
-        }
+        });
 
         return data;
     }

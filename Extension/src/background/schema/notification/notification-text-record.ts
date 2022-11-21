@@ -15,16 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Adguard Browser Extension. If not, see <http://www.gnu.org/licenses/>.
  */
-export * from './configuration';
-export * from './settings';
-export * from './preprocessor';
-export * from './metadata';
-export * from './i18n-metadata';
-export * from './filter-version';
-export * from './filter-state';
-export * from './group-state';
-export * from './trusted-domains';
-export * from './page-stats';
-export * from './custom-filter-metadata';
-export * from './local-script-rules';
-export * from './notification';
+
+import zod from 'zod';
+
+export const notificationTextRecordValidator = zod.object({
+    title: zod.string(),
+    desc: zod.string().optional(),
+    btn: zod.string(),
+}).strict();
+
+export type NotificationTextRecord = zod.infer<typeof notificationTextRecordValidator>;

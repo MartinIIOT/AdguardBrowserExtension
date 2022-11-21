@@ -33,6 +33,7 @@ import {
     FilterVersionData,
     CustomFilterMetadata,
 } from '../../schema';
+import { Log } from '../../../common/log';
 
 /**
  * Filter data displayed in category section on options page
@@ -78,13 +79,10 @@ export class Categories {
         const groups = Categories.getGroups();
         const filters = Categories.getFilters();
 
-        const categories: CategoriesGroupData[] = [];
-
-        for (let i = 0; i < groups.length; i += 1) {
-            const category = groups[i];
-            category.filters = Categories.selectFiltersByGroupId(category.groupId, filters);
-            categories.push(category);
-        }
+        const categories = groups.map((group) => ({
+            ...group,
+            filters: Categories.selectFiltersByGroupId(group.groupId, filters),
+        }));
 
         return {
             filters,
@@ -101,7 +99,7 @@ export class Categories {
     public static async enableGroup(groupId: number): Promise<void> {
         const group = groupStateStorage.get(groupId);
 
-        if (!group.toggled) {
+        if (!group?.toggled) {
             const recommendedFiltersIds = Categories.getRecommendedFilterIdsByGroupId(groupId);
             await FiltersApi.loadAndEnableFilters(recommendedFiltersIds);
         }
@@ -243,16 +241,22 @@ export class Categories {
 
         const result: CategoriesFilterData[] = [];
 
-        for (let i = 0; i < filtersMetadata.length; i += 1) {
-            const filterMetadata = filtersMetadata[i];
-
-            const tagsIds = filterMetadata.tags;
-
-            const tagsDetails = Categories.getTagsDetails(tagsIds);
+        filtersMetadata.forEach((filterMetadata) => {
+            const tagsDetails = Categories.getTagsDetails(filterMetadata.tags);
 
             const filterState = filterStateStorage.get(filterMetadata.filterId);
 
             const filterVersion = filterVersionStorage.get(filterMetadata.filterId);
+
+            if (!filterState) {
+                Log.error(`Can't find filter ${filterMetadata.filterId} state data`);
+                return;
+            }
+
+            if (!filterVersion) {
+                Log.error(`Can't find filter ${filterMetadata.filterId} version data`);
+                return;
+            }
 
             result.push({
                 ...filterMetadata,
@@ -260,7 +264,7 @@ export class Categories {
                 ...filterVersion,
                 tagsDetails,
             });
-        }
+        });
 
         return result;
     }
@@ -275,16 +279,19 @@ export class Categories {
 
         const result: CategoriesGroupData[] = [];
 
-        for (let i = 0; i < groupsMetadata.length; i += 1) {
-            const groupMetadata = groupsMetadata[i];
-
+        groupsMetadata.forEach((groupMetadata) => {
             const groupState = groupStateStorage.get(groupMetadata.groupId);
+
+            if (!groupState) {
+                Log.error(`Can't find group ${groupMetadata.groupId} state data`);
+                return;
+            }
 
             result.push({
                 ...groupMetadata,
                 ...groupState,
             });
-        }
+        });
 
         return result;
     }

@@ -56,7 +56,7 @@ export class FilterStateStorage extends StringStorage<
      * @returns specified filter state
      * @throws error if filter state data is not initialized
      */
-    public get(filterId: number): FilterStateData {
+    public get(filterId: number): FilterStateData | undefined {
         if (!this.data) {
             throw FilterStateStorage.createNotInitializedError();
         }
@@ -144,7 +144,16 @@ export class FilterStateStorage extends StringStorage<
 
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
-            this.data[filterId] = { ...this.data[filterId], enabled: true };
+
+            if (!filterId) {
+                continue;
+            }
+
+            const data = this.data[filterId];
+
+            if (data) {
+                data.enabled = true;
+            }
         }
 
         this.save();
@@ -162,7 +171,16 @@ export class FilterStateStorage extends StringStorage<
         }
         for (let i = 0; i < filtersIds.length; i += 1) {
             const filterId = filtersIds[i];
-            this.data[filterId] = { ...this.data[filterId], enabled: false };
+
+            if (!filterId) {
+                continue;
+            }
+
+            const data = this.data[filterId];
+
+            if (data) {
+                data.enabled = false;
+            }
         }
 
         this.save();
@@ -188,13 +206,11 @@ export class FilterStateStorage extends StringStorage<
             return !FilterStateStorage.unsupportedFiltersIds.includes(filterId);
         });
 
-        for (let i = 0; i < supportedFiltersMetadata.length; i += 1) {
-            const { filterId } = supportedFiltersMetadata[i];
-
+        supportedFiltersMetadata.forEach(({ filterId }) => {
             if (!states[filterId]) {
                 states[filterId] = { ...FilterStateStorage.defaultState };
             }
-        }
+        });
 
         return states;
     }

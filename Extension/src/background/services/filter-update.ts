@@ -30,7 +30,7 @@ export class FilterUpdateService {
     // checking period
     private static checkPeriodMs = 1000 * 60 * 30; // 30 min
 
-    private timerId: number;
+    private timerId: number | undefined;
 
     constructor() {
         this.update = this.update.bind(this);
