@@ -1,5 +1,5 @@
 {
     "rules": {
-        "jsdoc/require-file-overview": "warning"
+        "jsdoc/require-file-overview": "warn"
     }
   }

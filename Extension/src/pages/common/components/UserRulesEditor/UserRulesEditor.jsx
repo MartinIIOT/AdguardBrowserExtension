@@ -7,7 +7,7 @@ import React, {
 import { observer } from 'mobx-react';
 import { Range } from 'ace-builds';
 import debounce from 'lodash/debounce';
-import { SimpleRegex } from '@adguard/tsurlfilter/dist/es/simple-regex';
+import { SimpleRegex } from '@adguard/tsurlfilter';
 
 import { userRulesEditorStore } from './UserRulesEditorStore';
 import { Editor } from '../Editor';

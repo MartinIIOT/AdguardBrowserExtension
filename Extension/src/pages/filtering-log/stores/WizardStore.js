@@ -7,7 +7,7 @@ import {
 import {
     NETWORK_RULE_OPTIONS,
     OPTIONS_DELIMITER,
-} from '@adguard/tsurlfilter/dist/es/network-rule-options';
+} from '@adguard/tsurlfilter';
 
 import { RULE_OPTIONS } from '../components/RequestWizard/constants';
 import {
